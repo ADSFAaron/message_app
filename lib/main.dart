@@ -48,7 +48,7 @@ class MyHomePage extends StatefulWidget {
 class _MyHomePageState extends State<MyHomePage> {
   int _selectedIndex = 0;
   static const TextStyle optionStyle =
-  TextStyle(fontSize: 30, fontWeight: FontWeight.bold);
+      TextStyle(fontSize: 30, fontWeight: FontWeight.bold);
   int index = 20;
   static List<Widget> _widgetOptions = <Widget>[
     CustomScrollView(
@@ -64,19 +64,57 @@ class _MyHomePageState extends State<MyHomePage> {
             title: Text('Friend'),
             background: FlutterLogo(),
           ),
-        ),SliverGrid( //用來建list 裡面再放東西
+        ),
+        SliverGrid(
+          //用來建list 裡面再放東西
           gridDelegate: SliverGridDelegateWithMaxCrossAxisExtent(
             maxCrossAxisExtent: 160.0,
             childAspectRatio: 1.0,
           ),
           delegate: SliverChildListDelegate(
             <Widget>[
-            Container(
-            alignment: Alignment.center,
-            color: Colors.blue,
-            height: 100,
-            child: Text('Item:1'),
-            ),
+              Container(
+                alignment: Alignment.center,
+                color: Colors.blue,
+                height: 100,
+                child: Icon(Icons.add),
+              ),
+              Container(
+                alignment: Alignment.center,
+                color: Colors.blue,
+                height: 100,
+                child: Text('Item:1'),
+              ),
+              Container(
+                alignment: Alignment.center,
+                color: Colors.blue,
+                height: 100,
+                child: Icon(Icons.ac_unit_outlined),
+              ),
+              Container(
+                alignment: Alignment.center,
+                color: Colors.blue,
+                height: 100,
+                child: Text('Item:1'),
+              ),
+              Container(
+                alignment: Alignment.center,
+                color: Colors.blue,
+                height: 100,
+                child: Text('Item:1'),
+              ),
+              Container(
+                alignment: Alignment.center,
+                color: Colors.blue,
+                height: 100,
+                child: Text('Item:1'),
+              ),
+              Container(
+                alignment: Alignment.center,
+                color: Colors.blue,
+                height: 100,
+                child: Text('Item:1'),
+              ),
               Container(
                 alignment: Alignment.center,
                 color: Colors.blue,
@@ -107,52 +145,28 @@ class _MyHomePageState extends State<MyHomePage> {
                 height: 100,
                 child: Text('Item:1'),
               ),
-            Container(
-            alignment: Alignment.center,
-            color: Colors.blue,
-            height: 100,
-            child: Text('Item:1'),
-            ),
-            Container(
-            alignment: Alignment.center,
-            color: Colors.blue,
-            height: 100,
-            child: Text('Item:1'),
-            ),
-            Container(
-            alignment: Alignment.center,
-            color: Colors.blue,
-            height: 100,
-            child: Text('Item:1'),
-            ),
-            Container(
-            alignment: Alignment.center,
-            color: Colors.blue,
-            height: 100,
-            child: Text('Item:1'),
-            ),
-            Container(
-            alignment: Alignment.center,
-            color: Colors.blue,
-            height: 100,
-            child: Text('Item:1'),
-            ),
-            Container(
-            alignment: Alignment.center,
-            color: Colors.blue,
-            height: 100,
-            child: Text('Item:1'),
-            ),
-            Container(
-            alignment: Alignment.center,
-            color: Colors.blue,
-            height: 100,
-            child: Text('Item:1'),
-            ),
+              Container(
+                alignment: Alignment.center,
+                color: Colors.blue,
+                height: 100,
+                child: Text('Item:1'),
+              ),
+              Container(
+                alignment: Alignment.center,
+                color: Colors.blue,
+                height: 100,
+                child: Text('Item:1'),
+              ),
+              Container(
+                alignment: Alignment.center,
+                color: Colors.blue,
+                height: 100,
+                child: Text('Item:1'),
+              ),
             ],
-            ),
-            ),
-            ],
+          ),
+        ),
+      ],
     ),
     CustomScrollView(
       shrinkWrap: true,
@@ -167,60 +181,76 @@ class _MyHomePageState extends State<MyHomePage> {
             title: Text('Message'),
             background: FlutterLogo(),
           ),
-        ),SliverList( //用來建list 裡面再放東西
-            delegate: SliverChildListDelegate(
-              <Widget>[
-                Container(
-                  alignment: Alignment.center,
-                  color: Colors.blue,
-                  height: 100,
-                  child: Text('Item:1'),
+        ),
+        SliverList(
+          //用來建list 裡面再放東西
+          delegate: SliverChildListDelegate(
+            <Widget>[
+              Container(
+                alignment: Alignment.center,
+                color: Colors.blue,
+                height: 100,
+                child: Row(
+                  children: [
+                    Container( width: 70,),
+                    CircleAvatar(
+                      backgroundColor: Colors.purpleAccent,
+                      radius: 30,
+                      child: Icon(Icons.access_alarms_sharp)
+                    ),
+                    Container(width: 30,),
+                    Text(
+                      "123",
+                      style: TextStyle(fontSize:30),
+                    ),
+                  ],
                 ),
-                Container(
-                  alignment: Alignment.center,
-                  color: Colors.blue,
-                  height: 100,
-                  child: Text('Item:1'),
-                ),
-                Container(
+              ),
+              Container(
                 alignment: Alignment.center,
                 color: Colors.blue,
                 height: 100,
                 child: Text('Item:1'),
               ),
-                Container(
-                  alignment: Alignment.center,
-                  color: Colors.blue,
-                  height: 100,
-                  child: Text('Item:1'),
-                ),
-                Container(
-                  alignment: Alignment.center,
-                  color: Colors.blue,
-                  height: 100,
-                  child: Text('Item:1'),
-                ),
-                Container(
-                  alignment: Alignment.center,
-                  color: Colors.blue,
-                  height: 100,
-                  child: Text('Item:1'),
-                ),
-                Container(
-                  alignment: Alignment.center,
-                  color: Colors.blue,
-                  height: 100,
-                  child: Text('Item:1'),
-                ),
-                Container(
-                  alignment: Alignment.center,
-                  color: Colors.blue,
-                  height: 100,
-                  child: Text('Item:1'),
-                ),
-              ],
-            ),
+              Container(
+                alignment: Alignment.center,
+                color: Colors.blue,
+                height: 100,
+                child: Text('Item:1'),
+              ),
+              Container(
+                alignment: Alignment.center,
+                color: Colors.blue,
+                height: 100,
+                child: Text('Item:1'),
+              ),
+              Container(
+                alignment: Alignment.center,
+                color: Colors.blue,
+                height: 100,
+                child: Text('Item:1'),
+              ),
+              Container(
+                alignment: Alignment.center,
+                color: Colors.blue,
+                height: 100,
+                child: Text('Item:1'),
+              ),
+              Container(
+                alignment: Alignment.center,
+                color: Colors.blue,
+                height: 100,
+                child: Text('Item:1'),
+              ),
+              Container(
+                alignment: Alignment.center,
+                color: Colors.blue,
+                height: 100,
+                child: Text('Item:1'),
+              ),
+            ],
           ),
+        ),
       ],
     ),
   ];
@@ -235,9 +265,8 @@ class _MyHomePageState extends State<MyHomePage> {
   Widget build(BuildContext context) {
     return Scaffold(
       body: _widgetOptions.elementAt(_selectedIndex),
-
       bottomNavigationBar: BottomNavigationBar(
-        type:BottomNavigationBarType.shifting,
+        type: BottomNavigationBarType.shifting,
         items: const <BottomNavigationBarItem>[
           BottomNavigationBarItem(
             icon: Icon(Icons.home),
@@ -257,10 +286,10 @@ class _MyHomePageState extends State<MyHomePage> {
     );
   }
 
-  List<Widget> createFContainer(int index){
+  List<Widget> createFContainer(int index) {
     List<Widget> list;
-    for (int i =0;i<index;i++){
-      Container con =  Container(
+    for (int i = 0; i < index; i++) {
+      Container con = Container(
         alignment: Alignment.center,
         color: Colors.blue,
         height: 100,

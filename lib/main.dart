@@ -52,7 +52,7 @@ class _MyHomePageState extends State<MyHomePage> {
   int _selectedIndex = 0;
   static const TextStyle optionStyle =
       TextStyle(fontSize: 30, fontWeight: FontWeight.bold);
-  int index = 20;
+  int index = 21;
   int beenTaped = 999;
   static List<Widget> friendList = [];
   static List<Widget> chatList = [];
@@ -74,7 +74,7 @@ class _MyHomePageState extends State<MyHomePage> {
                 ),
                 actions: <Widget>[
                   IconButton(
-                    icon: const Icon(Icons.add_circle,size:30),
+                    icon: const Icon(Icons.add_circle, size: 30),
                     tooltip: 'Add Friend',
                     onPressed: () {
                       print("123");
@@ -102,7 +102,7 @@ class _MyHomePageState extends State<MyHomePage> {
               pinned: true,
               snap: true,
               floating: true,
-              expandedHeight: 120.0,
+              expandedHeight: 80.0,
               flexibleSpace: const FlexibleSpaceBar(
                 title: Text('Message'),
                 background: FlutterLogo(),
@@ -128,7 +128,7 @@ class _MyHomePageState extends State<MyHomePage> {
   Widget build(BuildContext context) {
     setState(() {
       chatList = createChatContainer(context);
-      friendList = createFContainer(20, context);
+      friendList = createFContainer(21, context);
     });
     return Scaffold(
       body: Stack(
@@ -158,7 +158,7 @@ class _MyHomePageState extends State<MyHomePage> {
           ),
         ],
         currentIndex: _selectedIndex,
-        selectedItemColor: Colors.amber[800],
+        selectedItemColor: Colors.yellow,
         onTap: _onItemTapped,
       ),
     );
@@ -169,23 +169,25 @@ class _MyHomePageState extends State<MyHomePage> {
     for (int i = 0; i < index; i++) {
       InkWell iw = InkWell(
         child: Hero(
-            child: Container(
-              alignment: Alignment.center,
-              color: Colors.blue[200 + i % 4 * 100],
-              height: 100,
-              child: Column(
-                children: [
-                  Container(
-                    height: 20,
+            child: Material(
+                type: MaterialType.transparency,
+                child: Container(
+                  alignment: Alignment.center,
+                  color: Colors.blue[200 + i % 4 * 100],
+                  height: 100,
+                  child: Column(
+                    children: [
+                      Container(
+                        height: 20,
+                      ),
+                      Icon(
+                        Icons.person_outline,
+                        size: 60,
+                      ),
+                      Text("PersonNameHere"),
+                    ],
                   ),
-                  Icon(
-                    Icons.person_outline,
-                    size: 60,
-                  ),
-                  Text("PersonNameHere"),
-                ],
-              ),
-            ),
+                )),
             tag: "friendDetail$i"),
         onTap: () {
           //print(i);

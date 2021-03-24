@@ -50,8 +50,6 @@ class MyHomePage extends StatefulWidget {
 
 class _MyHomePageState extends State<MyHomePage> {
   int _selectedIndex = 0;
-  static const TextStyle optionStyle =
-      TextStyle(fontSize: 30, fontWeight: FontWeight.bold);
   int index = 21;
   int beenTaped = 999;
   static List<Widget> friendList = [];
@@ -77,7 +75,25 @@ class _MyHomePageState extends State<MyHomePage> {
                     icon: const Icon(Icons.add_circle, size: 30),
                     tooltip: 'Add Friend',
                     onPressed: () {
-                      print("123");
+                      Navigator.of(context).push(
+                          PageRouteBuilder(
+                            pageBuilder: (context, animation, secondaryAnimation) => AddFriendPage(),
+                            transitionsBuilder:
+                                (context, animation, secondaryAnimation, child) {
+                              var begin = Offset(0.0, 1.0);
+                              var end = Offset.zero;
+                              var curve = Curves.ease;
+
+                              var tween =
+                              Tween(begin: begin, end: end).chain(CurveTween(curve: curve));
+
+                              return SlideTransition(
+                                position: animation.drive(tween),
+                                child: child,
+                              );
+                            },
+                          )
+                      );
                     },
                   ),
                 ]),
@@ -126,10 +142,6 @@ class _MyHomePageState extends State<MyHomePage> {
 
   @override
   Widget build(BuildContext context) {
-//    try{
-//      setState(() {
-//
-//      });
     chatList = createChatContainer(context);
     friendList = createFContainer(21, context);
     return Scaffold(
@@ -164,60 +176,45 @@ class _MyHomePageState extends State<MyHomePage> {
         onTap: _onItemTapped,
       ),
     );
-//    }
-//    catch(e){
-//      print(e);
-//    }
   }
 
   List<Widget> createFContainer(int index, BuildContext context) {
     List<Widget> list = [];
     for (int i = 0; i < index; i++) {
       InkWell iw = InkWell(
-        child: Hero(
-            child: Material(
-                type: MaterialType.transparency,
-                child: Container(
-                  alignment: Alignment.center,
-                  color: Colors.blue[200 + i % 4 * 100],
-                  height: 100,
-                  child: Column(
-                    children: [
-                      Container(
-                        height: 20,
-                      ),
-                      Icon(
-                        Icons.person_outline,
-                        size: 60,
-                      ),
-                      Text("PersonNameHere"),
-                    ],
-                  ),
-                )),
-            tag: "friendDetail$i"),
-        onTap: () {
-          //print(i);
-          Navigator.of(context).push(PageRouteBuilder(
-            pageBuilder: (context, animation, secondaryAnimation) =>
-                PersonDetailPage("123", "friendDetail$i"),
-            transitionsBuilder:
-                (context, animation, secondaryAnimation, child) {
-              var begin = Offset(0.0, 1.0);
-              var end = Offset.zero;
-              var curve = Curves.ease;
-
-              var tween =
-                  Tween(begin: begin, end: end).chain(CurveTween(curve: curve));
-
-              return SlideTransition(
-                position: animation.drive(tween),
-                child: child,
-              );
-            },
-          ));
-        },
-      );
-
+          child: Container(
+            alignment: Alignment.center,
+            color: Colors.blue[200 + i % 4 * 100],
+            height: 100,
+            child: Column(
+              children: [
+                Container(
+                  height: 20,
+                ),
+                Hero(
+                    tag: "friendDetail$i",
+                    child: Material(
+                        type: MaterialType.transparency,
+                        child: Icon(
+                          Icons.person_outline,
+                          size: 60,
+                        ))),
+                Hero(
+                    tag: "NameDetail$i",
+                    child: Material(
+                      type: MaterialType.transparency,
+                      child: Text("PersonNameHere"),
+                    )),
+              ],
+            ),
+          ),
+          onTap: () {
+            //print(i);
+            Navigator.of(context).push(PageRouteBuilder(
+              transitionDuration: Duration(seconds: 1),
+              pageBuilder: (_, __, ___) => PersonDetailPage(ftag:"friendDetail$i",ntag:"NameDetail$i"),
+            ));
+          });
       list.add(iw);
     }
     return list;
@@ -226,15 +223,14 @@ class _MyHomePageState extends State<MyHomePage> {
   List<Widget> createChatContainer(BuildContext context) {
     List<Widget> list = [];
     for (int i = 0; i < 21; i++) {
-      InkWell con = InkWell(
-        child: Container(
-          alignment: Alignment.center,
-          color: Colors.brown[200 + i % 4 * 100],
-          height: 100,
-          child: Row(
+      ElevatedButton con = ElevatedButton (
+        style: ButtonStyle(
+          padding: MaterialStateProperty.all((EdgeInsets.all(10))),
+        ),
+        child: Row(
             children: [
               Container(
-                width: 40,
+                width: MediaQuery.of(context).size.width/17,
               ),
               CircleAvatar(
                   backgroundColor: Colors.purpleAccent,
@@ -246,10 +242,8 @@ class _MyHomePageState extends State<MyHomePage> {
               Container(
                 width: 10,
               ),
-              Column(children: [
-                Container(
-                  height: 20,
-                ),
+              Column(
+                  children: [
                 Text(
                   "PersonNameHere",
                   style: TextStyle(fontSize: 30),
@@ -263,11 +257,12 @@ class _MyHomePageState extends State<MyHomePage> {
                 )
               ])
             ],
-          ),
+
         ),
-        onTap: () {
+        onLongPress: ()=>{}, //TODO 預覽畫面
+        onPressed: () {
           Navigator.of(context).push(PageRouteBuilder(
-            pageBuilder: (context, animation, secondaryAnimation) => chatPage(
+            pageBuilder: (context, animation, secondaryAnimation) => ChatPage(
               title: "nameHere",
             ),
             transitionsBuilder:

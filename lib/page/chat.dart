@@ -1,18 +1,18 @@
 import 'package:flutter/material.dart';
 
-class chatPage extends StatefulWidget {
+class ChatPage extends StatefulWidget {
   final String title;
 
-  chatPage({Key key, this.title}) : super(key: key);
+  ChatPage({Key key, this.title}) : super(key: key);
 
   @override
-  _chatPage createState() => _chatPage(title);
+  _ChatPage createState() => _ChatPage(title);
 }
 
-class _chatPage extends State<chatPage> {
+class _ChatPage extends State<ChatPage> {
   String _title;
 
-  _chatPage(String title1) {
+  _ChatPage(String title1) {
     _title = title1;
   }
 
@@ -62,26 +62,6 @@ class _chatPage extends State<chatPage> {
         ],
       ),
     );
-  }
-
-  List<Widget> createChatLog(int index) {
-    List<Widget> list = [];
-    for (int i = 0; i < index; i++) {
-      Container iw = Container(
-        decoration: BoxDecoration(
-          shape: BoxShape.circle,
-          color: Colors.lightBlueAccent,
-        ),
-        alignment: Alignment.center,
-        //color: Colors.blue[200 + i % 4 * 100],
-        margin: EdgeInsets.all(5.0),
-        height: 50,
-        width: 100,
-        child: Text("123"),
-      );
-      list.add(iw);
-    }
-    return list;
   }
 }
 

@@ -126,10 +126,12 @@ class _MyHomePageState extends State<MyHomePage> {
 
   @override
   Widget build(BuildContext context) {
-    setState(() {
-      chatList = createChatContainer(context);
-      friendList = createFContainer(21, context);
-    });
+//    try{
+//      setState(() {
+//
+//      });
+    chatList = createChatContainer(context);
+    friendList = createFContainer(21, context);
     return Scaffold(
       body: Stack(
         children: [
@@ -162,6 +164,10 @@ class _MyHomePageState extends State<MyHomePage> {
         onTap: _onItemTapped,
       ),
     );
+//    }
+//    catch(e){
+//      print(e);
+//    }
   }
 
   List<Widget> createFContainer(int index, BuildContext context) {
@@ -261,8 +267,9 @@ class _MyHomePageState extends State<MyHomePage> {
         ),
         onTap: () {
           Navigator.of(context).push(PageRouteBuilder(
-            pageBuilder: (context, animation, secondaryAnimation) =>
-                chatPage("123"),
+            pageBuilder: (context, animation, secondaryAnimation) => chatPage(
+              title: "nameHere",
+            ),
             transitionsBuilder:
                 (context, animation, secondaryAnimation, child) {
               var begin = Offset(0.0, 1.0);

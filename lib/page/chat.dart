@@ -30,38 +30,42 @@ class _ChatPage extends State<ChatPage> {
 
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: Text(_title),
-      ),
-      body: Column(
-        children: [
-          Expanded(
-            child: ListView.builder(
-              padding: EdgeInsets.all(8.0),
-              reverse: true, // 加入reverse，讓它反轉
-              itemBuilder: (context, index) => _messages[index],
-              itemCount: _messages.length,
-            ),
-          ),
-          SafeArea(
-              child: Row(children: [
-            Flexible(
-                child: TextField(
-              decoration: InputDecoration(
-                contentPadding: EdgeInsets.all(16.0),
-                border: OutlineInputBorder(),
-                hintText: '輸入文字',
+        appBar: AppBar(
+          title: Text(_title),
+        ),
+        body: InkWell(
+          onTap: (){
+            FocusScope.of(context).unfocus();
+          },
+          child: Column(
+            children: [
+              Expanded(
+                child: ListView.builder(
+                  padding: EdgeInsets.all(8.0),
+                  reverse: true, // 加入reverse，讓它反轉
+                  itemBuilder: (context, index) => _messages[index],
+                  itemCount: _messages.length,
+                ),
               ),
-              controller: _chatController,
-              onSubmitted: _submitText, // 綁定事件給_submitText這個Function
-            )),
-            IconButton(
-                icon: Icon(Icons.send),
-                onPressed: () => _submitText(_chatController.text))
-          ])),
-        ],
-      ),
-    );
+              SafeArea(
+                  child: Row(children: [
+                Flexible(
+                    child: TextField(
+                  decoration: InputDecoration(
+                    contentPadding: EdgeInsets.all(16.0),
+                    border: OutlineInputBorder(),
+                    hintText: '輸入文字',
+                  ),
+                  controller: _chatController,
+                  onSubmitted: _submitText, // 綁定事件給_submitText這個Function
+                )),
+                IconButton(
+                    icon: Icon(Icons.send),
+                    onPressed: () => _submitText(_chatController.text))
+              ])),
+            ],
+          ),
+        ));
   }
 }
 

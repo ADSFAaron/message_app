@@ -50,12 +50,14 @@ class PersonDetailPage extends StatelessWidget {
               height: 10,
             ),
             Container(
+              alignment: Alignment.center,
               child: Text(
-                "Detail Here",
-                style: TextStyle(fontSize: 20),
+                "Detail Here\nabc\ndefg\nhijklm\nnopqrs\ntuvwxyz",
+                style: TextStyle(fontSize: 20,),
+                textAlign: TextAlign.center,
               ),
             ),
-            Expanded(child: Text("123")),
+            Expanded(child: Text("")),
             Container(
               height: 100,
               child: Row(
@@ -125,31 +127,123 @@ class AddFriendPage extends StatefulWidget {
 
 class _AddFriendPage extends State<AddFriendPage> {
 //  _AddFriendPage();
+  final TextEditingController _chatController = new TextEditingController();
+
+  List<Widget> AddFriendOutline = [];
+
+  void _submitText(String text) {
+    AddFriendOutline.clear();
+    setState(() {
+      if (text == '123') {
+        CircleAvatar photo = CircleAvatar(
+          radius: 90,
+          backgroundColor: Colors.purple,
+          child: Icon(Icons.person, size: 100),
+        );
+        Text Name = Text(
+          "123",
+          style: TextStyle(fontSize: 50),
+        );
+        ElevatedButton addB = ElevatedButton(
+            style: ButtonStyle(
+              backgroundColor: MaterialStateProperty.all<Color>(Colors.brown),
+              padding: MaterialStateProperty.all((EdgeInsets.all(5))),
+            ),
+            onPressed: () {
+              Fluttertoast.showToast(
+                backgroundColor: Colors.grey,
+                msg: "還沒製作",
+                toastLength: Toast.LENGTH_SHORT,
+                gravity: ToastGravity.CENTER,
+              );
+            },
+            child: Text("添加好友"));
+        AddFriendOutline.add(photo);
+        AddFriendOutline.add(Container(height: 10,));
+        AddFriendOutline.add(Name);
+        AddFriendOutline.add(Container(height: 5,));
+        AddFriendOutline.add(addB);
+      } else {
+        AddFriendOutline.add(Text(
+          "並未找到$text",
+          style: TextStyle(fontSize: 40),
+        ));
+      }
+    });
+  }
 
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: Text("添加好友"),
-      ),
-      body: Column(
-        children: [
-          Container(
-            height: MediaQuery.of(context).size.height/2,
-          child:Container(
+        appBar: AppBar(
+          title: Text("添加好友"),
+        ),
+        body: InkWell(
+            onTap: () {
+              print("tap");
+              FocusScope.of(context).unfocus();
+            },
             child: Column(
               children: [
-                Text("123"),
-                ElevatedButton(
-                  child:
-                    Text("搜尋"),
-                  onPressed: ()=>{print('press')},
+                Container(
+                    color: Colors.grey[400],
+                    height: MediaQuery.of(context).size.height / 3.5,
+                    child: Container(
+                      alignment: Alignment.center,
+                      child: Column(
+                        children: [
+                          Container(
+                            height: MediaQuery.of(context).size.height / 10,
+                          ),
+                          Flexible(
+                              child: TextField(
+                            textAlign: TextAlign.center,
+                            decoration: InputDecoration(
+                              helperText: "輸入 123 試試看",
+                              helperStyle: TextStyle(color: Colors.yellow),
+                              focusedBorder: OutlineInputBorder(
+                                  //點擊的時候顯示
+                                  borderSide: BorderSide(
+                                color: Colors.green, //边框颜色为绿色
+                                width: 5, //宽度为5
+                              )),
+                              contentPadding: EdgeInsets.all(8.0),
+                              border: OutlineInputBorder(
+                                borderRadius: BorderRadius.all(
+                                  Radius.circular(30), //边角为30
+                                ),
+                                borderSide: BorderSide(
+                                  color: Colors.amber, //边线颜色为黄色
+                                  width: 5, //边线宽度为2
+                                ),
+                              ),
+                              hintText: '輸入文字',
+                            ),
+                            controller: _chatController,
+                            onSubmitted:
+                                _submitText, // 綁定事件給_submitText這個Function
+                          )),
+                          ElevatedButton(
+                            child: Text("搜尋"),
+                            onPressed: () {
+                              _submitText(_chatController.text);
+                              FocusScope.of(context).unfocus();
+                            },
+                          ),
+                        ],
+                      ),
+                    )),
+                Expanded(
+                  child: Container(
+                    alignment: Alignment.center,
+                    child: SingleChildScrollView(
+                        child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: AddFriendOutline,
+                    )),
+                    color: Colors.blue,
+                  ),
                 )
               ],
-            ),
-          )
-          )
-        ],
-      )
-    );
+            )));
   }
 }

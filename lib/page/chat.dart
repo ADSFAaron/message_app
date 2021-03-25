@@ -1,11 +1,13 @@
 import 'package:flutter/material.dart';
+import 'package:message_app/page/friend.dart';
 
 class MessageDetail {
   final String name;
+  final FriendDetail friend;
   final String message;
   final Container photoClip;
 
-  MessageDetail({this.name, this.message, this.photoClip});
+  MessageDetail({this.name, this.message, this.photoClip, this.friend});
 }
 
 List<MessageDetail> loadMessage(int index) {
@@ -28,19 +30,19 @@ List<MessageDetail> loadMessage(int index) {
 }
 
 class ChatPage extends StatefulWidget {
-  final String title;
+  final FriendDetail friend;
 
-  ChatPage({Key key, this.title}) : super(key: key);
+  ChatPage({Key key, this.friend}) : super(key: key);
 
   @override
-  _ChatPage createState() => _ChatPage(title);
+  _ChatPage createState() => _ChatPage(friend);
 }
 
 class _ChatPage extends State<ChatPage> {
-  String _title;
+  FriendDetail friend;
 
-  _ChatPage(String title1) {
-    _title = title1;
+  _ChatPage(FriendDetail _friend) {
+    friend = _friend;
   }
 
   final List<Widget> _messages = [];
@@ -56,9 +58,24 @@ class _ChatPage extends State<ChatPage> {
   }
 
   Widget build(BuildContext context) {
+    print("startBuild");
     return Scaffold(
         appBar: AppBar(
-          title: Text(_title),
+//          leading: Row(children:[
+//            IconButton(icon: Icon(Icons.arrow_back_outlined), onPressed: (){Navigator.of(context).pop();}),
+//            friend.hasPhoto
+//              ? Container(
+//                  alignment: Alignment.centerRight,
+//                  decoration: BoxDecoration(
+//                      shape: BoxShape.circle,
+//                      image: DecorationImage(image: friend.photoClip)))
+//              : Container(
+//                  alignment: Alignment.centerRight,
+//                  child: CircleAvatar(
+//                      backgroundColor: Colors.purpleAccent,
+//                      radius: 35,
+//                      child: friend.icon))]),
+          title: Text(friend.name),
         ),
         body: InkWell(
           onTap: () {
@@ -99,8 +116,11 @@ class _ChatPage extends State<ChatPage> {
 class MessageBox extends StatelessWidget {
   final String text;
   final bool other;
+  final FriendDetail friend;
+  final FriendDetail myself;
 
-  MessageBox({Key key, this.text, this.other}) : super(key: key);
+  MessageBox({Key key, this.text, this.other, this.friend, this.myself})
+      : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -111,13 +131,22 @@ class MessageBox extends StatelessWidget {
             other ? MainAxisAlignment.start : MainAxisAlignment.end,
         children: other
             ? <Widget>[
-                CircleAvatar(
-                    backgroundColor: Colors.purpleAccent,
-                    radius: 17,
-                    child: Icon(
-                      Icons.person,
-                      size: 30,
-                    )),
+                friend.hasPhoto
+                    ? Container(
+                        width: 70,
+                        height: 70,
+                        alignment: Alignment.center,
+                        decoration: BoxDecoration(
+                            shape: BoxShape.circle,
+                            image: DecorationImage(image: friend.photoClip)))
+                    : Container(
+                        width: 70,
+                        height: 70,
+                        alignment: Alignment.center,
+                        child: CircleAvatar(
+                            backgroundColor: Colors.purpleAccent,
+                            radius: 35,
+                            child: friend.icon)),
                 Container(
                   width: 5,
                 ),
@@ -152,13 +181,22 @@ class MessageBox extends StatelessWidget {
                 Container(
                   width: 5,
                 ),
-                CircleAvatar(
-                    backgroundColor: Colors.purpleAccent,
-                    radius: 17,
-                    child: Icon(
-                      Icons.person,
-                      size: 30,
-                    )),
+                myself.hasPhoto
+                    ? Container(
+                        width: 70,
+                        height: 70,
+                        alignment: Alignment.center,
+                        decoration: BoxDecoration(
+                            shape: BoxShape.circle,
+                            image: DecorationImage(image: myself.photoClip)))
+                    : Container(
+                        width: 70,
+                        height: 70,
+                        alignment: Alignment.center,
+                        child: CircleAvatar(
+                            backgroundColor: Colors.purpleAccent,
+                            radius: 35,
+                            child: myself.icon)),
               ],
       ),
     );

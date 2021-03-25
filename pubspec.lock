@@ -93,6 +93,13 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "0.6.3"
+  kumi_popup_window:
+    dependency: "direct main"
+    description:
+      name: kumi_popup_window
+      url: "https://pub.dartlang.org"
+    source: hosted
+    version: "2.0.0-nullsafety"
   matcher:
     dependency: transitive
     description:
@@ -176,5 +183,5 @@ packages:
     source: hosted
     version: "2.1.0"
 sdks:
-  dart: ">=2.12.0-0.0 <3.0.0"
+  dart: ">=2.12.0 <3.0.0"
   flutter: ">=1.10.0"

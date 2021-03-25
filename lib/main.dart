@@ -5,6 +5,7 @@ import 'page/friend.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'dart:async';
+import 'package:kumi_popup_window/kumi_popup_window.dart';
 
 void main() {
   runApp(MyApp());
@@ -59,6 +60,7 @@ class _MyHomePageState extends State<MyHomePage> {
   List<MessageDetail> messageDetail = [];
   List<Widget> friendList = [];
   List<Widget> chatList = [];
+  FriendDetail myself;
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
 
   List<Widget> _widgetOptions(BuildContext context) => <Widget>[
@@ -141,6 +143,80 @@ class _MyHomePageState extends State<MyHomePage> {
                 title: Text('Message'),
                 background: FlutterLogo(),
               ),
+              actions: [
+                IconButton(
+                    icon: Icon(Icons.menu),
+                    onPressed: () {
+                      showPopupWindow(
+                        context,
+                        offsetX: 5,
+                        offsetY: 70,
+                        //childSize:Size(240, 800),
+                        gravity: KumiPopupGravity.rightTop,
+                        //curve: Curves.elasticOut,
+                        duration: Duration(milliseconds: 300),
+                        bgColor: Colors.black.withOpacity(0),
+                        onShowStart: (pop) {
+                          print("showStart");
+                        },
+                        onShowFinish: (pop) {
+                          print("showFinish");
+                        },
+                        onDismissStart: (pop) {
+                          print("dismissStart");
+                        },
+                        onDismissFinish: (pop) {
+                          print("dismissFinish");
+                        },
+                        onClickOut: (pop) {
+                          print("onClickOut");
+                        },
+                        onClickBack: (pop) {
+                          print("onClickBack");
+                        },
+                        childFun: (pop) {
+                          String aaa = "1";
+                          return StatefulBuilder(
+                              key: GlobalKey(),
+                              builder: (popContext, popState) {
+                                return GestureDetector(
+                                  onTap: () {
+                                    //isSelect.value = !isSelect.value;
+                                    popState(() {
+                                      aaa = "sasdasd";
+                                    });
+                                  },
+                                  child: Container(
+                                    padding: EdgeInsets.all(10),
+                                    height: 76,
+                                    width: 200,
+                                    color: Colors.black,
+                                    alignment: Alignment.center,
+                                    child: Column(
+                                      children: [
+                                        ListTile(
+                                            leading: Icon(
+                                              Icons.delete,
+                                              color: Colors.white,
+                                            ),
+                                            onTap: () {
+                                              _cleanMessage();
+                                              Navigator.of(context).pop();
+                                            },
+                                            title: Text(
+                                              "全部刪除",
+                                              style: TextStyle(
+                                                  color: Colors.white),
+                                            ))
+                                      ],
+                                    ),
+                                  ),
+                                );
+                              });
+                        },
+                      );
+                    })
+              ],
             ),
             SliverList(
               //用來建list 裡面再放東西
@@ -151,6 +227,12 @@ class _MyHomePageState extends State<MyHomePage> {
           ],
         ),
       ];
+
+  void _cleanMessage() {
+    setState(() {
+      messageDetail.clear();
+    });
+  }
 
   void _createChat(FriendDetail friend) {
     setState(() {
@@ -176,11 +258,13 @@ class _MyHomePageState extends State<MyHomePage> {
                           radius: 35,
                           child: friend.icon))));
     });
+    //p
+    print("try");
     Navigator.of(context).push(PageRouteBuilder(
       transitionDuration: Duration(milliseconds: 800),
       pageBuilder: (context, animation, secondaryAnimation) => ChatPage(
         //TODO 修改chat裡面的資料 ex 頭貼名字那些
-        title: friend.name,
+        friend: friend,
       ),
       transitionsBuilder: (context, animation, secondaryAnimation, child) {
         var begin = Offset(0.0, 1.0);
@@ -195,6 +279,8 @@ class _MyHomePageState extends State<MyHomePage> {
         );
       },
     ));
+
+    _selectedIndex = 1;
   }
 
   void _onItemTapped(int index) {
@@ -213,6 +299,7 @@ class _MyHomePageState extends State<MyHomePage> {
   @mustCallSuper
   void initState() {
     super.initState();
+    myself = FriendDetail(hasPhoto: false, name: "未登錄");
     messageDetail = loadMessage(allMessageindex);
     friendDetail = loadFriend();
   }
@@ -220,7 +307,7 @@ class _MyHomePageState extends State<MyHomePage> {
   @override
   Widget build(BuildContext context) {
     chatList = createChatContainer(context);
-    friendList = createFContainer(21, context);
+    friendList = createFContainer(context);
     return Scaffold(
       key: _scaffoldKey,
       drawer: Drawer(
@@ -328,9 +415,9 @@ class _MyHomePageState extends State<MyHomePage> {
     );
   }
 
-  List<Widget> createFContainer(int index, BuildContext context) {
+  List<Widget> createFContainer(BuildContext context) {
     List<Widget> list = [];
-    for (int i = 0; i < index; i++) {
+    for (int i = 0; i < friendDetail.length; i++) {
       InkWell iw = InkWell(
           child: Container(
             alignment: Alignment.center,
@@ -397,7 +484,7 @@ class _MyHomePageState extends State<MyHomePage> {
                 friend: friendDetail.elementAt(i),
               ),
             ));
-            print(result.str);
+            //  print(result.str);
             if (result.str == "sendMessage") _createChat(result.friend);
 //            else if (result.str == "block") print("block"); //TODO 剩餘兩個button
           });
@@ -421,51 +508,39 @@ class _MyHomePageState extends State<MyHomePage> {
             )
           ],
           actionExtentRatio: 1 / 4,
-          child: ElevatedButton(
-            style: ButtonStyle(
-              backgroundColor: MaterialStateProperty.all<Color>(
-                  Colors.deepOrange[200 + (i % 4) * 100]),
-              padding: MaterialStateProperty.all((EdgeInsets.all(8))),
+          child: ListTile(
+            tileColor: Colors.orange[200 + (i % 4) * 100],
+            leading: friendDetail.elementAt(i).hasPhoto
+                ? Container(
+                    height: 90,
+                    width: 90,
+                    decoration: BoxDecoration(
+                        shape: BoxShape.circle,
+                        image: DecorationImage(
+                            image: friendDetail.elementAt(i).photoClip)))
+                : Container(
+                    height: 90,
+                    width: 90,
+                    child: CircleAvatar(
+                        backgroundColor: Colors.purpleAccent,
+                        radius: 35,
+                        child: friendDetail.elementAt(i).icon)),
+            title: Text(
+              friendDetail.elementAt(i).name,
+              style: TextStyle(fontSize: 30),
             ),
-            child: Row(
-              children: [
-                Container(
-                  width: MediaQuery.of(context).size.width / 17,
-                ),
-                messageDetail.elementAt(i).photoClip,
-                Container(
-                  width: 10,
-                ),
-                Column(children: [
-                  Text(
-                    messageDetail.elementAt(i).name,
-                    style: TextStyle(fontSize: 30),
-                  ),
-                  Container(
-                    height: 3,
-                  ),
-                  Text(
-                    messageDetail.elementAt(i).message,
-                    style: TextStyle(fontSize: 15),
-                  )
-                ])
-              ],
+            contentPadding:
+                EdgeInsets.symmetric(vertical: 15.0, horizontal: 0.0),
+            subtitle: Text(
+              "壓著往左滑看看",
+              style: TextStyle(color: Colors.red),
             ),
-            onLongPress: () => {
-              //TODO 預覽畫面
-              Fluttertoast.showToast(
-                backgroundColor: Colors.grey,
-                msg: "還沒製作",
-                toastLength: Toast.LENGTH_SHORT,
-                gravity: ToastGravity.CENTER,
-              )
-            },
-            onPressed: () {
+            onTap: () {
               Navigator.of(context).push(PageRouteBuilder(
                 transitionDuration: Duration(milliseconds: 800),
                 pageBuilder: (context, animation, secondaryAnimation) =>
                     ChatPage(
-                  title: "nameHere",
+                  friend: friendDetail.elementAt(i), //TODO 修改
                 ),
                 transitionsBuilder:
                     (context, animation, secondaryAnimation, child) {
@@ -481,6 +556,9 @@ class _MyHomePageState extends State<MyHomePage> {
                   );
                 },
               ));
+            },
+            onLongPress: () {
+              print("longPress");
             },
           ));
       list.add(con);

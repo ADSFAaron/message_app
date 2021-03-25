@@ -12,11 +12,19 @@ class FriendDetail {
   final AssetImage photoClip;
   final bool hasPhoto;
   final String name;
-  final Icon icon;
+  Icon icon;
 
-  FriendDetail({this.name, this.photoClip, this.hasPhoto, this.icon})
-      : assert(hasPhoto == false || icon == null, "沒圖片要有icon"),
-        assert(hasPhoto == true || photoClip == null, "有圖片要給圖片");
+  FriendDetail({this.name, this.photoClip, this.hasPhoto})
+      : assert(hasPhoto == true || photoClip == null, "有圖片要給圖片");
+
+  void initState(){
+    if(hasPhoto==false){
+      icon = Icon(
+        Icons.person,
+        size: 60,
+      );
+    }
+  }
 }
 
 List<FriendDetail> loadFriend() {
@@ -35,13 +43,8 @@ List<FriendDetail> loadFriend() {
         str = "艾主席";
       list.add(FriendDetail(name: str, hasPhoto: true, photoClip: con));
     } else {
-      Icon icon = Icon(
-        Icons.person,
-        size: 60,
-      );
-      int j=55+i;
-      str = "Person$j";
-      list.add(FriendDetail(name: str, hasPhoto: false, icon: icon));
+      str = "Person$i";
+      list.add(FriendDetail(name: str, hasPhoto: false));
     }
   }
   return list;

@@ -2,7 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:message_app/page/friend.dart';
 
 class MessageDetail {
-  @required final FriendDetail friend;
+  @required
+  final FriendDetail friend;
   final String message;
   Container photoClipContainer;
 
@@ -39,19 +40,24 @@ List<MessageDetail> loadMessage(int index, List<FriendDetail> friendDetail) {
 }
 
 class ChatPage extends StatefulWidget {
-  @required final FriendDetail friend;
-  @required final FriendDetail myself;
-  ChatPage({Key key, this.friend,this.myself}) : super(key: key);
+  @required
+  final FriendDetail friend;
+  @required
+  final FriendDetail myself;
+
+  ChatPage({Key key, this.friend, this.myself}) : super(key: key);
 
   @override
-  _ChatPage createState() => _ChatPage(friend);
+  _ChatPage createState() => _ChatPage(friend, myself);
 }
 
 class _ChatPage extends State<ChatPage> {
   FriendDetail friend;
+  FriendDetail myself;
 
-  _ChatPage(FriendDetail _friend) {
+  _ChatPage(FriendDetail _friend, FriendDetail _myself) {
     friend = _friend;
+    myself = _myself;
   }
 
   final List<Widget> _messages = [];
@@ -61,8 +67,15 @@ class _ChatPage extends State<ChatPage> {
     if (text == '') return;
     _chatController.clear(); // 清空controller資料
     setState(() {
-      _messages.insert(0, MessageBox(text: text, other: false));
-      _messages.insert(0, MessageBox(text: text, other: true));
+      _messages.insert(
+          0,
+          MessageBox(
+            text: text,
+            myself: myself,
+            other: false,
+          ));
+      _messages.insert(0, MessageBox(text: text, other: true,
+        friend: friend,));
     });
   }
 
@@ -113,10 +126,13 @@ class MessageBox extends StatelessWidget {
   final FriendDetail myself;
 
   MessageBox({Key key, this.text, this.other, this.friend, this.myself})
-      : super(key: key);
+      : assert(other == false || myself == null),
+        assert(other == true || friend == null),
+        super(key: key);
 
   @override
   Widget build(BuildContext context) {
+    double clipSize=60;
     return Container(
       margin: const EdgeInsets.symmetric(vertical: 10.0),
       child: Row(
@@ -126,15 +142,15 @@ class MessageBox extends StatelessWidget {
             ? <Widget>[
                 friend.hasPhoto
                     ? Container(
-                        width: 70,
-                        height: 70,
+                        width: clipSize,
+                        height: clipSize,
                         alignment: Alignment.center,
                         decoration: BoxDecoration(
                             shape: BoxShape.circle,
                             image: DecorationImage(image: friend.photoClip)))
                     : Container(
-                        width: 70,
-                        height: 70,
+                        width: clipSize,
+                        height: clipSize,
                         alignment: Alignment.center,
                         child: CircleAvatar(
                             backgroundColor: Colors.purpleAccent,
@@ -176,15 +192,15 @@ class MessageBox extends StatelessWidget {
                 ),
                 myself.hasPhoto
                     ? Container(
-                        width: 70,
-                        height: 70,
+                        width: clipSize,
+                        height: clipSize,
                         alignment: Alignment.center,
                         decoration: BoxDecoration(
                             shape: BoxShape.circle,
                             image: DecorationImage(image: myself.photoClip)))
                     : Container(
-                        width: 70,
-                        height: 70,
+                        width: clipSize,
+                        height: clipSize,
                         alignment: Alignment.center,
                         child: CircleAvatar(
                             backgroundColor: Colors.purpleAccent,

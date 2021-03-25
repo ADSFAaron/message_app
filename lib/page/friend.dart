@@ -10,15 +10,15 @@ class ReturnFValue {
 
 class FriendDetail {
   final AssetImage photoClip;
-  @required final bool hasPhoto;
-  @required final String name;
+  @required
+  final bool hasPhoto;
+  @required
+  final String name;
   Icon icon;
 
   FriendDetail({this.name, this.photoClip, this.hasPhoto})
-      : assert(hasPhoto == true || photoClip == null, "有圖片要給圖片");
-
-  void initState(){
-    if(hasPhoto==false){
+      : assert(hasPhoto == true || photoClip == null, "有圖片要給圖片") {
+    if (hasPhoto == false) {
       icon = Icon(
         Icons.person,
         size: 60,
@@ -87,49 +87,53 @@ class PersonDetailPage extends StatelessWidget {
                     tag: ftag,
                     child: Material(
                         type: MaterialType.transparency,
-                        child: friend.hasPhoto? Container(
-                            alignment: Alignment.center,
-                            decoration: BoxDecoration(
-                                image: DecorationImage(
-                                    image: friend.photoClip))):
-                        Container(alignment: Alignment.center, child: friend.icon)
-                    ))),
+                        child: friend.hasPhoto
+                            ? Container(
+                                alignment: Alignment.center,
+                                decoration: BoxDecoration(
+                                    image: DecorationImage(
+                                        image: friend.photoClip)))
+                            : Container(
+                                alignment: Alignment.center,
+                                child: friend.icon)))),
             Container(
               height: 10,
             ),
             Container(
-              width: MediaQuery.of(context).size.width,
               alignment: Alignment.center,
-              child: Hero(
-                  tag: ntag,
-                  child: Material(
-                      type: MaterialType.transparency,
-                      child: Text(friend.name,
-                          style: TextStyle(
-                              fontSize: 40,
-                              color: Colors.white,
-                              shadows: [
-                                Shadow(
-                                  blurRadius: 10.0,
-                                  color: Colors.pink,
-                                  offset: Offset(5.0, 5.0),
-                                ),
-                                Shadow(
-                                  blurRadius: 10.0,
-                                  color: Colors.pink,
-                                  offset: Offset(-5.0, 5.0),
-                                ),
-                                Shadow(
-                                  blurRadius: 10.0,
-                                  color: Colors.pink,
-                                  offset: Offset(5.0, -5.0),
-                                ),
-                                Shadow(
-                                  blurRadius: 10.0,
-                                  color: Colors.pink,
-                                  offset: Offset(-5.0, -5.0),
-                                ),
-                              ])))),
+              child: SizedBox(
+                  width: MediaQuery.of(context).size.width,
+                  child: Hero(
+                      tag: ntag,
+                      child: Material(
+                          type: MaterialType.transparency,
+                          child: Text(friend.name,
+                              textAlign: TextAlign.center,
+                              style: TextStyle(
+                                  fontSize: 40,
+                                  color: Colors.white,
+                                  shadows: [
+                                    Shadow(
+                                      blurRadius: 10.0,
+                                      color: Colors.pink,
+                                      offset: Offset(5.0, 5.0),
+                                    ),
+                                    Shadow(
+                                      blurRadius: 10.0,
+                                      color: Colors.pink,
+                                      offset: Offset(-5.0, 5.0),
+                                    ),
+                                    Shadow(
+                                      blurRadius: 10.0,
+                                      color: Colors.pink,
+                                      offset: Offset(5.0, -5.0),
+                                    ),
+                                    Shadow(
+                                      blurRadius: 10.0,
+                                      color: Colors.pink,
+                                      offset: Offset(-5.0, -5.0),
+                                    ),
+                                  ]))))),
             ),
             Container(
               height: 10,

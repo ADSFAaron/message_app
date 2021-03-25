@@ -3,8 +3,6 @@ import 'page/chat.dart';
 import 'package:message_app/page/chat.dart';
 import 'page/friend.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
-import 'package:fluttertoast/fluttertoast.dart';
-import 'dart:async';
 import 'package:kumi_popup_window/kumi_popup_window.dart';
 
 // TODO 製作快取快速讀取用戶資訊及朋友以及聊天資訊
@@ -177,41 +175,32 @@ class _MyHomePageState extends State<MyHomePage> {
                           print("onClickBack");
                         },
                         childFun: (pop) {
-                          String aaa = "1";
                           return StatefulBuilder(
                               key: GlobalKey(),
                               builder: (popContext, popState) {
-                                return GestureDetector(
-                                  onTap: () {
-                                    //isSelect.value = !isSelect.value;
-                                    popState(() {
-                                      aaa = "sasdasd";
-                                    });
-                                  },
-                                  child: Container(
-                                    padding: EdgeInsets.all(10),
-                                    height: 76,
-                                    width: 200,
-                                    color: Colors.black,
-                                    alignment: Alignment.center,
-                                    child: Column(
-                                      children: [
-                                        ListTile(
-                                            leading: Icon(
-                                              Icons.delete,
-                                              color: Colors.white,
-                                            ),
-                                            onTap: () {
-                                              _cleanMessage();
-                                              Navigator.of(context).pop();
-                                            },
-                                            title: Text(
-                                              "全部刪除",
-                                              style: TextStyle(
-                                                  color: Colors.white),
-                                            ))
-                                      ],
-                                    ),
+                                return Container(
+                                  padding: EdgeInsets.all(10),
+                                  height: 76,
+                                  width: 200,
+                                  color: Colors.black,
+                                  alignment: Alignment.center,
+                                  child: Column(
+                                    children: [
+                                      ListTile(
+                                          leading: Icon(
+                                            Icons.delete,
+                                            color: Colors.white,
+                                          ),
+                                          onTap: () {
+                                            _cleanMessage();
+                                            Navigator.of(context).pop();
+                                          },
+                                          title: Text(
+                                            "全部刪除",
+                                            style:
+                                                TextStyle(color: Colors.white),
+                                          ))
+                                    ],
                                   ),
                                 );
                               });
@@ -236,23 +225,31 @@ class _MyHomePageState extends State<MyHomePage> {
     });
   }
 
-  void _createChat(FriendDetail friend) {
-    int wh= messageDetail.indexWhere((element) => element.friend==friend);
-//    print(wh);
-    setState(() {
-      messageDetail.removeAt(wh);
-      messageDetail.insert(
-          0,
-          MessageDetail(
-            friend: friend,
-            message: "壓著往左滑看看",
-          ));
-
-      _selectedIndex = 1;
-    });
-    //p
+  void _createChat(FriendDetail friend) async {
+    int wh =-1;
+    try {
+     wh= messageDetail.indexWhere((element) => element.friend == friend);
+     setState(() {
+       messageDetail.removeAt(wh);
+       messageDetail.insert(
+           0,
+           MessageDetail(
+             friend: friend,
+             message: "壓著往左滑看看",
+           ));
+     });
+    }
+    catch (e){
+      print("no index");
+      setState(() {
+        messageDetail.insert(0,  MessageDetail(
+          friend: friend,
+          message: "壓著往左滑看看",
+        ));
+      });
+    }
 //    print("try");
-    Navigator.of(context).push(PageRouteBuilder(
+    await Navigator.of(context).push(PageRouteBuilder(
       transitionDuration: Duration(milliseconds: 800),
       pageBuilder: (context, animation, secondaryAnimation) => ChatPage(
         //TODO 修改chat裡面的資料 ex 頭貼名字那些
@@ -271,7 +268,9 @@ class _MyHomePageState extends State<MyHomePage> {
         );
       },
     ));
-
+    setState(() {
+      _selectedIndex = 1;
+    });
   }
 
   void _onItemTapped(int index) {
@@ -281,8 +280,7 @@ class _MyHomePageState extends State<MyHomePage> {
   }
 
   void _deleteMessage(int index) {
-    setState(()
-    {
+    setState(() {
       print(index);
       print(messageDetail.elementAt(index).friend.name);
       messageDetail.removeAt(index);
@@ -295,7 +293,7 @@ class _MyHomePageState extends State<MyHomePage> {
     super.initState();
     myself = FriendDetail(hasPhoto: false, name: "未登錄");
     friendDetail = loadFriend();
-    messageDetail = loadMessage(allMessageindex,friendDetail);
+    messageDetail = loadMessage(allMessageindex, friendDetail);
   }
 
   @override
@@ -434,12 +432,11 @@ class _MyHomePageState extends State<MyHomePage> {
                             : Container(
                                 alignment: Alignment.center,
                                 child: friendDetail.elementAt(i).icon))),
-                Hero(
+            Hero(
                     tag: "NameDetail$i",
                     child: Material(
                       type: MaterialType.transparency,
-                      child: Container( // TODO 修正 hero 動畫問題
-                       // width: 500,
+                      child: Container(
                         alignment: Alignment.bottomCenter,
                         child: Text(friendDetail.elementAt(i).name,
                             style: TextStyle(color: Colors.white, shadows: [
@@ -479,7 +476,7 @@ class _MyHomePageState extends State<MyHomePage> {
                 friend: friendDetail.elementAt(i),
               ),
             ));
-            //  print(result.str);
+              print(result.str);
             if (result.str == "sendMessage") _createChat(result.friend);
 //            else if (result.str == "block") print("block"); //TODO 剩餘兩個button
           });
@@ -505,21 +502,22 @@ class _MyHomePageState extends State<MyHomePage> {
           actionExtentRatio: 1 / 4,
           child: ListTile(
             tileColor: Colors.orange[200 + (i % 4) * 100],
-            leading:  messageDetail.elementAt(i).friend.hasPhoto
+            leading: messageDetail.elementAt(i).friend.hasPhoto
                 ? Container(
                     height: 90,
                     width: 90,
                     decoration: BoxDecoration(
                         shape: BoxShape.circle,
                         image: DecorationImage(
-                            image:  messageDetail.elementAt(i).friend.photoClip)))
+                            image:
+                                messageDetail.elementAt(i).friend.photoClip)))
                 : Container(
                     height: 90,
                     width: 90,
                     child: CircleAvatar(
                         backgroundColor: Colors.purpleAccent,
                         radius: 35,
-                        child:  messageDetail.elementAt(i).friend.icon)),
+                        child: messageDetail.elementAt(i).friend.icon)),
             title: Text(
               messageDetail.elementAt(i).friend.name,
               style: TextStyle(fontSize: 30),
@@ -535,8 +533,8 @@ class _MyHomePageState extends State<MyHomePage> {
                 transitionDuration: Duration(milliseconds: 800),
                 pageBuilder: (context, animation, secondaryAnimation) =>
                     ChatPage(
-                  friend:  messageDetail.elementAt(i).friend,
-                      myself: myself,//TODO 修改
+                  friend: messageDetail.elementAt(i).friend,
+                  myself: myself,
                 ),
                 transitionsBuilder:
                     (context, animation, secondaryAnimation, child) {

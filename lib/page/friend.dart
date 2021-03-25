@@ -1,24 +1,30 @@
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 
-class FriendDetail{
-  final Container photoClip;
-  final String name;
-  FriendDetail({this.name,this.photoClip});
+class ReturnFValue {
+  final FriendDetail friend;
+  final String str;
+
+  ReturnFValue({this.friend, this.str});
 }
 
-List<FriendDetail> loadFriend(){
+class FriendDetail {
+  final AssetImage photoClip;
+  final bool hasPhoto;
+  final String name;
+  final Icon icon;
+
+  FriendDetail({this.name, this.photoClip, this.hasPhoto, this.icon})
+      : assert(hasPhoto == false || icon == null, "沒圖片要有icon"),
+        assert(hasPhoto == true || photoClip == null, "有圖片要給圖片");
+}
+
+List<FriendDetail> loadFriend() {
   List<FriendDetail> list = [];
-  for (int i=0;i<21;i++){
-    Container con;
+  for (int i = 0; i < 21; i++) {
     String str;
     if (i == 1 || i == 4 || i == 7 || i == 11) {
-      con = Container(
-        alignment: Alignment.center,
-        decoration: BoxDecoration(
-            image:
-            DecorationImage(image: AssetImage('images/person/$i.jpg'))),
-      );
+      AssetImage con = AssetImage('images/person/$i.jpg');
       if (i == 1)
         str = "琦玉";
       else if (i == 4)
@@ -27,16 +33,16 @@ List<FriendDetail> loadFriend(){
         str = "派大星";
       else
         str = "艾主席";
+      list.add(FriendDetail(name: str, hasPhoto: true, photoClip: con));
     } else {
-      con = Container(
-          alignment: Alignment.center,
-          child: Icon(
-            Icons.person_outline,
-            size: 60,
-          ));
-      str = "PersonNameHere";
+      Icon icon = Icon(
+        Icons.person,
+        size: 60,
+      );
+      int j=55+i;
+      str = "Person$j";
+      list.add(FriendDetail(name: str, hasPhoto: false, icon: icon));
     }
-    list.add(FriendDetail(name: str,photoClip: con));
   }
   return list;
 }
@@ -44,26 +50,24 @@ List<FriendDetail> loadFriend(){
 class PersonDetailPage extends StatelessWidget {
   final String ftag;
   final String ntag;
-  final Container photoClip;
-  final int index;
-  final String name;
+  final FriendDetail friend;
 
-  PersonDetailPage(
-      {Key key,
-      this.ftag,
-      this.ntag,
-      this.photoClip,
-      this.index,
-      this.name});
+  PersonDetailPage({
+    Key key,
+    this.friend,
+    this.ftag,
+    this.ntag,
+  });
 
   Widget build(BuildContext context) {
-    // print(_tag);
+//    print(friend.name);
     return Scaffold(
         floatingActionButtonLocation: FloatingActionButtonLocation.startTop,
         floatingActionButton: IconButton(
           icon: Icon(Icons.arrow_back_outlined),
           onPressed: () {
-            Navigator.of(context).pop();
+            Navigator.of(context)
+                .pop(ReturnFValue(friend: friend, str: "close"));
           },
         ),
         body: Column(
@@ -80,7 +84,13 @@ class PersonDetailPage extends StatelessWidget {
                     tag: ftag,
                     child: Material(
                         type: MaterialType.transparency,
-                        child: photoClip))),
+                        child: friend.hasPhoto? Container(
+                            alignment: Alignment.center,
+                            decoration: BoxDecoration(
+                                image: DecorationImage(
+                                    image: friend.photoClip))):
+                        Container(alignment: Alignment.center, child: friend.icon)
+                    ))),
             Container(
               height: 10,
             ),
@@ -90,31 +100,32 @@ class PersonDetailPage extends StatelessWidget {
                   tag: ntag,
                   child: Material(
                       type: MaterialType.transparency,
-                      child: Text(name,
+                      child: Text(friend.name,
                           style: TextStyle(
                               fontSize: 40,
-                              color: Colors.white, shadows: [
-                            Shadow(
-                              blurRadius: 10.0,
-                              color: Colors.pink,
-                              offset: Offset(5.0, 5.0),
-                            ),
-                            Shadow(
-                              blurRadius: 10.0,
-                              color: Colors.pink,
-                              offset: Offset(-5.0, 5.0),
-                            ),
-                            Shadow(
-                              blurRadius: 10.0,
-                              color: Colors.pink,
-                              offset: Offset(5.0, -5.0),
-                            ),
-                            Shadow(
-                              blurRadius: 10.0,
-                              color: Colors.pink,
-                              offset: Offset(-5.0, -5.0),
-                            ),
-                          ])))),
+                              color: Colors.white,
+                              shadows: [
+                                Shadow(
+                                  blurRadius: 10.0,
+                                  color: Colors.pink,
+                                  offset: Offset(5.0, 5.0),
+                                ),
+                                Shadow(
+                                  blurRadius: 10.0,
+                                  color: Colors.pink,
+                                  offset: Offset(-5.0, 5.0),
+                                ),
+                                Shadow(
+                                  blurRadius: 10.0,
+                                  color: Colors.pink,
+                                  offset: Offset(5.0, -5.0),
+                                ),
+                                Shadow(
+                                  blurRadius: 10.0,
+                                  color: Colors.pink,
+                                  offset: Offset(-5.0, -5.0),
+                                ),
+                              ])))),
             ),
             Container(
               height: 10,
@@ -131,6 +142,7 @@ class PersonDetailPage extends StatelessWidget {
             ),
             Expanded(child: Text("")),
             Container(
+              //TODO 三個按鈕的功能 封鎖最後 刪除第二
               height: 100,
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.center,
@@ -145,12 +157,8 @@ class PersonDetailPage extends StatelessWidget {
                           ],
                         )),
                     onTap: () {
-                      Fluttertoast.showToast(
-                        backgroundColor: Colors.grey,
-                        msg: "還沒製作",
-                        toastLength: Toast.LENGTH_SHORT,
-                        gravity: ToastGravity.CENTER,
-                      );
+                      Navigator.of(context).pop(
+                          ReturnFValue(friend: friend, str: "sendMessage"));
                     },
                   ),
                   InkWell(

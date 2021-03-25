@@ -4,6 +4,7 @@ import 'package:message_app/page/chat.dart';
 import 'page/friend.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
 import 'package:fluttertoast/fluttertoast.dart';
+import 'dart:async';
 
 void main() {
   runApp(MyApp());
@@ -151,6 +152,51 @@ class _MyHomePageState extends State<MyHomePage> {
         ),
       ];
 
+  void _createChat(FriendDetail friend) {
+    setState(() {
+      messageDetail.insert(
+          0,
+          MessageDetail(
+              name: friend.name,
+              message: "壓著往左滑看看",
+              photoClip: friend.hasPhoto
+                  ? Container(
+                      width: 70,
+                      height: 70,
+                      alignment: Alignment.center,
+                      decoration: BoxDecoration(
+                          shape: BoxShape.circle,
+                          image: DecorationImage(image: friend.photoClip)))
+                  : Container(
+                      width: 70,
+                      height: 70,
+                      alignment: Alignment.center,
+                      child: CircleAvatar(
+                          backgroundColor: Colors.purpleAccent,
+                          radius: 35,
+                          child: friend.icon))));
+    });
+    Navigator.of(context).push(PageRouteBuilder(
+      transitionDuration: Duration(milliseconds: 800),
+      pageBuilder: (context, animation, secondaryAnimation) => ChatPage(
+        //TODO 修改chat裡面的資料 ex 頭貼名字那些
+        title: friend.name,
+      ),
+      transitionsBuilder: (context, animation, secondaryAnimation, child) {
+        var begin = Offset(0.0, 1.0);
+        var end = Offset.zero;
+        var curve = Curves.ease;
+
+        var tween =
+            Tween(begin: begin, end: end).chain(CurveTween(curve: curve));
+        return SlideTransition(
+          position: animation.drive(tween),
+          child: child,
+        );
+      },
+    ));
+  }
+
   void _onItemTapped(int index) {
     setState(() {
       _selectedIndex = index;
@@ -173,7 +219,7 @@ class _MyHomePageState extends State<MyHomePage> {
 
   @override
   Widget build(BuildContext context) {
-    chatList = createChatContainer(context, allMessageindex);
+    chatList = createChatContainer(context);
     friendList = createFContainer(21, context);
     return Scaffold(
       key: _scaffoldKey,
@@ -295,9 +341,18 @@ class _MyHomePageState extends State<MyHomePage> {
                 Hero(
                     tag: "friendDetail$i",
                     child: Material(
-                      type: MaterialType.transparency,
-                      child: friendDetail.elementAt(i).photoClip,
-                    )),
+                        type: MaterialType.transparency,
+                        child: friendDetail.elementAt(i).hasPhoto
+                            ? Container(
+                                alignment: Alignment.center,
+                                decoration: BoxDecoration(
+                                    image: DecorationImage(
+                                        image: friendDetail
+                                            .elementAt(i)
+                                            .photoClip)))
+                            : Container(
+                                alignment: Alignment.center,
+                                child: friendDetail.elementAt(i).icon))),
                 Hero(
                     tag: "NameDetail$i",
                     child: Material(
@@ -332,18 +387,19 @@ class _MyHomePageState extends State<MyHomePage> {
               ],
             ),
           ),
-          onTap: () {
-            //print(i);
-            Navigator.of(context).push(PageRouteBuilder(
+          onTap: () async {
+            ReturnFValue result =
+                await Navigator.of(context).push(PageRouteBuilder(
               transitionDuration: Duration(seconds: 1),
               pageBuilder: (_, __, ___) => PersonDetailPage(
                 ftag: "friendDetail$i",
                 ntag: "NameDetail$i",
-                photoClip: friendDetail.elementAt(i).photoClip,
-                index: i,
-                name: friendDetail.elementAt(i).name,
+                friend: friendDetail.elementAt(i),
               ),
             ));
+            print(result.str);
+            if (result.str == "sendMessage") _createChat(result.friend);
+//            else if (result.str == "block") print("block"); //TODO 剩餘兩個button
           });
       list.add(iw);
     }
@@ -351,7 +407,7 @@ class _MyHomePageState extends State<MyHomePage> {
     return list;
   }
 
-  List<Widget> createChatContainer(BuildContext context, int index) {
+  List<Widget> createChatContainer(BuildContext context) {
     List<Widget> list = [];
     for (int i = 0; i < messageDetail.length; i++) {
       Slidable con = Slidable(
@@ -376,7 +432,7 @@ class _MyHomePageState extends State<MyHomePage> {
                 Container(
                   width: MediaQuery.of(context).size.width / 17,
                 ),
-               messageDetail.elementAt(i).photoClip,
+                messageDetail.elementAt(i).photoClip,
                 Container(
                   width: 10,
                 ),

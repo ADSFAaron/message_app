@@ -17,10 +17,10 @@ List<MessageDetail> loadMessage(int index) {
       photoClip: Container(
           child: CircleAvatar(
               backgroundColor: Colors.purpleAccent,
-              radius: 30,
+              radius: 35,
               child: Icon(
                 Icons.person,
-                size: 30,
+                size: 60,
               ))),
     ));
   }

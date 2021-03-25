@@ -1,11 +1,60 @@
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 
+class FriendDetail{
+  final Container photoClip;
+  final String name;
+  FriendDetail({this.name,this.photoClip});
+}
+
+List<FriendDetail> loadFriend(){
+  List<FriendDetail> list = [];
+  for (int i=0;i<21;i++){
+    Container con;
+    String str;
+    if (i == 1 || i == 4 || i == 7 || i == 11) {
+      con = Container(
+        alignment: Alignment.center,
+        decoration: BoxDecoration(
+            image:
+            DecorationImage(image: AssetImage('images/person/$i.jpg'))),
+      );
+      if (i == 1)
+        str = "琦玉";
+      else if (i == 4)
+        str = "五條悟";
+      else if (i == 7)
+        str = "派大星";
+      else
+        str = "艾主席";
+    } else {
+      con = Container(
+          alignment: Alignment.center,
+          child: Icon(
+            Icons.person_outline,
+            size: 60,
+          ));
+      str = "PersonNameHere";
+    }
+    list.add(FriendDetail(name: str,photoClip: con));
+  }
+  return list;
+}
+
 class PersonDetailPage extends StatelessWidget {
   final String ftag;
   final String ntag;
+  final Container photoClip;
+  final int index;
+  final String name;
 
-  PersonDetailPage({Key key, this.ftag, this.ntag});
+  PersonDetailPage(
+      {Key key,
+      this.ftag,
+      this.ntag,
+      this.photoClip,
+      this.index,
+      this.name});
 
   Widget build(BuildContext context) {
     // print(_tag);
@@ -31,7 +80,7 @@ class PersonDetailPage extends StatelessWidget {
                     tag: ftag,
                     child: Material(
                         type: MaterialType.transparency,
-                        child: Icon(Icons.person_outline, size: 100)))),
+                        child: photoClip))),
             Container(
               height: 10,
             ),
@@ -41,10 +90,31 @@ class PersonDetailPage extends StatelessWidget {
                   tag: ntag,
                   child: Material(
                       type: MaterialType.transparency,
-                      child: Text(
-                        "PersonNameHere",
-                        style: TextStyle(fontSize: 40),
-                      ))),
+                      child: Text(name,
+                          style: TextStyle(
+                              fontSize: 40,
+                              color: Colors.white, shadows: [
+                            Shadow(
+                              blurRadius: 10.0,
+                              color: Colors.pink,
+                              offset: Offset(5.0, 5.0),
+                            ),
+                            Shadow(
+                              blurRadius: 10.0,
+                              color: Colors.pink,
+                              offset: Offset(-5.0, 5.0),
+                            ),
+                            Shadow(
+                              blurRadius: 10.0,
+                              color: Colors.pink,
+                              offset: Offset(5.0, -5.0),
+                            ),
+                            Shadow(
+                              blurRadius: 10.0,
+                              color: Colors.pink,
+                              offset: Offset(-5.0, -5.0),
+                            ),
+                          ])))),
             ),
             Container(
               height: 10,
@@ -53,7 +123,9 @@ class PersonDetailPage extends StatelessWidget {
               alignment: Alignment.center,
               child: Text(
                 "Detail Here\nabc\ndefg\nhijklm\nnopqrs\ntuvwxyz",
-                style: TextStyle(fontSize: 20,),
+                style: TextStyle(
+                  fontSize: 20,
+                ),
                 textAlign: TextAlign.center,
               ),
             ),
@@ -129,19 +201,31 @@ class _AddFriendPage extends State<AddFriendPage> {
 //  _AddFriendPage();
   final TextEditingController _chatController = new TextEditingController();
 
-  List<Widget> AddFriendOutline = [];
+  List<Widget> addFriendOutline = [];
 
   void _submitText(String text) {
-    AddFriendOutline.clear();
+    addFriendOutline.clear();
     setState(() {
-      if (text == '123') {
-        CircleAvatar photo = CircleAvatar(
-          radius: 90,
-          backgroundColor: Colors.purple,
-          child: Icon(Icons.person, size: 100),
+      if (text == "") {
+        addFriendOutline.add(Text(
+          "請輸入後再搜尋",
+          style: TextStyle(fontSize: 40),
+        ));
+      } else if (text == '123') {
+        Container photo = Container(
+          width: 180,
+          height: 180,
+          decoration: BoxDecoration(
+              // color: Colors.redAccent,
+              shape: BoxShape.circle,
+              image: DecorationImage(image: AssetImage('images/uglyGuy.jpg'))),
         );
-        Text Name = Text(
-          "123",
+//        CircleAvatar photo = CircleAvatar(
+//          radius: 1,
+//          child: ClipOval(child:Image.asset('images/7.jpg')),
+//        );
+        Text name = Text(
+          "uglyGuy",
           style: TextStyle(fontSize: 50),
         );
         ElevatedButton addB = ElevatedButton(
@@ -158,13 +242,17 @@ class _AddFriendPage extends State<AddFriendPage> {
               );
             },
             child: Text("添加好友"));
-        AddFriendOutline.add(photo);
-        AddFriendOutline.add(Container(height: 10,));
-        AddFriendOutline.add(Name);
-        AddFriendOutline.add(Container(height: 5,));
-        AddFriendOutline.add(addB);
+        addFriendOutline.add(photo);
+        addFriendOutline.add(Container(
+          height: 10,
+        ));
+        addFriendOutline.add(name);
+        addFriendOutline.add(Container(
+          height: 5,
+        ));
+        addFriendOutline.add(addB);
       } else {
-        AddFriendOutline.add(Text(
+        addFriendOutline.add(Text(
           "並未找到$text",
           style: TextStyle(fontSize: 40),
         ));
@@ -185,7 +273,7 @@ class _AddFriendPage extends State<AddFriendPage> {
             child: Column(
               children: [
                 Container(
-                    color: Colors.grey[400],
+                    color: Colors.yellow,
                     height: MediaQuery.of(context).size.height / 3.5,
                     child: Container(
                       alignment: Alignment.center,
@@ -199,7 +287,7 @@ class _AddFriendPage extends State<AddFriendPage> {
                             textAlign: TextAlign.center,
                             decoration: InputDecoration(
                               helperText: "輸入 123 試試看",
-                              helperStyle: TextStyle(color: Colors.yellow),
+                              helperStyle: TextStyle(color: Colors.red),
                               focusedBorder: OutlineInputBorder(
                                   //點擊的時候顯示
                                   borderSide: BorderSide(
@@ -238,9 +326,9 @@ class _AddFriendPage extends State<AddFriendPage> {
                     child: SingleChildScrollView(
                         child: Column(
                       mainAxisAlignment: MainAxisAlignment.center,
-                      children: AddFriendOutline,
+                      children: addFriendOutline,
                     )),
-                    color: Colors.blue,
+                    color: Colors.green,
                   ),
                 )
               ],

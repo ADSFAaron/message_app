@@ -1,5 +1,32 @@
 import 'package:flutter/material.dart';
 
+class MessageDetail {
+  final String name;
+  final String message;
+  final Container photoClip;
+
+  MessageDetail({this.name, this.message, this.photoClip});
+}
+
+List<MessageDetail> loadMessage(int index) {
+  List<MessageDetail> list = [];
+  for (int i = 0; i < index; i++) {
+    list.add(MessageDetail(
+      name: "Person$i",
+      message: "壓著往左滑看看",
+      photoClip: Container(
+          child: CircleAvatar(
+              backgroundColor: Colors.purpleAccent,
+              radius: 30,
+              child: Icon(
+                Icons.person,
+                size: 30,
+              ))),
+    ));
+  }
+  return list;
+}
+
 class ChatPage extends StatefulWidget {
   final String title;
 
@@ -34,7 +61,7 @@ class _ChatPage extends State<ChatPage> {
           title: Text(_title),
         ),
         body: InkWell(
-          onTap: (){
+          onTap: () {
             FocusScope.of(context).unfocus();
           },
           child: Column(

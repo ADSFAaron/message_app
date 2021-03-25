@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'page/chat.dart';
 import 'package:message_app/page/chat.dart';
 import 'page/friend.dart';
+import 'package:flutter_slidable/flutter_slidable.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 
 void main() {
   runApp(MyApp());
@@ -50,8 +52,10 @@ class MyHomePage extends StatefulWidget {
 
 class _MyHomePageState extends State<MyHomePage> {
   int _selectedIndex = 0;
-  int index = 21;
+  int allMessageindex = 21;
   int beenTaped = 999;
+  List<FriendDetail> friendDetail = [];
+  List<MessageDetail> messageDetail = [];
   List<Widget> friendList = [];
   List<Widget> chatList = [];
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
@@ -147,19 +151,29 @@ class _MyHomePageState extends State<MyHomePage> {
         ),
       ];
 
-  void _opendrawer() {
-    Scaffold.of(context).openDrawer();
-  }
-
   void _onItemTapped(int index) {
     setState(() {
       _selectedIndex = index;
     });
   }
 
+  void _deleteMessage(int index) {
+    setState(() {
+      messageDetail.removeAt(index);
+    });
+  }
+
+  @protected
+  @mustCallSuper
+  void initState() {
+    super.initState();
+    messageDetail = loadMessage(allMessageindex);
+    friendDetail = loadFriend();
+  }
+
   @override
   Widget build(BuildContext context) {
-    chatList = createChatContainer(context);
+    chatList = createChatContainer(context, allMessageindex);
     friendList = createFContainer(21, context);
     return Scaffold(
       key: _scaffoldKey,
@@ -188,8 +202,7 @@ class _MyHomePageState extends State<MyHomePage> {
                         style: TextStyle(
                             fontSize: 30,
                             color: Colors.white,
-                            shadows:
-                            [
+                            shadows: [
                               Shadow(
                                 blurRadius: 10.0,
                                 color: Colors.pink,
@@ -277,25 +290,45 @@ class _MyHomePageState extends State<MyHomePage> {
             alignment: Alignment.center,
             color: Colors.blue[200 + i % 4 * 100],
             height: 100,
-            child: Column(
+            child: Stack(
               children: [
-                Container(
-                  height: 20,
-                ),
                 Hero(
                     tag: "friendDetail$i",
                     child: Material(
-                        type: MaterialType.transparency,
-                        child: Icon(
-                          Icons.person_outline,
-                          size: 60,
-                        ))),
+                      type: MaterialType.transparency,
+                      child: friendDetail.elementAt(i).photoClip,
+                    )),
                 Hero(
                     tag: "NameDetail$i",
                     child: Material(
                       type: MaterialType.transparency,
-                      child: Text("PersonNameHere"),
-                    )),
+                      child: Container(
+                        alignment: Alignment.bottomCenter,
+                        child: Text(friendDetail.elementAt(i).name,
+                            style: TextStyle(color: Colors.white, shadows: [
+                              Shadow(
+                                blurRadius: 10.0,
+                                color: Colors.pink,
+                                offset: Offset(5.0, 5.0),
+                              ),
+                              Shadow(
+                                blurRadius: 10.0,
+                                color: Colors.pink,
+                                offset: Offset(-5.0, 5.0),
+                              ),
+                              Shadow(
+                                blurRadius: 10.0,
+                                color: Colors.pink,
+                                offset: Offset(5.0, -5.0),
+                              ),
+                              Shadow(
+                                blurRadius: 10.0,
+                                color: Colors.pink,
+                                offset: Offset(-5.0, -5.0),
+                              ),
+                            ])),
+                      ),
+                    ))
               ],
             ),
           ),
@@ -304,74 +337,96 @@ class _MyHomePageState extends State<MyHomePage> {
             Navigator.of(context).push(PageRouteBuilder(
               transitionDuration: Duration(seconds: 1),
               pageBuilder: (_, __, ___) => PersonDetailPage(
-                  ftag: "friendDetail$i", ntag: "NameDetail$i"),
+                ftag: "friendDetail$i",
+                ntag: "NameDetail$i",
+                photoClip: friendDetail.elementAt(i).photoClip,
+                index: i,
+                name: friendDetail.elementAt(i).name,
+              ),
             ));
           });
       list.add(iw);
     }
+
     return list;
   }
 
-  List<Widget> createChatContainer(BuildContext context) {
+  List<Widget> createChatContainer(BuildContext context, int index) {
     List<Widget> list = [];
-    for (int i = 0; i < 21; i++) {
-      ElevatedButton con = ElevatedButton(
-        style: ButtonStyle(
-          padding: MaterialStateProperty.all((EdgeInsets.all(10))),
-        ),
-        child: Row(
-          children: [
-            Container(
-              width: MediaQuery.of(context).size.width / 17,
-            ),
-            CircleAvatar(
-                backgroundColor: Colors.purpleAccent,
-                radius: 30,
-                child: Icon(
-                  Icons.person,
-                  size: 30,
-                )),
-            Container(
-              width: 10,
-            ),
-            Column(children: [
-              Text(
-                "PersonNameHere",
-                style: TextStyle(fontSize: 30),
-              ),
-              Container(
-                height: 5,
-              ),
-              Text(
-                "Last message here",
-                style: TextStyle(fontSize: 15),
-              )
-            ])
+    for (int i = 0; i < messageDetail.length; i++) {
+      Slidable con = Slidable(
+          actionPane: SlidableScrollActionPane(),
+          secondaryActions: <Widget>[
+            IconSlideAction(
+              caption: 'delete',
+              color: Colors.orange,
+              icon: Icons.delete,
+              onTap: () => _deleteMessage(i),
+            )
           ],
-        ),
-        onLongPress: () => {}, //TODO 預覽畫面
-        onPressed: () {
-          Navigator.of(context).push(PageRouteBuilder(
-            pageBuilder: (context, animation, secondaryAnimation) => ChatPage(
-              title: "nameHere",
+          actionExtentRatio: 1 / 4,
+          child: ElevatedButton(
+            style: ButtonStyle(
+              backgroundColor: MaterialStateProperty.all<Color>(
+                  Colors.deepOrange[200 + (i % 4) * 100]),
+              padding: MaterialStateProperty.all((EdgeInsets.all(8))),
             ),
-            transitionsBuilder:
-                (context, animation, secondaryAnimation, child) {
-              var begin = Offset(0.0, 1.0);
-              var end = Offset.zero;
-              var curve = Curves.ease;
+            child: Row(
+              children: [
+                Container(
+                  width: MediaQuery.of(context).size.width / 17,
+                ),
+               messageDetail.elementAt(i).photoClip,
+                Container(
+                  width: 10,
+                ),
+                Column(children: [
+                  Text(
+                    messageDetail.elementAt(i).name,
+                    style: TextStyle(fontSize: 30),
+                  ),
+                  Container(
+                    height: 3,
+                  ),
+                  Text(
+                    messageDetail.elementAt(i).message,
+                    style: TextStyle(fontSize: 15),
+                  )
+                ])
+              ],
+            ),
+            onLongPress: () => {
+              //TODO 預覽畫面
+              Fluttertoast.showToast(
+                backgroundColor: Colors.grey,
+                msg: "還沒製作",
+                toastLength: Toast.LENGTH_SHORT,
+                gravity: ToastGravity.CENTER,
+              )
+            },
+            onPressed: () {
+              Navigator.of(context).push(PageRouteBuilder(
+                transitionDuration: Duration(milliseconds: 800),
+                pageBuilder: (context, animation, secondaryAnimation) =>
+                    ChatPage(
+                  title: "nameHere",
+                ),
+                transitionsBuilder:
+                    (context, animation, secondaryAnimation, child) {
+                  var begin = Offset(0.0, 1.0);
+                  var end = Offset.zero;
+                  var curve = Curves.ease;
 
-              var tween =
-                  Tween(begin: begin, end: end).chain(CurveTween(curve: curve));
-
-              return SlideTransition(
-                position: animation.drive(tween),
-                child: child,
-              );
+                  var tween = Tween(begin: begin, end: end)
+                      .chain(CurveTween(curve: curve));
+                  return SlideTransition(
+                    position: animation.drive(tween),
+                    child: child,
+                  );
+                },
+              ));
             },
           ));
-        },
-      );
       list.add(con);
     }
     return list;

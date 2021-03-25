@@ -10,8 +10,8 @@ class ReturnFValue {
 
 class FriendDetail {
   final AssetImage photoClip;
-  final bool hasPhoto;
-  final String name;
+  @required final bool hasPhoto;
+  @required final String name;
   Icon icon;
 
   FriendDetail({this.name, this.photoClip, this.hasPhoto})
@@ -98,6 +98,7 @@ class PersonDetailPage extends StatelessWidget {
               height: 10,
             ),
             Container(
+              width: MediaQuery.of(context).size.width,
               alignment: Alignment.center,
               child: Hero(
                   tag: ntag,

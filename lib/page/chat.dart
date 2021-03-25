@@ -2,37 +2,46 @@ import 'package:flutter/material.dart';
 import 'package:message_app/page/friend.dart';
 
 class MessageDetail {
-  final String name;
-  final FriendDetail friend;
+  @required final FriendDetail friend;
   final String message;
-  final Container photoClip;
+  Container photoClipContainer;
 
-  MessageDetail({this.name, this.message, this.photoClip, this.friend});
+  MessageDetail({this.message, this.friend});
+
+  void initState() {
+    photoClipContainer = friend.hasPhoto
+        ? Container(
+            width: 70,
+            height: 70,
+            alignment: Alignment.center,
+            decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                image: DecorationImage(image: friend.photoClip)))
+        : Container(
+            width: 70,
+            height: 70,
+            alignment: Alignment.center,
+            child: CircleAvatar(
+                backgroundColor: Colors.purpleAccent,
+                radius: 35,
+                child: friend.icon));
+  }
 }
 
-List<MessageDetail> loadMessage(int index) {
+List<MessageDetail> loadMessage(int index, List<FriendDetail> friendDetail) {
   List<MessageDetail> list = [];
   for (int i = 0; i < index; i++) {
     list.add(MessageDetail(
-      name: "Person$i",
-      message: "壓著往左滑看看",
-      photoClip: Container(
-          child: CircleAvatar(
-              backgroundColor: Colors.purpleAccent,
-              radius: 35,
-              child: Icon(
-                Icons.person,
-                size: 60,
-              ))),
+      friend: friendDetail.elementAt(i),
     ));
   }
   return list;
 }
 
 class ChatPage extends StatefulWidget {
-  final FriendDetail friend;
-
-  ChatPage({Key key, this.friend}) : super(key: key);
+  @required final FriendDetail friend;
+  @required final FriendDetail myself;
+  ChatPage({Key key, this.friend,this.myself}) : super(key: key);
 
   @override
   _ChatPage createState() => _ChatPage(friend);
@@ -58,25 +67,9 @@ class _ChatPage extends State<ChatPage> {
   }
 
   Widget build(BuildContext context) {
-    print("startBuild");
+//    print("startBuild");
     return Scaffold(
-        appBar: AppBar(
-//          leading: Row(children:[
-//            IconButton(icon: Icon(Icons.arrow_back_outlined), onPressed: (){Navigator.of(context).pop();}),
-//            friend.hasPhoto
-//              ? Container(
-//                  alignment: Alignment.centerRight,
-//                  decoration: BoxDecoration(
-//                      shape: BoxShape.circle,
-//                      image: DecorationImage(image: friend.photoClip)))
-//              : Container(
-//                  alignment: Alignment.centerRight,
-//                  child: CircleAvatar(
-//                      backgroundColor: Colors.purpleAccent,
-//                      radius: 35,
-//                      child: friend.icon))]),
-          title: Text(friend.name),
-        ),
+        appBar: AppBar(title: Text(friend.name)),
         body: InkWell(
           onTap: () {
             FocusScope.of(context).unfocus();

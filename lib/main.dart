@@ -7,6 +7,8 @@ import 'package:fluttertoast/fluttertoast.dart';
 import 'dart:async';
 import 'package:kumi_popup_window/kumi_popup_window.dart';
 
+// TODO 製作快取快速讀取用戶資訊及朋友以及聊天資訊
+// TODO 串接後端 以及資料庫 儲存必要文件
 void main() {
   runApp(MyApp());
 }
@@ -235,31 +237,21 @@ class _MyHomePageState extends State<MyHomePage> {
   }
 
   void _createChat(FriendDetail friend) {
+    int wh= messageDetail.indexWhere((element) => element.friend==friend);
+//    print(wh);
     setState(() {
+      messageDetail.removeAt(wh);
       messageDetail.insert(
           0,
           MessageDetail(
-              name: friend.name,
-              message: "壓著往左滑看看",
-              photoClip: friend.hasPhoto
-                  ? Container(
-                      width: 70,
-                      height: 70,
-                      alignment: Alignment.center,
-                      decoration: BoxDecoration(
-                          shape: BoxShape.circle,
-                          image: DecorationImage(image: friend.photoClip)))
-                  : Container(
-                      width: 70,
-                      height: 70,
-                      alignment: Alignment.center,
-                      child: CircleAvatar(
-                          backgroundColor: Colors.purpleAccent,
-                          radius: 35,
-                          child: friend.icon))));
+            friend: friend,
+            message: "壓著往左滑看看",
+          ));
+
+      _selectedIndex = 1;
     });
     //p
-    print("try");
+//    print("try");
     Navigator.of(context).push(PageRouteBuilder(
       transitionDuration: Duration(milliseconds: 800),
       pageBuilder: (context, animation, secondaryAnimation) => ChatPage(
@@ -280,7 +272,6 @@ class _MyHomePageState extends State<MyHomePage> {
       },
     ));
 
-    _selectedIndex = 1;
   }
 
   void _onItemTapped(int index) {
@@ -290,7 +281,10 @@ class _MyHomePageState extends State<MyHomePage> {
   }
 
   void _deleteMessage(int index) {
-    setState(() {
+    setState(()
+    {
+      print(index);
+      print(messageDetail.elementAt(index).friend.name);
       messageDetail.removeAt(index);
     });
   }
@@ -300,14 +294,14 @@ class _MyHomePageState extends State<MyHomePage> {
   void initState() {
     super.initState();
     myself = FriendDetail(hasPhoto: false, name: "未登錄");
-    messageDetail = loadMessage(allMessageindex);
     friendDetail = loadFriend();
+    messageDetail = loadMessage(allMessageindex,friendDetail);
   }
 
   @override
   Widget build(BuildContext context) {
-    chatList = createChatContainer(context);
     friendList = createFContainer(context);
+    chatList = createChatContainer(context);
     return Scaffold(
       key: _scaffoldKey,
       drawer: Drawer(
@@ -444,7 +438,8 @@ class _MyHomePageState extends State<MyHomePage> {
                     tag: "NameDetail$i",
                     child: Material(
                       type: MaterialType.transparency,
-                      child: Container(
+                      child: Container( // TODO 修正 hero 動畫問題
+                       // width: 500,
                         alignment: Alignment.bottomCenter,
                         child: Text(friendDetail.elementAt(i).name,
                             style: TextStyle(color: Colors.white, shadows: [
@@ -502,7 +497,7 @@ class _MyHomePageState extends State<MyHomePage> {
           secondaryActions: <Widget>[
             IconSlideAction(
               caption: 'delete',
-              color: Colors.orange,
+              color: Colors.white,
               icon: Icons.delete,
               onTap: () => _deleteMessage(i),
             )
@@ -510,23 +505,23 @@ class _MyHomePageState extends State<MyHomePage> {
           actionExtentRatio: 1 / 4,
           child: ListTile(
             tileColor: Colors.orange[200 + (i % 4) * 100],
-            leading: friendDetail.elementAt(i).hasPhoto
+            leading:  messageDetail.elementAt(i).friend.hasPhoto
                 ? Container(
                     height: 90,
                     width: 90,
                     decoration: BoxDecoration(
                         shape: BoxShape.circle,
                         image: DecorationImage(
-                            image: friendDetail.elementAt(i).photoClip)))
+                            image:  messageDetail.elementAt(i).friend.photoClip)))
                 : Container(
                     height: 90,
                     width: 90,
                     child: CircleAvatar(
                         backgroundColor: Colors.purpleAccent,
                         radius: 35,
-                        child: friendDetail.elementAt(i).icon)),
+                        child:  messageDetail.elementAt(i).friend.icon)),
             title: Text(
-              friendDetail.elementAt(i).name,
+              messageDetail.elementAt(i).friend.name,
               style: TextStyle(fontSize: 30),
             ),
             contentPadding:
@@ -540,7 +535,8 @@ class _MyHomePageState extends State<MyHomePage> {
                 transitionDuration: Duration(milliseconds: 800),
                 pageBuilder: (context, animation, secondaryAnimation) =>
                     ChatPage(
-                  friend: friendDetail.elementAt(i), //TODO 修改
+                  friend:  messageDetail.elementAt(i).friend,
+                      myself: myself,//TODO 修改
                 ),
                 transitionsBuilder:
                     (context, animation, secondaryAnimation, child) {

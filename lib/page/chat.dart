@@ -61,7 +61,7 @@ class _ChatPage extends State<ChatPage> {
   }
 
   final List<Widget> _messages = [];
-  final TextEditingController _chatController = new TextEditingController();
+  final TextEditingController _chatController = TextEditingController();
 
   void _submitText(String text) {
     if (text == '') return;

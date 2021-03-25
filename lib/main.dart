@@ -4,6 +4,7 @@ import 'package:message_app/page/chat.dart';
 import 'page/friend.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
 import 'package:kumi_popup_window/kumi_popup_window.dart';
+import 'page/login.dart';
 
 // TODO 製作快取快速讀取用戶資訊及朋友以及聊天資訊
 // TODO 串接後端 以及資料庫 儲存必要文件
@@ -62,6 +63,7 @@ class _MyHomePageState extends State<MyHomePage> {
   List<Widget> chatList = [];
   FriendDetail myself;
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
+  bool loginBoolean = false;
 
   List<Widget> _widgetOptions(BuildContext context) => <Widget>[
         CustomScrollView(
@@ -226,26 +228,27 @@ class _MyHomePageState extends State<MyHomePage> {
   }
 
   void _createChat(FriendDetail friend) async {
-    int wh =-1;
+    int wh = -1;
     try {
-     wh= messageDetail.indexWhere((element) => element.friend == friend);
-     setState(() {
-       messageDetail.removeAt(wh);
-       messageDetail.insert(
-           0,
-           MessageDetail(
-             friend: friend,
-             message: "壓著往左滑看看",
-           ));
-     });
-    }
-    catch (e){
+      wh = messageDetail.indexWhere((element) => element.friend == friend);
+      setState(() {
+        messageDetail.removeAt(wh);
+        messageDetail.insert(
+            0,
+            MessageDetail(
+              friend: friend,
+              message: "壓著往左滑看看",
+            ));
+      });
+    } catch (e) {
       print("no index");
       setState(() {
-        messageDetail.insert(0,  MessageDetail(
-          friend: friend,
-          message: "壓著往左滑看看",
-        ));
+        messageDetail.insert(
+            0,
+            MessageDetail(
+              friend: friend,
+              message: "壓著往左滑看看",
+            ));
       });
     }
 //    print("try");
@@ -317,13 +320,21 @@ class _MyHomePageState extends State<MyHomePage> {
                   child: Column(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      CircleAvatar(
-                        radius: 40,
-                        backgroundColor: Colors.brown,
-                        child: Icon(Icons.person),
-                      ),
+                      myself.hasPhoto
+                          ? Container(
+                              alignment: Alignment.center,
+                              decoration: BoxDecoration(
+                                  shape: BoxShape.circle,
+                                  image:
+                                      DecorationImage(image: myself.photoClip)))
+                          : Container(
+                              alignment: Alignment.center,
+                              child: CircleAvatar(
+                                  backgroundColor: Colors.purpleAccent,
+                                  radius: 40,
+                                  child: myself.icon)),
                       Text(
-                        "未登錄",
+                        myself.name,
                         style: TextStyle(
                             fontSize: 30,
                             color: Colors.white,
@@ -363,12 +374,46 @@ class _MyHomePageState extends State<MyHomePage> {
                     Navigator.of(context).pop();
                   },
                 ),
-                ListTile(
-                  title: Text("登入"),
-                  onTap: () {
-                    Navigator.of(context).pop();
-                  },
-                ),
+                loginBoolean
+                    ? ListTile( //TODO 新增alertDialog確定是否登出
+                        title: Text("登出"),
+                        onTap: () {
+                          setState(() {
+                            loginBoolean=false;
+                            myself = FriendDetail(name: "未登入",hasPhoto: false);
+                          });
+                        },
+                      )
+                    : ListTile(
+                        title: Text("登入"),
+                        onTap: () async {
+                          myself =
+                              await Navigator.of(context).push(PageRouteBuilder(
+                            transitionDuration: Duration(milliseconds: 800),
+                            pageBuilder:
+                                (context, animation, secondaryAnimation) =>
+                                    LoginPage(),
+                            transitionsBuilder: (context, animation,
+                                secondaryAnimation, child) {
+                              var begin = Offset(0.0, 1.0);
+                              var end = Offset.zero;
+                              var curve = Curves.ease;
+
+                              var tween = Tween(begin: begin, end: end)
+                                  .chain(CurveTween(curve: curve));
+                              return SlideTransition(
+                                position: animation.drive(tween),
+                                child: child,
+                              );
+                            },
+                          ));
+                          if(myself.name!="未登入"){
+                            setState(() {
+                              loginBoolean=true;
+                            });
+                          }
+                        },
+                      ),
               ]),
             )
           ],
@@ -432,7 +477,7 @@ class _MyHomePageState extends State<MyHomePage> {
                             : Container(
                                 alignment: Alignment.center,
                                 child: friendDetail.elementAt(i).icon))),
-            Hero(
+                Hero(
                     tag: "NameDetail$i",
                     child: Material(
                       type: MaterialType.transparency,
@@ -476,13 +521,12 @@ class _MyHomePageState extends State<MyHomePage> {
                 friend: friendDetail.elementAt(i),
               ),
             ));
-              print(result.str);
+            print(result.str);
             if (result.str == "sendMessage") _createChat(result.friend);
 //            else if (result.str == "block") print("block"); //TODO 剩餘兩個button
           });
       list.add(iw);
     }
-
     return list;
   }
 

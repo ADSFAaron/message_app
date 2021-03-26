@@ -29,9 +29,11 @@ class MessageDetail {
   }
 }
 
-List<MessageDetail> loadMessage(int index, List<FriendDetail> friendDetail) {
+List<MessageDetail> loadMessage(FriendDetail myself,List<FriendDetail> friendDetail) {
   List<MessageDetail> list = [];
-  for (int i = 0; i < index; i++) {
+  if(myself.name!="123")
+    return list;
+  for (int i = 0; i < friendDetail.length; i++) {
     list.add(MessageDetail(
       friend: friendDetail.elementAt(i),
     ));

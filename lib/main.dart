@@ -8,6 +8,7 @@ import 'page/login.dart';
 
 // TODO 製作快取快速讀取用戶資訊及朋友以及聊天資訊
 // TODO 串接後端 以及資料庫 儲存必要文件
+
 void main() {
   runApp(MyApp());
 }
@@ -255,7 +256,6 @@ class _MyHomePageState extends State<MyHomePage> {
     await Navigator.of(context).push(PageRouteBuilder(
       transitionDuration: Duration(milliseconds: 800),
       pageBuilder: (context, animation, secondaryAnimation) => ChatPage(
-        //TODO 修改chat裡面的資料 ex 頭貼名字那些
         friend: friend,
       ),
       transitionsBuilder: (context, animation, secondaryAnimation, child) {
@@ -295,8 +295,8 @@ class _MyHomePageState extends State<MyHomePage> {
   void initState() {
     super.initState();
     myself = FriendDetail(hasPhoto: false, name: "未登錄");
-    friendDetail = loadFriend();
-    messageDetail = loadMessage(allMessageindex, friendDetail);
+    friendDetail = loadFriend(myself);
+    messageDetail = loadMessage(myself, friendDetail);
   }
 
   @override
@@ -375,19 +375,53 @@ class _MyHomePageState extends State<MyHomePage> {
                   },
                 ),
                 loginBoolean
-                    ? ListTile( //TODO 新增alertDialog確定是否登出
+                    ? ListTile(
                         title: Text("登出"),
                         onTap: () {
-                          setState(() {
-                            loginBoolean=false;
-                            myself = FriendDetail(name: "未登入",hasPhoto: false);
-                          });
+                          showDialog(
+                            context: context,
+                            builder: (BuildContext context) {
+                              return AlertDialog(
+                                title: Text('確定登出?'),
+                                content: SingleChildScrollView(
+                                  child: ListBody(
+                                    children: <Widget>[
+                                      Text('你正在登出'),
+                                      Text("請確認是否要登出"),
+                                    ],
+                                  ),
+                                ),
+                                actions: <Widget>[
+                                  TextButton(
+                                    child: Text('確定'),
+                                    onPressed: () {
+                                      setState(() {
+                                        loginBoolean = false;
+                                        myself = FriendDetail(
+                                            name: "未登入", hasPhoto: false);
+                                        friendDetail = loadFriend(myself);
+                                        messageDetail =
+                                            loadMessage(myself, friendDetail);
+                                      });
+                                      Navigator.of(context).pop();
+                                    },
+                                  ),
+                                  TextButton(
+                                    child: Text("取消"),
+                                    onPressed: () {
+                                      Navigator.of(context).pop();
+                                    },
+                                  ),
+                                ],
+                              );
+                            },
+                          );
                         },
                       )
                     : ListTile(
                         title: Text("登入"),
                         onTap: () async {
-                          myself =
+                          var result =
                               await Navigator.of(context).push(PageRouteBuilder(
                             transitionDuration: Duration(milliseconds: 800),
                             pageBuilder:
@@ -407,9 +441,13 @@ class _MyHomePageState extends State<MyHomePage> {
                               );
                             },
                           ));
-                          if(myself.name!="未登入"){
+                          if (result == null) print("null");
+                          if (result.name != "未登入") {
                             setState(() {
-                              loginBoolean=true;
+                              myself = result;
+                              loginBoolean = true;
+                              friendDetail = loadFriend(myself);
+                              messageDetail = loadMessage(myself, friendDetail);
                             });
                           }
                         },
@@ -421,7 +459,44 @@ class _MyHomePageState extends State<MyHomePage> {
       ),
       body: Stack(
         children: [
-          Container(color: Colors.brown),
+          Container(
+            width: MediaQuery.of(context).size.width,
+            height: MediaQuery.of(context).size.height,
+            color: Colors.brown,
+            alignment: Alignment.center,
+            child: ElevatedButton(
+              child: Text("登入"),
+              onPressed: () async {
+                var result = await Navigator.of(context).push(PageRouteBuilder(
+                  transitionDuration: Duration(milliseconds: 800),
+                  pageBuilder: (context, animation, secondaryAnimation) =>
+                      LoginPage(),
+                  transitionsBuilder:
+                      (context, animation, secondaryAnimation, child) {
+                    var begin = Offset(0.0, 1.0);
+                    var end = Offset.zero;
+                    var curve = Curves.ease;
+
+                    var tween = Tween(begin: begin, end: end)
+                        .chain(CurveTween(curve: curve));
+                    return SlideTransition(
+                      position: animation.drive(tween),
+                      child: child,
+                    );
+                  },
+                ));
+                if (result == null) print("null");
+                if (result.name != "未登入") {
+                  setState(() {
+                    myself = result;
+                    loginBoolean = true;
+                    friendDetail = loadFriend(myself);
+                    messageDetail = loadMessage(myself, friendDetail);
+                  });
+                }
+              },
+            ),
+          ),
           AnimatedSwitcher(
             duration: const Duration(milliseconds: 300),
             transitionBuilder: (Widget child, Animation<double> animation) {
@@ -522,7 +597,9 @@ class _MyHomePageState extends State<MyHomePage> {
               ),
             ));
             print(result.str);
-            if (result.str == "sendMessage") _createChat(result.friend);
+            if (result == null)
+              print("null");
+            else if (result.str == "sendMessage") _createChat(result.friend);
 //            else if (result.str == "block") print("block"); //TODO 剩餘兩個button
           });
       list.add(iw);

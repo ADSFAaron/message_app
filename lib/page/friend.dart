@@ -27,8 +27,10 @@ class FriendDetail {
   }
 }
 
-List<FriendDetail> loadFriend() {
+List<FriendDetail> loadFriend(FriendDetail myself) {
   List<FriendDetail> list = [];
+  if(myself.name!="123")
+    return list;
   for (int i = 0; i < 21; i++) {
     String str;
     if (i == 1 || i == 4 || i == 7 || i == 11) {

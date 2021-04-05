@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
 import 'page/chat.dart';
 import 'package:message_app/page/chat.dart';
@@ -5,6 +7,7 @@ import 'page/friend.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
 import 'package:kumi_popup_window/kumi_popup_window.dart';
 import 'page/login.dart';
+
 //import 'package:permission_handler/permission_handler.dart';
 //import 'package:fluttertoast/fluttertoast.dart';
 //import 'dart:developer';
@@ -97,7 +100,7 @@ class _MyHomePageState extends State<MyHomePage> {
                     icon: const Icon(Icons.add_circle, size: 30),
                     tooltip: 'Add Friend',
                     onPressed: () {
-                      Navigator.of(context).push(PageRouteBuilder(
+                     Navigator.of(context).push(PageRouteBuilder(
                         pageBuilder: (context, animation, secondaryAnimation) =>
                             AddFriendPage(),
                         transitionsBuilder:
@@ -114,7 +117,9 @@ class _MyHomePageState extends State<MyHomePage> {
                             child: child,
                           );
                         },
-                      ));
+                      )).then((value) => { //TODO reload一下朋友列表
+                          print("123")
+                         });
                     },
                   ),
                 ]),
@@ -299,7 +304,7 @@ class _MyHomePageState extends State<MyHomePage> {
   void initState() {
     super.initState();
     //_checkFinePosPermission();
-    myself = FriendDetail(hasPhoto: false, name: "未登錄");
+    //myself = FriendDetail(hasPhoto: false, name: "未登錄");
     //TODO 處理login前的資訊
 //    friendDetail = loadFriend(myself);
     messageDetail = loadMessage(myself, friendDetail);
@@ -404,11 +409,10 @@ class _MyHomePageState extends State<MyHomePage> {
                                     onPressed: () {
                                       setState(() {
                                         loginBoolean = false;
-                                        myself = FriendDetail(
-                                            name: "未登入", hasPhoto: false);
-                                        //friendDetail = loadFriend(myself);
-                                        messageDetail =
-                                            loadMessage(myself, friendDetail);
+//                                        myself = FriendDetail(
+//                                            name: "未登入", hasPhoto: false);
+                                        friendDetail = [];
+                                        messageDetail = [];
                                       });
                                       Navigator.of(context).pop();
                                     },
@@ -448,8 +452,12 @@ class _MyHomePageState extends State<MyHomePage> {
                               );
                             },
                           ));
-                          if (result == null) print("null");
-                          handleLoginMessage(result);
+                          print("login off");
+//                          print(result);
+                          if (result == null)
+                            print("null");
+                          else
+                            handleLoginMessage(result);
                         },
                       ),
               ]),
@@ -459,36 +467,37 @@ class _MyHomePageState extends State<MyHomePage> {
       ),
       body: Stack(
         children: [
-
           Container(
             width: MediaQuery.of(context).size.width,
             height: MediaQuery.of(context).size.height,
             color: Colors.brown,
             alignment: Alignment.center,
-            child: (myself.name=="未登入")?ElevatedButton(
-              child: Text("登入"),
-              onPressed: () async {
-                var result = await Navigator.of(context).push(PageRouteBuilder(
-                  transitionDuration: Duration(milliseconds: 800),
-                  pageBuilder: (context, animation, secondaryAnimation) =>
-                      LoginPage(),
-                  transitionsBuilder:
-                      (context, animation, secondaryAnimation, child) {
-                    var begin = Offset(0.0, 1.0);
-                    var end = Offset.zero;
-                    var curve = Curves.ease;
+            child: !loginBoolean
+                ? ElevatedButton(
+                    child: Text("登入"),
+                    onPressed: () async {
+                      var result =
+                          await Navigator.of(context).push(PageRouteBuilder(
+                        transitionDuration: Duration(milliseconds: 800),
+                        pageBuilder: (context, animation, secondaryAnimation) =>
+                            LoginPage(),
+                        transitionsBuilder:
+                            (context, animation, secondaryAnimation, child) {
+                          var begin = Offset(0.0, 1.0);
+                          var end = Offset.zero;
+                          var curve = Curves.ease;
 
-                    var tween = Tween(begin: begin, end: end)
-                        .chain(CurveTween(curve: curve));
-                    return SlideTransition(
-                      position: animation.drive(tween),
-                      child: child,
-                    );
-                  },
-                ));
-                //result = json黨 myself資訊
-                if (result == null) print("null");
-                handleLoginMessage(result);
+                          var tween = Tween(begin: begin, end: end)
+                              .chain(CurveTween(curve: curve));
+                          return SlideTransition(
+                            position: animation.drive(tween),
+                            child: child,
+                          );
+                        },
+                      ));
+                      //result = json黨 myself資訊
+                      if (result == null) print("null");
+                      handleLoginMessage(result);
 //                if (result.name != "未登入") {
 //                  setState(() {
 //                    myself = result;
@@ -497,8 +506,9 @@ class _MyHomePageState extends State<MyHomePage> {
 //                    messageDetail = loadMessage(myself, friendDetail);
 //                  });
 //                }
-              },
-            ):null,
+                    },
+                  )
+                : null,
           ),
           AnimatedSwitcher(
             duration: const Duration(milliseconds: 300),
@@ -683,9 +693,21 @@ class _MyHomePageState extends State<MyHomePage> {
     }
     return list;
   }
+
   //TODO 處理登入後的資料
-  void handleLoginMessage(var json){
-    myself = FriendDetail(name:json.username,hasPhoto: false);
-//    friendList = loadFriend(json.friend);
+  void handleLoginMessage(var result) {
+    Map<String, dynamic> json = jsonDecode(result);
+    print(json);
+//    print(json);
+    setState(() {
+      loginBoolean = true;
+      myself = FriendDetail(
+        account: json['account'],
+          name: json['username'],
+          hasPhoto: json['hasImage'],
+          photoClip: json['hasImage'] ? json['imageUrl'] : null);
+//      print(myself.name);
+//    friendList = loadFriend(json['friend']);
+    });
   }
 }

@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'register.dart';
-import 'friend.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 
@@ -19,32 +18,34 @@ class _LoginPage extends State<LoginPage> {
 
   final TextEditingController accountController = TextEditingController();
   final TextEditingController passwordController = TextEditingController();
-  final String baseUrl = "http://10.0.2.2:3000/api/user/";
+  //final String baseUrl = "http://10.0.2.2:3000/api/user/";
   String errorText;
 
   @mustCallSuper
   void initState() {
     super.initState();
     errorText = null;
+    accountController.text="henryd";
+    passwordController.text="123456";
   }
 
   void _loginButton(String text1, String text2) async {
 //    print(text1);
 //    print(text2);
     try {
-      var Response = await http.post(Uri.parse(baseUrl + "login"),
+      var response = await http.post(Uri.parse(baseUrl + "login"),
           headers: <String, String>{
             'Content-Type': 'application/json; charset=UTF-8',
           },
-          body: jsonEncode({"email": text1, "password": text2}));
-//    print(Response.body);
-      if (Response.body != "not found") {
-        var jsonD = jsonDecode(Response.body);
-        print(jsonD);
+          body: jsonEncode({"account": text1, "password": text2}));
+//     print(response.body);
+      if (response.body != "not found") {
+//        var jsonD = jsonDecode(response.body);
+//        print(jsonD);
         Navigator.of(context)
-            .pop(jsonD);
+            .pop(response.body);
       } else {
-        print("1");
+//        print("1");
         setState(() {
           errorText = "帳號或密碼錯誤";
         });

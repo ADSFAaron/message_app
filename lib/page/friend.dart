@@ -3,6 +3,8 @@ import 'package:fluttertoast/fluttertoast.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 
+import 'package:message_app/page/register.dart';
+
 class ReturnFValue {
   final FriendDetail friend;
   final String str;
@@ -11,14 +13,15 @@ class ReturnFValue {
 }
 
 class FriendDetail {
-  final AssetImage photoClip;
+  @required final String account;
+  final NetworkImage photoClip;
   @required
   final bool hasPhoto;
   @required
   final String name;
   Icon icon;
 
-  FriendDetail({this.name, this.photoClip, this.hasPhoto})
+  FriendDetail({@required this.name, this.photoClip,@required this.hasPhoto,@required this.account})
       : assert(hasPhoto == true || photoClip == null, "有圖片要給圖片") {
     if (hasPhoto == false) {
       icon = Icon(
@@ -28,49 +31,30 @@ class FriendDetail {
     }
   }
 }
-//Future<http.StreamedResponse> AskFriendDetail(){
-//
-//}
 
-List<FriendDetail> loadFriend(List friendList) {
-//  final String baseUrl = "http://10.0.2.2:3000/api/user/";
-//  List<FriendDetail> list = [];
-//  for (int i =0;i<friendList.length;i++){
-//    var Response = await http.post(Uri.parse(baseUrl + "login"),
-//        headers: <String, String>{
-//          'Content-Type': 'application/json; charset=UTF-8',
-//        },
-//        body: jsonEncode({"email": text1, "password": text2}));
-//  }
-
-//  if(myself.name!="123")
-//    return list;
-//  for (int i = 0; i < 21; i++) {
-//    String str;
-//    if (i == 1 || i == 4 || i == 7 || i == 11) {
-//      AssetImage con = AssetImage('images/person/$i.jpg');
-//      if (i == 1)
-//        str = "琦玉";
-//      else if (i == 4)
-//        str = "五條悟";
-//      else if (i == 7)
-//        str = "派大星";
-//      else
-//        str = "艾主席";
-//      list.add(FriendDetail(name: str, hasPhoto: true, photoClip: con));
-//    } else {
-//      str = "Person$i";
-//      list.add(FriendDetail(name: str, hasPhoto: false));
-//    }
-//  }
-//  return list;
+Future<List<FriendDetail>> loadFriend(List friendList) async {
+  final String baseUrl = "http://10.0.2.2:3000/api/user/";
+  List<FriendDetail> list = [];
+  for (int i = 0; i < friendList.length; i++) {
+    var response = await http.post(Uri.parse(baseUrl + "getFriendData"),
+        headers: <String, String>{
+          'Content-Type': 'application/json; charset=UTF-8',
+        },
+        body: jsonEncode({"account": friendList.elementAt(i)}));
+    var toJson = jsonDecode(response.body);
+    list.add(FriendDetail(
+        account: toJson.account,
+        name: toJson.username,
+        hasPhoto: toJson.hasImage,
+        photoClip: toJson.hasImage ? NetworkImage(toJson.imageUrl) : null));
+  }
+  return list;
 }
 
 class PersonDetailPage extends StatelessWidget {
   final String ftag;
   final String ntag;
   final FriendDetail friend;
-
   PersonDetailPage({
     Key key,
     this.friend,
@@ -224,65 +208,85 @@ class PersonDetailPage extends StatelessWidget {
 }
 
 class AddFriendPage extends StatefulWidget {
-  AddFriendPage({Key key}) : super(key: key);
-
-  _AddFriendPage createState() => _AddFriendPage();
+  AddFriendPage({Key key,this.account}) : super(key: key);
+  final String account;
+  _AddFriendPage createState() => _AddFriendPage(account: account);
 }
 
 class _AddFriendPage extends State<AddFriendPage> {
+  _AddFriendPage({this.account});
+  final String account;
 //  _AddFriendPage();
   final TextEditingController _chatController = new TextEditingController();
 
   List<Widget> addFriendOutline = [];
 
-  void _submitText(String text) {
+  void _submitText(String text) async {
     addFriendOutline.clear();
+    var response = await http.post(Uri.parse(baseUrl + "getFriendData"),
+        headers: <String, String>{
+          'Content-Type': 'application/json; charset=UTF-8',
+        },
+        body: jsonEncode({"account": text}));
+    var json = jsonDecode(response.body);
+    FriendDetail friend = FriendDetail(
+      account: json.account,
+        name: json.username,
+        hasPhoto: json.hasImage,
+        photoClip: json.hasImage ? NetworkImage(json.imageUrl) : null);
+
     setState(() {
       if (text == "") {
         addFriendOutline.add(Text(
           "請輸入後再搜尋",
           style: TextStyle(fontSize: 40),
         ));
-      } else if (text == '123') {
+      }
+
+      if (response.body!="not found") {
         Container photo = Container(
           width: 180,
           height: 180,
           decoration: BoxDecoration(
               // color: Colors.redAccent,
               shape: BoxShape.circle,
-              image: DecorationImage(image: AssetImage('images/uglyGuy.jpg'))),
+              image: DecorationImage(image: friend.photoClip)),
         );
 //        CircleAvatar photo = CircleAvatar(
 //          radius: 1,
 //          child: ClipOval(child:Image.asset('images/7.jpg')),
 //        );
-        Text name = Text(
-          "uglyGuy",
-          style: TextStyle(fontSize: 50),
-        );
-        ElevatedButton addB = ElevatedButton(
-            style: ButtonStyle(
-              backgroundColor: MaterialStateProperty.all<Color>(Colors.brown),
-              padding: MaterialStateProperty.all((EdgeInsets.all(5))),
-            ),
-            onPressed: () {
-              Fluttertoast.showToast(
-                backgroundColor: Colors.grey,
-                msg: "還沒製作",
-                toastLength: Toast.LENGTH_SHORT,
-                gravity: ToastGravity.CENTER,
-              );
-            },
-            child: Text("添加好友"));
         addFriendOutline.add(photo);
         addFriendOutline.add(Container(
           height: 10,
         ));
-        addFriendOutline.add(name);
+        addFriendOutline.add(Text(
+          friend.name,
+          style: TextStyle(fontSize: 50),
+        ));
         addFriendOutline.add(Container(
           height: 5,
         ));
-        addFriendOutline.add(addB);
+        addFriendOutline.add(ElevatedButton(
+            style: ButtonStyle(
+              backgroundColor: MaterialStateProperty.all<Color>(Colors.brown),
+              padding: MaterialStateProperty.all((EdgeInsets.all(5))),
+            ),
+            onPressed: () async{
+              var response = await http.patch(
+                Uri.parse(baseUrl+account),
+                headers: <String, String>{
+                  'Content-Type': 'application/json; charset=UTF-8',
+                },
+                body: jsonEncode({"account":friend.account})
+              );
+              if(response.body=='success'){
+                print("success");
+              //TODO pop後friend list 重新刷新
+              //TODO 是否需要跳到 friend personDetail page
+              }
+            },
+            child: Text("添加好友")));
       } else {
         addFriendOutline.add(Text(
           "並未找到$text",

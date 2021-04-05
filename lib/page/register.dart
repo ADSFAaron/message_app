@@ -3,6 +3,8 @@ import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 
+final String baseUrl = "http://10.0.2.2:3000/api/user/";
+
 class RegisterPage extends StatefulWidget {
   RegisterPage({Key key}) : super(key: key);
 
@@ -12,10 +14,9 @@ class RegisterPage extends StatefulWidget {
 
 class _RegisterPage extends State<RegisterPage> {
   final TextEditingController myController = TextEditingController();
-  final TextEditingController emailController = TextEditingController();
+  final TextEditingController accountController = TextEditingController();
   final TextEditingController password = TextEditingController();
   final TextEditingController checkPassword = TextEditingController();
-  final String baseUrl = "http://10.0.2.2:3000/api/user/";
   String errorText;
 
   @override
@@ -46,10 +47,10 @@ class _RegisterPage extends State<RegisterPage> {
                     padding:
                         EdgeInsets.symmetric(horizontal: 24.0, vertical: 16.0),
                     child: TextField(
-                      controller: emailController,
+                      controller: accountController,
                       decoration: InputDecoration(
                         icon: Icon(Icons.email),
-                        labelText: "請輸入電子信箱",
+                        labelText: "請輸入帳號",
                         errorText: errorText,
                       ),
                     )),
@@ -84,7 +85,7 @@ class _RegisterPage extends State<RegisterPage> {
                 ElevatedButton(
                   child: Text('確認'),
                   onPressed: () => btnEvent(myController.text,
-                      emailController.text, password.text, context),
+                      accountController.text, password.text, context),
                 )
               ],
             ),
@@ -93,7 +94,7 @@ class _RegisterPage extends State<RegisterPage> {
   }
 
   String checkUsername(String value) {
-    if (value.length < 6 || value.length > 16 && value.isNotEmpty) return "密碼需要介於6~16個字之間";
+    if ((value.length < 6 || value.length > 16 )&& value.isNotEmpty) return "密碼需要介於6~16個字之間";
     return null;
   }
 
@@ -104,12 +105,12 @@ class _RegisterPage extends State<RegisterPage> {
     return null;
   }
 
-  void btnEvent(String _username, String _email, String _password,
+  void btnEvent(String _username, String _account, String _password,
       BuildContext context) async {
 //    print(_username);
     var map = {
       "username": _username,
-      "email": _email,
+      "account": _account,
       "password": _password,
       "hasImage": false
     };
@@ -149,11 +150,11 @@ class _RegisterPage extends State<RegisterPage> {
       }
       else if(uriResponse.body=="is already created"){
         setState(() {
-          errorText="email已被註冊";
+          errorText="帳號已被註冊";
         });
       }
-      else{ //TODO 註冊失敗
-        print("應該沒有");
+      else{
+        print("-----------------ERROR-----------------");
       }
     } catch (e) {
       print(e);

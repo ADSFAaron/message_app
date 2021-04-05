@@ -208,13 +208,13 @@ class PersonDetailPage extends StatelessWidget {
 }
 
 class AddFriendPage extends StatefulWidget {
-  AddFriendPage({Key key,this.account}) : super(key: key);
+  AddFriendPage({Key key,@required this.account}) : super(key: key);
   final String account;
   _AddFriendPage createState() => _AddFriendPage(account: account);
 }
 
 class _AddFriendPage extends State<AddFriendPage> {
-  _AddFriendPage({this.account});
+  _AddFriendPage({@required this.account});
   final String account;
 //  _AddFriendPage();
   final TextEditingController _chatController = new TextEditingController();
@@ -228,12 +228,13 @@ class _AddFriendPage extends State<AddFriendPage> {
           'Content-Type': 'application/json; charset=UTF-8',
         },
         body: jsonEncode({"account": text}));
-    var json = jsonDecode(response.body);
+    Map<String,dynamic> json = jsonDecode(response.body);
+    print(json);
     FriendDetail friend = FriendDetail(
-      account: json.account,
-        name: json.username,
-        hasPhoto: json.hasImage,
-        photoClip: json.hasImage ? NetworkImage(json.imageUrl) : null);
+      account: json["account"],
+        name: json['username'],
+        hasPhoto: json['hasImage'],
+        photoClip: json['hasImage'] ? NetworkImage(json['imageUrl']) : null);
 
     setState(() {
       if (text == "") {
@@ -244,18 +245,20 @@ class _AddFriendPage extends State<AddFriendPage> {
       }
 
       if (response.body!="not found") {
-        Container photo = Container(
+        print("go to create friend data");
+        var photo = friend.hasPhoto?Container(
           width: 180,
           height: 180,
           decoration: BoxDecoration(
               // color: Colors.redAccent,
               shape: BoxShape.circle,
               image: DecorationImage(image: friend.photoClip)),
-        );
-//        CircleAvatar photo = CircleAvatar(
-//          radius: 1,
-//          child: ClipOval(child:Image.asset('images/7.jpg')),
-//        );
+        ):Container(
+            alignment: Alignment.center,
+            child: CircleAvatar(
+                backgroundColor: Colors.purpleAccent,
+                radius: 40,
+                child: friend.icon));
         addFriendOutline.add(photo);
         addFriendOutline.add(Container(
           height: 10,
@@ -273,6 +276,8 @@ class _AddFriendPage extends State<AddFriendPage> {
               padding: MaterialStateProperty.all((EdgeInsets.all(5))),
             ),
             onPressed: () async{
+//              print("------------------------------------------");
+//              print(account);
               var response = await http.patch(
                 Uri.parse(baseUrl+account),
                 headers: <String, String>{

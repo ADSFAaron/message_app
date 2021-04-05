@@ -100,9 +100,11 @@ class _MyHomePageState extends State<MyHomePage> {
                     icon: const Icon(Icons.add_circle, size: 30),
                     tooltip: 'Add Friend',
                     onPressed: () {
+                      print("-------add---------");
+                      print(myself.account);
                      Navigator.of(context).push(PageRouteBuilder(
                         pageBuilder: (context, animation, secondaryAnimation) =>
-                            AddFriendPage(),
+                            AddFriendPage(account: myself.account,),
                         transitionsBuilder:
                             (context, animation, secondaryAnimation, child) {
                           var begin = Offset(0.0, 1.0);

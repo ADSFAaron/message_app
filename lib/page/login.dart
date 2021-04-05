@@ -25,8 +25,8 @@ class _LoginPage extends State<LoginPage> {
   void initState() {
     super.initState();
     errorText = null;
-    accountController.text="henryd";
-    passwordController.text="123456";
+    accountController.text="1234567";
+    passwordController.text="abc1234";
   }
 
   void _loginButton(String text1, String text2) async {

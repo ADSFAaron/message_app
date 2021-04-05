@@ -30,6 +30,8 @@ dependencies:
   cupertino_icons: ^1.0.2
   flutter_slidable: 0.5.7
   kumi_popup_window: ^2.0.0-nullsafety
+  http: ^0.13.1
+  permission_handler: ^6.1.1
 
 dev_dependencies:
   flutter_test:

@@ -5,6 +5,10 @@ import 'page/friend.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
 import 'package:kumi_popup_window/kumi_popup_window.dart';
 import 'page/login.dart';
+//import 'package:permission_handler/permission_handler.dart';
+//import 'package:fluttertoast/fluttertoast.dart';
+//import 'dart:developer';
+//import 'package:flutter/services.dart';
 
 // TODO 製作快取快速讀取用戶資訊及朋友以及聊天資訊
 // TODO 串接後端 以及資料庫 儲存必要文件
@@ -294,8 +298,10 @@ class _MyHomePageState extends State<MyHomePage> {
   @mustCallSuper
   void initState() {
     super.initState();
+    //_checkFinePosPermission();
     myself = FriendDetail(hasPhoto: false, name: "未登錄");
-    friendDetail = loadFriend(myself);
+    //TODO 處理login前的資訊
+//    friendDetail = loadFriend(myself);
     messageDetail = loadMessage(myself, friendDetail);
   }
 
@@ -391,6 +397,7 @@ class _MyHomePageState extends State<MyHomePage> {
                                     ],
                                   ),
                                 ),
+                                //TODO 處理一下登出的部分
                                 actions: <Widget>[
                                   TextButton(
                                     child: Text('確定'),
@@ -399,7 +406,7 @@ class _MyHomePageState extends State<MyHomePage> {
                                         loginBoolean = false;
                                         myself = FriendDetail(
                                             name: "未登入", hasPhoto: false);
-                                        friendDetail = loadFriend(myself);
+                                        //friendDetail = loadFriend(myself);
                                         messageDetail =
                                             loadMessage(myself, friendDetail);
                                       });
@@ -442,14 +449,7 @@ class _MyHomePageState extends State<MyHomePage> {
                             },
                           ));
                           if (result == null) print("null");
-                          if (result.name != "未登入") {
-                            setState(() {
-                              myself = result;
-                              loginBoolean = true;
-                              friendDetail = loadFriend(myself);
-                              messageDetail = loadMessage(myself, friendDetail);
-                            });
-                          }
+                          handleLoginMessage(result);
                         },
                       ),
               ]),
@@ -459,12 +459,13 @@ class _MyHomePageState extends State<MyHomePage> {
       ),
       body: Stack(
         children: [
+
           Container(
             width: MediaQuery.of(context).size.width,
             height: MediaQuery.of(context).size.height,
             color: Colors.brown,
             alignment: Alignment.center,
-            child: ElevatedButton(
+            child: (myself.name=="未登入")?ElevatedButton(
               child: Text("登入"),
               onPressed: () async {
                 var result = await Navigator.of(context).push(PageRouteBuilder(
@@ -485,17 +486,19 @@ class _MyHomePageState extends State<MyHomePage> {
                     );
                   },
                 ));
+                //result = json黨 myself資訊
                 if (result == null) print("null");
-                if (result.name != "未登入") {
-                  setState(() {
-                    myself = result;
-                    loginBoolean = true;
-                    friendDetail = loadFriend(myself);
-                    messageDetail = loadMessage(myself, friendDetail);
-                  });
-                }
+                handleLoginMessage(result);
+//                if (result.name != "未登入") {
+//                  setState(() {
+//                    myself = result;
+//                    loginBoolean = true;
+//                    friendDetail = loadFriend(myself);
+//                    messageDetail = loadMessage(myself, friendDetail);
+//                  });
+//                }
               },
-            ),
+            ):null,
           ),
           AnimatedSwitcher(
             duration: const Duration(milliseconds: 300),
@@ -679,5 +682,10 @@ class _MyHomePageState extends State<MyHomePage> {
       list.add(con);
     }
     return list;
+  }
+  //TODO 處理登入後的資料
+  void handleLoginMessage(var json){
+    myself = FriendDetail(name:json.username,hasPhoto: false);
+//    friendList = loadFriend(json.friend);
   }
 }

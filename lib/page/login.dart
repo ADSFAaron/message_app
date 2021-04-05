@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'register.dart';
 import 'friend.dart';
+import 'package:http/http.dart' as http;
+import 'dart:convert';
 
 class LoginPage extends StatefulWidget {
   LoginPage({Key key}) : super(key: key);
@@ -17,18 +19,38 @@ class _LoginPage extends State<LoginPage> {
 
   final TextEditingController accountController = TextEditingController();
   final TextEditingController passwordController = TextEditingController();
+  final String baseUrl = "http://10.0.2.2:3000/api/user/";
+  String errorText;
 
-  String errorText=null;
-  void _loginButton(String text1, String text2) {
-    print(text1);
-    print(text2);
-    if (text1 == "123" && text2 == "123") {
-      Navigator.of(context).pop(FriendDetail(hasPhoto: false, name: "123"));
-    }
-    else{
-      setState(() {
-        errorText="帳號或密碼錯誤，請輸入123再試一次";
-      });
+  @mustCallSuper
+  void initState() {
+    super.initState();
+    errorText = null;
+  }
+
+  void _loginButton(String text1, String text2) async {
+//    print(text1);
+//    print(text2);
+    try {
+      var Response = await http.post(Uri.parse(baseUrl + "login"),
+          headers: <String, String>{
+            'Content-Type': 'application/json; charset=UTF-8',
+          },
+          body: jsonEncode({"email": text1, "password": text2}));
+//    print(Response.body);
+      if (Response.body != "not found") {
+        var jsonD = jsonDecode(Response.body);
+        print(jsonD);
+        Navigator.of(context)
+            .pop(jsonD);
+      } else {
+        print("1");
+        setState(() {
+          errorText = "帳號或密碼錯誤";
+        });
+      }
+    } catch (e) {
+      print(e);
     }
   }
 
@@ -36,7 +58,7 @@ class _LoginPage extends State<LoginPage> {
   Widget build(BuildContext context) {
     return Scaffold(
         appBar: AppBar(
-          title: Text("9000 DAMAGE 登入"),
+          title: Text("登入"),
         ),
         body: InkWell(
             onTap: () {

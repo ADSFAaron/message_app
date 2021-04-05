@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
+import 'package:http/http.dart' as http;
+import 'dart:convert';
 
 class ReturnFValue {
   final FriendDetail friend;
@@ -26,30 +28,42 @@ class FriendDetail {
     }
   }
 }
+//Future<http.StreamedResponse> AskFriendDetail(){
+//
+//}
 
-List<FriendDetail> loadFriend(FriendDetail myself) {
-  List<FriendDetail> list = [];
-  if(myself.name!="123")
-    return list;
-  for (int i = 0; i < 21; i++) {
-    String str;
-    if (i == 1 || i == 4 || i == 7 || i == 11) {
-      AssetImage con = AssetImage('images/person/$i.jpg');
-      if (i == 1)
-        str = "琦玉";
-      else if (i == 4)
-        str = "五條悟";
-      else if (i == 7)
-        str = "派大星";
-      else
-        str = "艾主席";
-      list.add(FriendDetail(name: str, hasPhoto: true, photoClip: con));
-    } else {
-      str = "Person$i";
-      list.add(FriendDetail(name: str, hasPhoto: false));
-    }
-  }
-  return list;
+List<FriendDetail> loadFriend(List friendList) {
+//  final String baseUrl = "http://10.0.2.2:3000/api/user/";
+//  List<FriendDetail> list = [];
+//  for (int i =0;i<friendList.length;i++){
+//    var Response = await http.post(Uri.parse(baseUrl + "login"),
+//        headers: <String, String>{
+//          'Content-Type': 'application/json; charset=UTF-8',
+//        },
+//        body: jsonEncode({"email": text1, "password": text2}));
+//  }
+
+//  if(myself.name!="123")
+//    return list;
+//  for (int i = 0; i < 21; i++) {
+//    String str;
+//    if (i == 1 || i == 4 || i == 7 || i == 11) {
+//      AssetImage con = AssetImage('images/person/$i.jpg');
+//      if (i == 1)
+//        str = "琦玉";
+//      else if (i == 4)
+//        str = "五條悟";
+//      else if (i == 7)
+//        str = "派大星";
+//      else
+//        str = "艾主席";
+//      list.add(FriendDetail(name: str, hasPhoto: true, photoClip: con));
+//    } else {
+//      str = "Person$i";
+//      list.add(FriendDetail(name: str, hasPhoto: false));
+//    }
+//  }
+//  return list;
 }
 
 class PersonDetailPage extends StatelessWidget {

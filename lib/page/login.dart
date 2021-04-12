@@ -18,6 +18,7 @@ class _LoginPage extends State<LoginPage> {
 
   final TextEditingController accountController = TextEditingController();
   final TextEditingController passwordController = TextEditingController();
+
   //final String baseUrl = "http://10.0.2.2:3000/api/user/";
   String errorText;
 
@@ -25,8 +26,8 @@ class _LoginPage extends State<LoginPage> {
   void initState() {
     super.initState();
     errorText = null;
-    accountController.text="1234567";
-    passwordController.text="abc1234";
+    accountController.text = "1234567";
+    passwordController.text = "abc1234";
   }
 
   void _loginButton(String text1, String text2) async {
@@ -42,8 +43,7 @@ class _LoginPage extends State<LoginPage> {
       if (response.body != "not found") {
 //        var jsonD = jsonDecode(response.body);
 //        print(jsonD);
-        Navigator.of(context)
-            .pop(response.body);
+        Navigator.of(context).pop(response.body);
       } else {
 //        print("1");
         setState(() {

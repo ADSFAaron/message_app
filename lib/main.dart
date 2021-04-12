@@ -1,5 +1,4 @@
 import 'dart:convert';
-
 import 'package:flutter/material.dart';
 import 'page/chat.dart';
 import 'package:message_app/page/chat.dart';
@@ -7,11 +6,7 @@ import 'page/friend.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
 import 'package:kumi_popup_window/kumi_popup_window.dart';
 import 'page/login.dart';
-
-//import 'package:permission_handler/permission_handler.dart';
-//import 'package:fluttertoast/fluttertoast.dart';
-//import 'dart:developer';
-//import 'package:flutter/services.dart';
+import 'package:page_transition/page_transition.dart';
 
 // TODO 製作快取快速讀取用戶資訊及朋友以及聊天資訊
 // TODO 串接後端 以及資料庫 儲存必要文件
@@ -73,243 +68,16 @@ class _MyHomePageState extends State<MyHomePage> {
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
   bool loginBoolean = false;
 
-  List<Widget> _widgetOptions(BuildContext context) => <Widget>[
-        CustomScrollView(
-          key: ValueKey<int>(0),
-          shrinkWrap: true,
-          slivers: <Widget>[
-            SliverAppBar(
-                backgroundColor: Colors.purple,
-                pinned: true,
-                snap: true,
-                floating: true,
-                expandedHeight: 120.0,
-                flexibleSpace: const FlexibleSpaceBar(
-                  title: Text('Friend'),
-                  background: FlutterLogo(),
-                ),
-                leading: IconButton(
-                  icon: Icon(Icons.menu, size: 30),
-                  onPressed: () {
-                    _scaffoldKey.currentState.openDrawer();
-                  },
-                ),
-                actions: <Widget>[
-                  IconButton(
-                    alignment: Alignment.centerRight,
-                    icon: const Icon(Icons.add_circle, size: 30),
-                    tooltip: 'Add Friend',
-                    onPressed: () {
-                      print("-------add---------");
-                      print(myself.account);
-                     Navigator.of(context).push(PageRouteBuilder(
-                        pageBuilder: (context, animation, secondaryAnimation) =>
-                            AddFriendPage(account: myself.account,),
-                        transitionsBuilder:
-                            (context, animation, secondaryAnimation, child) {
-                          var begin = Offset(0.0, 1.0);
-                          var end = Offset.zero;
-                          var curve = Curves.ease;
-
-                          var tween = Tween(begin: begin, end: end)
-                              .chain(CurveTween(curve: curve));
-
-                          return SlideTransition(
-                            position: animation.drive(tween),
-                            child: child,
-                          );
-                        },
-                      )).then((value) => { //TODO reload一下朋友列表
-                          print("123")
-                         });
-                    },
-                  ),
-                ]),
-            SliverGrid(
-              //用來建list 裡面再放東西
-              gridDelegate: SliverGridDelegateWithMaxCrossAxisExtent(
-                maxCrossAxisExtent: 160.0,
-                childAspectRatio: 1.0,
-              ),
-              delegate: SliverChildListDelegate(
-                friendList,
-              ),
-            ),
-          ],
-        ),
-        CustomScrollView(
-          key: ValueKey<int>(1),
-          shrinkWrap: true,
-          slivers: <Widget>[
-            SliverAppBar(
-              leading: IconButton(
-                icon: Icon(Icons.menu, size: 30),
-                onPressed: () {
-                  _scaffoldKey.currentState.openDrawer();
-                },
-              ),
-              backgroundColor: Colors.lightGreen,
-              pinned: true,
-              snap: true,
-              floating: true,
-              expandedHeight: 80.0,
-              flexibleSpace: const FlexibleSpaceBar(
-                title: Text('Message'),
-                background: FlutterLogo(),
-              ),
-              actions: [
-                IconButton(
-                    icon: Icon(Icons.menu),
-                    onPressed: () {
-                      showPopupWindow(
-                        context,
-                        offsetX: 5,
-                        offsetY: 70,
-                        //childSize:Size(240, 800),
-                        gravity: KumiPopupGravity.rightTop,
-                        //curve: Curves.elasticOut,
-                        duration: Duration(milliseconds: 300),
-                        bgColor: Colors.black.withOpacity(0),
-                        onShowStart: (pop) {
-                          print("showStart");
-                        },
-                        onShowFinish: (pop) {
-                          print("showFinish");
-                        },
-                        onDismissStart: (pop) {
-                          print("dismissStart");
-                        },
-                        onDismissFinish: (pop) {
-                          print("dismissFinish");
-                        },
-                        onClickOut: (pop) {
-                          print("onClickOut");
-                        },
-                        onClickBack: (pop) {
-                          print("onClickBack");
-                        },
-                        childFun: (pop) {
-                          return StatefulBuilder(
-                              key: GlobalKey(),
-                              builder: (popContext, popState) {
-                                return Container(
-                                  padding: EdgeInsets.all(10),
-                                  height: 76,
-                                  width: 200,
-                                  color: Colors.black,
-                                  alignment: Alignment.center,
-                                  child: Column(
-                                    children: [
-                                      ListTile(
-                                          leading: Icon(
-                                            Icons.delete,
-                                            color: Colors.white,
-                                          ),
-                                          onTap: () {
-                                            _cleanMessage();
-                                            Navigator.of(context).pop();
-                                          },
-                                          title: Text(
-                                            "全部刪除",
-                                            style:
-                                                TextStyle(color: Colors.white),
-                                          ))
-                                    ],
-                                  ),
-                                );
-                              });
-                        },
-                      );
-                    })
-              ],
-            ),
-            SliverList(
-              //用來建list 裡面再放東西
-              delegate: SliverChildListDelegate(
-                chatList,
-              ),
-            ),
-          ],
-        ),
-      ];
-
-  void _cleanMessage() {
-    setState(() {
-      messageDetail.clear();
-    });
-  }
-
-  void _createChat(FriendDetail friend) async {
-    int wh = -1;
-    try {
-      wh = messageDetail.indexWhere((element) => element.friend == friend);
-      setState(() {
-        messageDetail.removeAt(wh);
-        messageDetail.insert(
-            0,
-            MessageDetail(
-              friend: friend,
-              message: "壓著往左滑看看",
-            ));
-      });
-    } catch (e) {
-      print("no index");
-      setState(() {
-        messageDetail.insert(
-            0,
-            MessageDetail(
-              friend: friend,
-              message: "壓著往左滑看看",
-            ));
-      });
-    }
-//    print("try");
-    await Navigator.of(context).push(PageRouteBuilder(
-      transitionDuration: Duration(milliseconds: 800),
-      pageBuilder: (context, animation, secondaryAnimation) => ChatPage(
-        friend: friend,
-      ),
-      transitionsBuilder: (context, animation, secondaryAnimation, child) {
-        var begin = Offset(0.0, 1.0);
-        var end = Offset.zero;
-        var curve = Curves.ease;
-
-        var tween =
-            Tween(begin: begin, end: end).chain(CurveTween(curve: curve));
-        return SlideTransition(
-          position: animation.drive(tween),
-          child: child,
-        );
-      },
-    ));
-    setState(() {
-      _selectedIndex = 1;
-    });
-  }
-
-  void _onItemTapped(int index) {
-    setState(() {
-      _selectedIndex = index;
-    });
-  }
-
-  void _deleteMessage(int index) {
-    setState(() {
-      print(index);
-      print(messageDetail.elementAt(index).friend.name);
-      messageDetail.removeAt(index);
-    });
-  }
+  List<Widget> _widgetOptions(BuildContext context) =>
+      <Widget>[friendPage(), chatRoomPage()];
 
   @protected
   @mustCallSuper
   void initState() {
     super.initState();
     //_checkFinePosPermission();
-    //myself = FriendDetail(hasPhoto: false, name: "未登錄");
+    myself = FriendDetail(account: null, hasPhoto: false, name: "未登錄");
     //TODO 處理login前的資訊
-//    friendDetail = loadFriend(myself);
-    messageDetail = loadMessage(myself, friendDetail);
   }
 
   @override
@@ -413,7 +181,7 @@ class _MyHomePageState extends State<MyHomePage> {
                                         loginBoolean = false;
 //                                        myself = FriendDetail(
 //                                            name: "未登入", hasPhoto: false);
-                                        friendDetail = [];
+//                                        friendDetail ;
                                         messageDetail = [];
                                       });
                                       Navigator.of(context).pop();
@@ -500,25 +268,12 @@ class _MyHomePageState extends State<MyHomePage> {
                       //result = json黨 myself資訊
                       if (result == null) print("null");
                       handleLoginMessage(result);
-//                if (result.name != "未登入") {
-//                  setState(() {
-//                    myself = result;
-//                    loginBoolean = true;
-//                    friendDetail = loadFriend(myself);
-//                    messageDetail = loadMessage(myself, friendDetail);
-//                  });
-//                }
                     },
                   )
                 : null,
           ),
-          AnimatedSwitcher(
-            duration: const Duration(milliseconds: 300),
-            transitionBuilder: (Widget child, Animation<double> animation) {
-              return ScaleTransition(child: child, scale: animation);
-            },
-            child: _widgetOptions(context).elementAt(_selectedIndex),
-          ),
+          IndexedStack(
+              index: _selectedIndex, children: _widgetOptions(context)),
         ],
       ),
       bottomNavigationBar: BottomNavigationBar(
@@ -696,20 +451,262 @@ class _MyHomePageState extends State<MyHomePage> {
     return list;
   }
 
+  Widget friendPage() {
+    return CustomScrollView(
+      key: ValueKey<int>(0),
+      shrinkWrap: true,
+      slivers: <Widget>[
+        SliverAppBar(
+            backgroundColor: Colors.purple,
+            pinned: true,
+            snap: true,
+            floating: true,
+            expandedHeight: 120.0,
+            flexibleSpace: const FlexibleSpaceBar(
+              title: Text('Friend'),
+              background: FlutterLogo(),
+            ),
+            leading: IconButton(
+              icon: Icon(Icons.menu, size: 30),
+              onPressed: () {
+                _scaffoldKey.currentState.openDrawer();
+              },
+            ),
+            actions: <Widget>[
+              IconButton(
+                alignment: Alignment.centerRight,
+                icon: const Icon(Icons.add_circle, size: 30),
+                tooltip: 'Add Friend',
+                onPressed: () {
+                  print("-------add---------");
+                  print(myself.account);
+                  Navigator.of(context)
+                      .push(PageRouteBuilder(
+                        pageBuilder: (context, animation, secondaryAnimation) =>
+                            AddFriendPage(
+                          account: myself.account,
+                        ),
+                        transitionsBuilder:
+                            (context, animation, secondaryAnimation, child) {
+                          var begin = Offset(0.0, 1.0);
+                          var end = Offset.zero;
+                          var curve = Curves.ease;
+
+                          var tween = Tween(begin: begin, end: end)
+                              .chain(CurveTween(curve: curve));
+
+                          return SlideTransition(
+                            position: animation.drive(tween),
+                            child: child,
+                          );
+                        },
+                      ))
+                      .then((value) => {
+                            //TODO reload一下朋友列表
+                            rebuildFriend(value)
+                          });
+                },
+              ),
+            ]),
+        SliverGrid(
+          //用來建list 裡面再放東西
+          gridDelegate: SliverGridDelegateWithMaxCrossAxisExtent(
+            maxCrossAxisExtent: 160.0,
+            childAspectRatio: 1.0,
+          ),
+          delegate: SliverChildListDelegate(
+            friendList,
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget chatRoomPage() {
+    return CustomScrollView(
+      key: ValueKey<int>(3),
+      shrinkWrap: true,
+      slivers: <Widget>[
+        SliverAppBar(
+          leading: IconButton(
+            icon: Icon(Icons.menu, size: 30),
+            onPressed: () {
+              _scaffoldKey.currentState.openDrawer();
+            },
+          ),
+          backgroundColor: Colors.lightGreen,
+          pinned: true,
+          snap: true,
+          floating: true,
+          expandedHeight: 80.0,
+          flexibleSpace: const FlexibleSpaceBar(
+            title: Text('Message'),
+            background: FlutterLogo(),
+          ),
+          actions: [
+            IconButton(
+                icon: Icon(Icons.menu),
+                onPressed: () {
+                  showPopupWindow(
+                    context,
+                    offsetX: 5,
+                    offsetY: 70,
+                    //childSize:Size(240, 800),
+                    gravity: KumiPopupGravity.rightTop,
+                    //curve: Curves.elasticOut,
+                    duration: Duration(milliseconds: 300),
+                    bgColor: Colors.black.withOpacity(0),
+                    onShowStart: (pop) {
+                      print("showStart");
+                    },
+                    onShowFinish: (pop) {
+                      print("showFinish");
+                    },
+                    onDismissStart: (pop) {
+                      print("dismissStart");
+                    },
+                    onDismissFinish: (pop) {
+                      print("dismissFinish");
+                    },
+                    onClickOut: (pop) {
+                      print("onClickOut");
+                    },
+                    onClickBack: (pop) {
+                      print("onClickBack");
+                    },
+                    childFun: (pop) {
+                      return StatefulBuilder(
+                          key: GlobalKey(),
+                          builder: (popContext, popState) {
+                            return Container(
+                              padding: EdgeInsets.all(10),
+                              height: 76,
+                              width: 200,
+                              color: Colors.black,
+                              alignment: Alignment.center,
+                              child: Column(
+                                children: [
+                                  ListTile(
+                                      leading: Icon(
+                                        Icons.delete,
+                                        color: Colors.white,
+                                      ),
+                                      onTap: () {
+                                        _cleanMessage();
+                                        Navigator.of(context).pop();
+                                      },
+                                      title: Text(
+                                        "全部刪除",
+                                        style: TextStyle(color: Colors.white),
+                                      ))
+                                ],
+                              ),
+                            );
+                          });
+                    },
+                  );
+                })
+          ],
+        ),
+
+        SliverList(
+          //用來建list 裡面再放東西
+          delegate: SliverChildListDelegate(
+            chatList,
+          ),
+        ),
+      ],
+    );
+  }
+
+  void _createChat(FriendDetail friend) async {
+    int wh = -1;
+    try {
+      wh = messageDetail.indexWhere((element) => element.friend == friend);
+      setState(() {
+        messageDetail.removeAt(wh);
+        messageDetail.insert(
+            0,
+            MessageDetail(
+              friend: friend,
+              message: "壓著往左滑看看",
+            ));
+      });
+    } catch (e) {
+      print("no index");
+      setState(() {
+        messageDetail.insert(
+            0,
+            MessageDetail(
+              friend: friend,
+              message: "壓著往左滑看看",
+            ));
+      });
+    }
+//    print("try");
+    await Navigator.of(context).push(PageRouteBuilder(
+      transitionDuration: Duration(milliseconds: 800),
+      pageBuilder: (context, animation, secondaryAnimation) => ChatPage(
+        friend: friend,
+      ),
+      transitionsBuilder: (context, animation, secondaryAnimation, child) {
+        var begin = Offset(0.0, 1.0);
+        var end = Offset.zero;
+        var curve = Curves.ease;
+
+        var tween =
+            Tween(begin: begin, end: end).chain(CurveTween(curve: curve));
+        return SlideTransition(
+          position: animation.drive(tween),
+          child: child,
+        );
+      },
+    ));
+    setState(() {
+      _selectedIndex = 1;
+    });
+  }
+
+  void _cleanMessage() {
+    setState(() {
+      messageDetail.clear();
+    });
+  }
+
+  void _onItemTapped(int index) {
+    setState(() {
+      _selectedIndex = index;
+    });
+  }
+
+  void _deleteMessage(int index) {
+    setState(() {
+      print(index);
+      print(messageDetail.elementAt(index).friend.name);
+      messageDetail.removeAt(index);
+    });
+  }
+
   //TODO 處理登入後的資料
-  void handleLoginMessage(var result) {
+  void handleLoginMessage(var result) async {
     Map<String, dynamic> json = jsonDecode(result);
     print(json);
 //    print(json);
+    friendDetail = await loadFriend(json['friend']);
     setState(() {
       loginBoolean = true;
       myself = FriendDetail(
-        account: json['account'],
+          account: json['account'],
           name: json['username'],
           hasPhoto: json['hasImage'],
           photoClip: json['hasImage'] ? json['imageUrl'] : null);
-//      print(myself.name);
-//    friendList = loadFriend(json['friend']);
+    });
+  }
+
+  void rebuildFriend(var result) async {
+    friendDetail = await loadFriend(result);
+    setState(() {
+      loginBoolean = true;
     });
   }
 }

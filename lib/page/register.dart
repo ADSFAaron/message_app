@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 
+//final String baseUrl = "http://140.138.152.96:3000/api/user/";
 final String baseUrl = "http://10.0.2.2:3000/api/user/";
 
 class RegisterPage extends StatefulWidget {

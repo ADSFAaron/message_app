@@ -12,32 +12,44 @@ class MessageDetail {
   void initState() {
     photoClipContainer = friend.hasPhoto
         ? Container(
-            width: 70,
-            height: 70,
-            alignment: Alignment.center,
-            decoration: BoxDecoration(
-                shape: BoxShape.circle,
-                image: DecorationImage(image: friend.photoClip)))
+        width: 70,
+        height: 70,
+        alignment: Alignment.center,
+        decoration: BoxDecoration(
+            shape: BoxShape.circle,
+            image: DecorationImage(image: friend.photoClip)))
         : Container(
-            width: 70,
-            height: 70,
-            alignment: Alignment.center,
-            child: CircleAvatar(
-                backgroundColor: Colors.purpleAccent,
-                radius: 35,
-                child: friend.icon));
+        width: 70,
+        height: 70,
+        alignment: Alignment.center,
+        child: CircleAvatar(
+            backgroundColor: Colors.purpleAccent,
+            radius: 35,
+            child: friend.icon));
   }
 }
 
-List<MessageDetail> loadMessage(FriendDetail myself,List<FriendDetail> friendDetail) {
-  List<MessageDetail> list = [];
-  if(myself.name!="123")
-    return list;
-  for (int i = 0; i < friendDetail.length; i++) {
-    list.add(MessageDetail(
-      friend: friendDetail.elementAt(i),
-    ));
+final List<String> l = ['a', 'b', 'c'];
+
+Stream<String> count() async* {
+  int i = 1;
+  while (true) {
+    yield l.elementAt(i);
+    i++;
   }
+}
+
+List<MessageDetail> loadMessage(List chatRoom) {
+  List<MessageDetail> list = [];
+
+
+//  if(myself.name!="123")
+//    return list;
+//  for (int i = 0; i < friendDetail.length; i++) {
+//    list.add(MessageDetail(
+//      friend: friendDetail.elementAt(i),
+//    ));
+//  }
   return list;
 }
 
@@ -101,20 +113,20 @@ class _ChatPage extends State<ChatPage> {
               ),
               SafeArea(
                   child: Row(children: [
-                Flexible(
-                    child: TextField(
-                  decoration: InputDecoration(
-                    contentPadding: EdgeInsets.all(16.0),
-                    border: OutlineInputBorder(),
-                    hintText: '輸入文字',
-                  ),
-                  controller: _chatController,
-                  onSubmitted: _submitText, // 綁定事件給_submitText這個Function
-                )),
-                IconButton(
-                    icon: Icon(Icons.send),
-                    onPressed: () => _submitText(_chatController.text))
-              ])),
+                    Flexible(
+                        child: TextField(
+                          decoration: InputDecoration(
+                            contentPadding: EdgeInsets.all(16.0),
+                            border: OutlineInputBorder(),
+                            hintText: '輸入文字',
+                          ),
+                          controller: _chatController,
+                          onSubmitted: _submitText, // 綁定事件給_submitText這個Function
+                        )),
+                    IconButton(
+                        icon: Icon(Icons.send),
+                        onPressed: () => _submitText(_chatController.text))
+                  ])),
             ],
           ),
         ));
@@ -134,81 +146,81 @@ class MessageBox extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    double clipSize=60;
+    double clipSize = 60;
     return Container(
       margin: const EdgeInsets.symmetric(vertical: 10.0),
       child: Row(
         mainAxisAlignment:
-            other ? MainAxisAlignment.start : MainAxisAlignment.end,
+        other ? MainAxisAlignment.start : MainAxisAlignment.end,
         children: other
             ? <Widget>[
-                friend.hasPhoto
-                    ? Container(
-                        width: clipSize,
-                        height: clipSize,
-                        alignment: Alignment.center,
-                        decoration: BoxDecoration(
-                            shape: BoxShape.circle,
-                            image: DecorationImage(image: friend.photoClip)))
-                    : Container(
-                        width: clipSize,
-                        height: clipSize,
-                        alignment: Alignment.center,
-                        child: CircleAvatar(
-                            backgroundColor: Colors.purpleAccent,
-                            radius: 35,
-                            child: friend.icon)),
-                Container(
-                  width: 5,
-                ),
-                Flexible(
-                  child: Container(
-                    color: Colors.grey,
-                    padding: EdgeInsets.all(10.0),
-                    child: Text(text,
-                        overflow: TextOverflow.ellipsis,
-                        maxLines: 5,
-                        style: TextStyle(fontSize: 18.0, color: Colors.white)),
-                  ),
-                ),
-                Container(
-                  width: 60,
-                ),
-              ]
+          friend.hasPhoto
+              ? Container(
+              width: clipSize,
+              height: clipSize,
+              alignment: Alignment.center,
+              decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  image: DecorationImage(image: friend.photoClip)))
+              : Container(
+              width: clipSize,
+              height: clipSize,
+              alignment: Alignment.center,
+              child: CircleAvatar(
+                  backgroundColor: Colors.purpleAccent,
+                  radius: 35,
+                  child: friend.icon)),
+          Container(
+            width: 5,
+          ),
+          Flexible(
+            child: Container(
+              color: Colors.grey,
+              padding: EdgeInsets.all(10.0),
+              child: Text(text,
+                  overflow: TextOverflow.ellipsis,
+                  maxLines: 5,
+                  style: TextStyle(fontSize: 18.0, color: Colors.white)),
+            ),
+          ),
+          Container(
+            width: 60,
+          ),
+        ]
             : <Widget>[
-                Container(
-                  width: 60,
-                ),
-                Flexible(
-                  child: Container(
-                    color: Colors.lightGreen,
-                    padding: EdgeInsets.all(10.0),
-                    child: Text(text,
-                        overflow: TextOverflow.ellipsis,
-                        maxLines: 5,
-                        style: TextStyle(fontSize: 18.0, color: Colors.white)),
-                  ),
-                ),
-                Container(
-                  width: 5,
-                ),
-                myself.hasPhoto
-                    ? Container(
-                        width: clipSize,
-                        height: clipSize,
-                        alignment: Alignment.center,
-                        decoration: BoxDecoration(
-                            shape: BoxShape.circle,
-                            image: DecorationImage(image: myself.photoClip)))
-                    : Container(
-                        width: clipSize,
-                        height: clipSize,
-                        alignment: Alignment.center,
-                        child: CircleAvatar(
-                            backgroundColor: Colors.purpleAccent,
-                            radius: 35,
-                            child: myself.icon)),
-              ],
+          Container(
+            width: 60,
+          ),
+          Flexible(
+            child: Container(
+              color: Colors.lightGreen,
+              padding: EdgeInsets.all(10.0),
+              child: Text(text,
+                  overflow: TextOverflow.ellipsis,
+                  maxLines: 5,
+                  style: TextStyle(fontSize: 18.0, color: Colors.white)),
+            ),
+          ),
+          Container(
+            width: 5,
+          ),
+          myself.hasPhoto
+              ? Container(
+              width: clipSize,
+              height: clipSize,
+              alignment: Alignment.center,
+              decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  image: DecorationImage(image: myself.photoClip)))
+              : Container(
+              width: clipSize,
+              height: clipSize,
+              alignment: Alignment.center,
+              child: CircleAvatar(
+                  backgroundColor: Colors.purpleAccent,
+                  radius: 35,
+                  child: myself.icon)),
+        ],
       ),
     );
   }

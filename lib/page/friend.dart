@@ -33,20 +33,29 @@ class FriendDetail {
 }
 
 Future<List<FriendDetail>> loadFriend(List friendList) async {
-  final String baseUrl = "http://10.0.2.2:3000/api/user/";
+//  print("into loadFriend----------------------");
   List<FriendDetail> list = [];
   for (int i = 0; i < friendList.length; i++) {
+//    print((friendList.elementAt(i)).runtimeType);
+    Map<String,String> json =Map<String,String>.from(friendList.elementAt(i));
+//    print("--------------------------");
+    try{
     var response = await http.post(Uri.parse(baseUrl + "getFriendData"),
         headers: <String, String>{
           'Content-Type': 'application/json; charset=UTF-8',
         },
-        body: jsonEncode({"account": friendList.elementAt(i)}));
-    var toJson = jsonDecode(response.body);
+        body: jsonEncode({"account": json['account']}));
+//    print("get response----------------");
+//    print(response.body);
+    Map<String,dynamic> toJson = jsonDecode(response.body);
     list.add(FriendDetail(
-        account: toJson.account,
-        name: toJson.username,
-        hasPhoto: toJson.hasImage,
-        photoClip: toJson.hasImage ? NetworkImage(toJson.imageUrl) : null));
+        account: toJson["account"],
+        name: toJson['username'],
+        hasPhoto: toJson['hasImage'],
+        photoClip: toJson['hasImage'] ? NetworkImage(toJson['imageUrl']) : null));
+  }catch(e){
+      print("no account");
+    }
   }
   return list;
 }
@@ -223,29 +232,33 @@ class _AddFriendPage extends State<AddFriendPage> {
 
   void _submitText(String text) async {
     addFriendOutline.clear();
+    if (text == "") {
+      setState(() {
+        addFriendOutline.add(Text(
+          "請輸入後再搜尋",
+          style: TextStyle(fontSize: 40),
+        ));
+      });
+    }
     var response = await http.post(Uri.parse(baseUrl + "getFriendData"),
         headers: <String, String>{
           'Content-Type': 'application/json; charset=UTF-8',
         },
         body: jsonEncode({"account": text}));
-    Map<String,dynamic> json = jsonDecode(response.body);
-    print(json);
-    FriendDetail friend = FriendDetail(
-      account: json["account"],
-        name: json['username'],
-        hasPhoto: json['hasImage'],
-        photoClip: json['hasImage'] ? NetworkImage(json['imageUrl']) : null);
 
     setState(() {
-      if (text == "") {
-        addFriendOutline.add(Text(
-          "請輸入後再搜尋",
-          style: TextStyle(fontSize: 40),
-        ));
-      }
-
+//      print("*${response.body}*");
       if (response.body!="not found") {
         print("go to create friend data");
+
+        Map<String,dynamic> json = jsonDecode(response.body);
+        print(json);
+        FriendDetail friend = FriendDetail(
+            account: json["account"],
+            name: json['username'],
+            hasPhoto: json['hasImage'],
+            photoClip: json['hasImage'] ? NetworkImage(json['imageUrl']) : null);
+
         var photo = friend.hasPhoto?Container(
           width: 180,
           height: 180,
@@ -285,8 +298,9 @@ class _AddFriendPage extends State<AddFriendPage> {
                 },
                 body: jsonEncode({"account":friend.account})
               );
-              if(response.body=='success'){
-                print("success");
+              if(response.body!='failed'){
+                Map<String,dynamic> map = jsonDecode(response.body);
+                Navigator.pop(context,map['friend']);
               //TODO pop後friend list 重新刷新
               //TODO 是否需要跳到 friend personDetail page
               }

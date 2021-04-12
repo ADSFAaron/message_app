@@ -8,6 +8,9 @@ import 'package:flutter_slidable/flutter_slidable.dart';
 import 'package:kumi_popup_window/kumi_popup_window.dart';
 import 'page/login.dart';
 import 'package:page_transition/page_transition.dart';
+import 'package:http/http.dart' as http;
+import 'dart:convert';
+import 'page/register.dart';
 
 // TODO 製作快取快速讀取用戶資訊及朋友以及聊天資訊
 // TODO 串接後端 以及資料庫 儲存必要文件
@@ -79,16 +82,16 @@ class _MyHomePageState extends State<MyHomePage> {
     super.initState();
     //_checkFinePosPermission();
     myself = FriendDetail(account: null, hasPhoto: false, name: "未登錄");
-    messageDetail.add(MessageDetail(friend: none,message: "12"));
-    messageDetail.add(MessageDetail(friend: none,message: "12"));
-    messageDetail.add(MessageDetail(friend: none,message: "12"));
+    messageDetail.add(MessageDetail(friend: none, message: "12"));
+    messageDetail.add(MessageDetail(friend: none, message: "12"));
+    messageDetail.add(MessageDetail(friend: none, message: "12"));
     //TODO 處理login前的資訊
   }
 
   @override
   Widget build(BuildContext context) {
     friendList = createFContainer(context);
-    chatList = createChatContainer(context,[]);
+//    chatList = createChatContainer(context, []);
     return Scaffold(
       key: _scaffoldKey,
       drawer: Drawer(
@@ -97,10 +100,7 @@ class _MyHomePageState extends State<MyHomePage> {
             Expanded(
               flex: 1,
               child: Container(
-                width: MediaQuery
-                    .of(context)
-                    .size
-                    .width * 0.85,
+                width: MediaQuery.of(context).size.width * 0.85,
                 child: DrawerHeader(
                   decoration: BoxDecoration(
                       image: DecorationImage(
@@ -111,17 +111,17 @@ class _MyHomePageState extends State<MyHomePage> {
                     children: [
                       myself.hasPhoto
                           ? Container(
-                          alignment: Alignment.center,
-                          decoration: BoxDecoration(
-                              shape: BoxShape.circle,
-                              image:
-                              DecorationImage(image: myself.photoClip)))
+                              alignment: Alignment.center,
+                              decoration: BoxDecoration(
+                                  shape: BoxShape.circle,
+                                  image:
+                                      DecorationImage(image: myself.photoClip)))
                           : Container(
-                          alignment: Alignment.center,
-                          child: CircleAvatar(
-                              backgroundColor: Colors.purpleAccent,
-                              radius: 40,
-                              child: myself.icon)),
+                              alignment: Alignment.center,
+                              child: CircleAvatar(
+                                  backgroundColor: Colors.purpleAccent,
+                                  radius: 40,
+                                  child: myself.icon)),
                       Text(
                         myself.name,
                         style: TextStyle(
@@ -165,79 +165,79 @@ class _MyHomePageState extends State<MyHomePage> {
                 ),
                 loginBoolean
                     ? ListTile(
-                  title: Text("登出"),
-                  onTap: () {
-                    showDialog(
-                      context: context,
-                      builder: (BuildContext context) {
-                        return AlertDialog(
-                          title: Text('確定登出?'),
-                          content: SingleChildScrollView(
-                            child: ListBody(
-                              children: <Widget>[
-                                Text('你正在登出'),
-                                Text("請確認是否要登出"),
-                              ],
-                            ),
-                          ),
-                          //TODO 處理一下登出的部分
-                          actions: <Widget>[
-                            TextButton(
-                              child: Text('確定'),
-                              onPressed: () {
-                                setState(() {
-                                  loginBoolean = false;
+                        title: Text("登出"),
+                        onTap: () {
+                          showDialog(
+                            context: context,
+                            builder: (BuildContext context) {
+                              return AlertDialog(
+                                title: Text('確定登出?'),
+                                content: SingleChildScrollView(
+                                  child: ListBody(
+                                    children: <Widget>[
+                                      Text('你正在登出'),
+                                      Text("請確認是否要登出"),
+                                    ],
+                                  ),
+                                ),
+                                //TODO 處理一下登出的部分
+                                actions: <Widget>[
+                                  TextButton(
+                                    child: Text('確定'),
+                                    onPressed: () {
+                                      setState(() {
+                                        loginBoolean = false;
 //                                        myself = FriendDetail(
 //                                            name: "未登入", hasPhoto: false);
 //                                        friendDetail ;
-                                  messageDetail = [];
-                                });
-                                Navigator.of(context).pop();
-                              },
-                            ),
-                            TextButton(
-                              child: Text("取消"),
-                              onPressed: () {
-                                Navigator.of(context).pop();
-                              },
-                            ),
-                          ],
-                        );
-                      },
-                    );
-                  },
-                )
+                                        messageDetail = [];
+                                      });
+                                      Navigator.of(context).pop();
+                                    },
+                                  ),
+                                  TextButton(
+                                    child: Text("取消"),
+                                    onPressed: () {
+                                      Navigator.of(context).pop();
+                                    },
+                                  ),
+                                ],
+                              );
+                            },
+                          );
+                        },
+                      )
                     : ListTile(
-                  title: Text("登入"),
-                  onTap: () async {
-                    var result =
-                    await Navigator.of(context).push(PageRouteBuilder(
-                      transitionDuration: Duration(milliseconds: 800),
-                      pageBuilder:
-                          (context, animation, secondaryAnimation) =>
-                          LoginPage(),
-                      transitionsBuilder: (context, animation,
-                          secondaryAnimation, child) {
-                        var begin = Offset(0.0, 1.0);
-                        var end = Offset.zero;
-                        var curve = Curves.ease;
+                        title: Text("登入"),
+                        onTap: () async {
+                          var result =
+                              await Navigator.of(context).push(PageRouteBuilder(
+                            transitionDuration: Duration(milliseconds: 800),
+                            pageBuilder:
+                                (context, animation, secondaryAnimation) =>
+                                    LoginPage(),
+                            transitionsBuilder: (context, animation,
+                                secondaryAnimation, child) {
+                              var begin = Offset(0.0, 1.0);
+                              var end = Offset.zero;
+                              var curve = Curves.ease;
 
-                        var tween = Tween(begin: begin, end: end)
-                            .chain(CurveTween(curve: curve));
-                        return SlideTransition(
-                          position: animation.drive(tween),
-                          child: child,
-                        );
-                      },
-                    ));
-                    print("login off");
+                              var tween = Tween(begin: begin, end: end)
+                                  .chain(CurveTween(curve: curve));
+                              return SlideTransition(
+                                position: animation.drive(tween),
+                                child: child,
+                              );
+                            },
+                          ));
+                          print("login off");
 //                          print(result);
-                    if (result == null)
-                      print("null");
-                    else
-                      handleLoginMessage(result);
-                  },
-                ),
+                          if (result == null)
+                            print("null");
+                          else
+                            handleLoginMessage(result);
+                        },
+                      ),
               ]),
             )
           ],
@@ -246,44 +246,38 @@ class _MyHomePageState extends State<MyHomePage> {
       body: Stack(
         children: [
           Container(
-            width: MediaQuery
-                .of(context)
-                .size
-                .width,
-            height: MediaQuery
-                .of(context)
-                .size
-                .height,
+            width: MediaQuery.of(context).size.width,
+            height: MediaQuery.of(context).size.height,
             color: Colors.brown,
             alignment: Alignment.center,
             child: !loginBoolean
                 ? ElevatedButton(
-              child: Text("登入"),
-              onPressed: () async {
-                var result =
-                await Navigator.of(context).push(PageRouteBuilder(
-                  transitionDuration: Duration(milliseconds: 800),
-                  pageBuilder: (context, animation, secondaryAnimation) =>
-                      LoginPage(),
-                  transitionsBuilder:
-                      (context, animation, secondaryAnimation, child) {
-                    var begin = Offset(0.0, 1.0);
-                    var end = Offset.zero;
-                    var curve = Curves.ease;
+                    child: Text("登入"),
+                    onPressed: () async {
+                      var result =
+                          await Navigator.of(context).push(PageRouteBuilder(
+                        transitionDuration: Duration(milliseconds: 800),
+                        pageBuilder: (context, animation, secondaryAnimation) =>
+                            LoginPage(),
+                        transitionsBuilder:
+                            (context, animation, secondaryAnimation, child) {
+                          var begin = Offset(0.0, 1.0);
+                          var end = Offset.zero;
+                          var curve = Curves.ease;
 
-                    var tween = Tween(begin: begin, end: end)
-                        .chain(CurveTween(curve: curve));
-                    return SlideTransition(
-                      position: animation.drive(tween),
-                      child: child,
-                    );
-                  },
-                ));
-                //result = json黨 myself資訊
-                if (result == null) print("null");
-                handleLoginMessage(result);
-              },
-            )
+                          var tween = Tween(begin: begin, end: end)
+                              .chain(CurveTween(curve: curve));
+                          return SlideTransition(
+                            position: animation.drive(tween),
+                            child: child,
+                          );
+                        },
+                      ));
+                      //result = json黨 myself資訊
+                      if (result == null) print("null");
+                      handleLoginMessage(result);
+                    },
+                  )
                 : null,
           ),
           IndexedStack(
@@ -325,30 +319,24 @@ class _MyHomePageState extends State<MyHomePage> {
                     tag: "friendDetail$i",
                     child: Material(
                         type: MaterialType.transparency,
-                        child: friendDetail
-                            .elementAt(i)
-                            .hasPhoto
+                        child: friendDetail.elementAt(i).hasPhoto
                             ? Container(
-                            alignment: Alignment.center,
-                            decoration: BoxDecoration(
-                                image: DecorationImage(
-                                    image: friendDetail
-                                        .elementAt(i)
-                                        .photoClip)))
+                                alignment: Alignment.center,
+                                decoration: BoxDecoration(
+                                    image: DecorationImage(
+                                        image: friendDetail
+                                            .elementAt(i)
+                                            .photoClip)))
                             : Container(
-                            alignment: Alignment.center,
-                            child: friendDetail
-                                .elementAt(i)
-                                .icon))),
+                                alignment: Alignment.center,
+                                child: friendDetail.elementAt(i).icon))),
                 Hero(
                     tag: "NameDetail$i",
                     child: Material(
                       type: MaterialType.transparency,
                       child: Container(
                         alignment: Alignment.bottomCenter,
-                        child: Text(friendDetail
-                            .elementAt(i)
-                            .name,
+                        child: Text(friendDetail.elementAt(i).name,
                             style: TextStyle(color: Colors.white, shadows: [
                               Shadow(
                                 blurRadius: 10.0,
@@ -378,14 +366,13 @@ class _MyHomePageState extends State<MyHomePage> {
           ),
           onTap: () async {
             ReturnFValue result =
-            await Navigator.of(context).push(PageRouteBuilder(
+                await Navigator.of(context).push(PageRouteBuilder(
               transitionDuration: Duration(seconds: 1),
-              pageBuilder: (_, __, ___) =>
-                  PersonDetailPage(
-                    ftag: "friendDetail$i",
-                    ntag: "NameDetail$i",
-                    friend: friendDetail.elementAt(i),
-                  ),
+              pageBuilder: (_, __, ___) => PersonDetailPage(
+                ftag: "friendDetail$i",
+                ntag: "NameDetail$i",
+                friend: friendDetail.elementAt(i),
+              ),
             ));
             print(result.str);
             if (result == null)
@@ -398,7 +385,9 @@ class _MyHomePageState extends State<MyHomePage> {
     return list;
   }
 
-  List<Widget> createChatContainer(BuildContext context,List snapshot) {
+  List<Widget> createChatContainer(BuildContext context, List snapshot) {
+    print("into createChatContainer");
+    print(snapshot);
     List<Widget> list = [];
     for (int i = 0; i < snapshot.length; i++) {
       Slidable con = Slidable(
@@ -420,7 +409,7 @@ class _MyHomePageState extends State<MyHomePage> {
                 child: CircleAvatar(
                     backgroundColor: Colors.purpleAccent,
                     radius: 35,
-                    child:  Icon(
+                    child: Icon(
                       Icons.person,
                       size: 60,
                     ))),
@@ -429,13 +418,12 @@ class _MyHomePageState extends State<MyHomePage> {
               style: TextStyle(fontSize: 30),
             ),
             contentPadding:
-            EdgeInsets.symmetric(vertical: 15.0, horizontal: 0.0),
+                EdgeInsets.symmetric(vertical: 15.0, horizontal: 0.0),
             subtitle: Text(
               "壓著往左滑看看",
               style: TextStyle(color: Colors.red),
             ),
             onTap: () {
-              //TODO 添加功能
 //              Navigator.of(context).push(PageRouteBuilder(
 //                transitionDuration: Duration(milliseconds: 800),
 //                pageBuilder: (context, animation, secondaryAnimation) =>
@@ -500,30 +488,29 @@ class _MyHomePageState extends State<MyHomePage> {
                   print(myself.account);
                   Navigator.of(context)
                       .push(PageRouteBuilder(
-                    pageBuilder: (context, animation, secondaryAnimation) =>
-                        AddFriendPage(
+                        pageBuilder: (context, animation, secondaryAnimation) =>
+                            AddFriendPage(
                           account: myself.account,
                         ),
-                    transitionsBuilder:
-                        (context, animation, secondaryAnimation, child) {
-                      var begin = Offset(0.0, 1.0);
-                      var end = Offset.zero;
-                      var curve = Curves.ease;
+                        transitionsBuilder:
+                            (context, animation, secondaryAnimation, child) {
+                          var begin = Offset(0.0, 1.0);
+                          var end = Offset.zero;
+                          var curve = Curves.ease;
 
-                      var tween = Tween(begin: begin, end: end)
-                          .chain(CurveTween(curve: curve));
+                          var tween = Tween(begin: begin, end: end)
+                              .chain(CurveTween(curve: curve));
 
-                      return SlideTransition(
-                        position: animation.drive(tween),
-                        child: child,
-                      );
-                    },
-                  ))
-                      .then((value) =>
-                  {
-                    //TODO reload一下朋友列表
-                    rebuildFriend(value)
-                  });
+                          return SlideTransition(
+                            position: animation.drive(tween),
+                            child: child,
+                          );
+                        },
+                      ))
+                      .then((value) => {
+                            //TODO reload一下朋友列表
+                            rebuildFriend(value)
+                          });
                 },
               ),
             ]),
@@ -630,70 +617,109 @@ class _MyHomePageState extends State<MyHomePage> {
         StreamBuilder(
             stream: count(myself),
             builder: (context, snapshot) {
-          if (snapshot.connectionState==ConnectionState.waiting) {
-            return SliverList(delegate: SliverChildListDelegate(
-                [Container(height: 300, child: CircularProgressIndicator(),)]));
-          }
-          if(snapshot.connectionState==ConnectionState.done) {print("done");}
-          chatList = createChatContainer(context,snapshot.data);
-          return SliverList(
-            //用來建list 裡面再放東西
-            delegate: SliverChildListDelegate(
-              chatList,
-            ),
-          );
-        }),
+              if (snapshot.hasError) {
+                return SliverList(
+                    delegate: SliverChildListDelegate([
+                  Container(
+                    height: 100,
+                    child: Text("error"),
+                  )
+                ]));
+              }
+              if (snapshot.connectionState == ConnectionState.waiting) {
+                return SliverList(
+                    delegate: SliverChildListDelegate([
+                  Container(
+                    height: 100,
+                    child: CircularProgressIndicator(),
+                  )
+                ]));
+              }
+              if (snapshot.connectionState == ConnectionState.done) {
+//                print("done");
+                return SliverList(
+                    delegate: SliverChildListDelegate([
+                  Container(
+                    height: 100,
+                  )
+                ]));
+              }
+              if (!snapshot.hasData) {
+                return SliverList(
+                    delegate: SliverChildListDelegate([
+                  Container(
+                    height: 100,
+                  )
+                ]));
+              } else
+                chatList = createChatContainer(context, snapshot.data);
+              return SliverList(
+                //用來建list 裡面再放東西
+                delegate: SliverChildListDelegate(
+                  chatList,
+                ),
+              );
+            }),
       ],
     );
   }
 
   void _createChat(FriendDetail friend) async {
-    int wh = -1;
-    try {
-      wh = messageDetail.indexWhere((element) => element.friend == friend);
-      setState(() {
-        messageDetail.removeAt(wh);
-        messageDetail.insert(
-            0,
-            MessageDetail(
-              friend: friend,
-              message: "壓著往左滑看看",
-            ));
-      });
-    } catch (e) {
-      print("no index");
-      setState(() {
-        messageDetail.insert(
-            0,
-            MessageDetail(
-              friend: friend,
-              message: "壓著往左滑看看",
-            ));
-      });
-    }
-//    print("try");
-    await Navigator.of(context).push(PageRouteBuilder(
-      transitionDuration: Duration(milliseconds: 800),
-      pageBuilder: (context, animation, secondaryAnimation) =>
-          ChatPage(
-            friend: friend,
-          ),
-      transitionsBuilder: (context, animation, secondaryAnimation, child) {
-        var begin = Offset(0.0, 1.0);
-        var end = Offset.zero;
-        var curve = Curves.ease;
-
-        var tween =
-        Tween(begin: begin, end: end).chain(CurveTween(curve: curve));
-        return SlideTransition(
-          position: animation.drive(tween),
-          child: child,
-        );
-      },
-    ));
-    setState(() {
-      _selectedIndex = 1;
-    });
+    var response =
+        await http.patch(Uri.parse(baseUrl + 'createChat/' + myself.account),
+            headers: <String, String>{
+              'Content-Type': 'application/json; charset=UTF-8',
+            },
+            body: jsonEncode({"chatRoomName": friend.name}));
+    String roomId = jsonDecode(response.body);
+//    print(response.body);
+    print(roomId);
+//
+//    int wh = -1;
+//    try {
+//      wh = messageDetail.indexWhere((element) => element.friend == friend);
+//      setState(() {
+//        messageDetail.removeAt(wh);
+//        messageDetail.insert(
+//            0,
+//            MessageDetail(
+//              friend: friend,
+//              message: "壓著往左滑看看",
+//            ));
+//      });
+//    } catch (e) {
+//      print("no index");
+//      setState(() {
+//        messageDetail.insert(
+//            0,
+//            MessageDetail(
+//              friend: friend,
+//              message: "壓著往左滑看看",
+//            ));
+//      });
+//    }
+////    print("try");
+//    await Navigator.of(context).push(PageRouteBuilder(
+//      transitionDuration: Duration(milliseconds: 800),
+//      pageBuilder: (context, animation, secondaryAnimation) => ChatPage(
+//        friend: friend,
+//      ),
+//      transitionsBuilder: (context, animation, secondaryAnimation, child) {
+//        var begin = Offset(0.0, 1.0);
+//        var end = Offset.zero;
+//        var curve = Curves.ease;
+//
+//        var tween =
+//            Tween(begin: begin, end: end).chain(CurveTween(curve: curve));
+//        return SlideTransition(
+//          position: animation.drive(tween),
+//          child: child,
+//        );
+//      },
+//    ));
+//    setState(() {
+//      _selectedIndex = 1;
+//    });
   }
 
   void _cleanMessage() {
@@ -711,10 +737,7 @@ class _MyHomePageState extends State<MyHomePage> {
   void _deleteMessage(int index) {
     setState(() {
       print(index);
-      print(messageDetail
-          .elementAt(index)
-          .friend
-          .name);
+      print(messageDetail.elementAt(index).friend.name);
       messageDetail.removeAt(index);
     });
   }
@@ -722,7 +745,7 @@ class _MyHomePageState extends State<MyHomePage> {
   //TODO 處理登入後的資料
   void handleLoginMessage(var result) async {
     Map<String, dynamic> json = jsonDecode(result);
-    print(json);
+//    print(json);
 //    print(json);
     friendDetail = await loadFriend(json['friend']);
 

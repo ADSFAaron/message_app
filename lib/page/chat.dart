@@ -35,30 +35,30 @@ class MessageDetail {
 final List<String> l = ['a', 'b', 'c'];
 
 Stream<List<Map<String, dynamic>>> count(FriendDetail myself) async* {
-  print("start strean");
-  try {
-    var response = await http.post(Uri.parse(baseUrl + "getChatRoom"),
-        headers: <String, String>{
-          'Content-Type': 'application/json; charset=UTF-8',
-        },
-        body: jsonEncode({"account": myself.account}));
-    print(response.body);
+//  await Future.delayed(Duration(seconds: 5));
+//  print("start strean");
+  while (true) {
+    try {
+        var response = await http.post(Uri.parse(baseUrl + "getChatRoom"),
+            headers: <String, String>{
+              'Content-Type': 'application/json; charset=UTF-8',
+            },
+            body: jsonEncode({"account": myself.account}));
+    //    print(response.body);
 
-    Map<String, dynamic> json = jsonDecode(response.body);
-    List<Map<String, dynamic>> products;
-    (json['chatRoom'] as List).map((e) => products.add(jsonDecode(e)));
-    print(products);
-    yield products;
-    await Future.delayed(Duration(seconds: 1));
-  } catch (e) {
-    print("error");
-    print(e);
+        Map<String, dynamic> json = jsonDecode(response.body);
+        List<Map<String, dynamic>> products=[];
+        List<dynamic> list =json['chatRoom'];
+//        print(list);
+        list.forEach((element) {        products.add(element);        });
+//        print(products[0]['roomId']);
+        yield products;
+        await Future.delayed(Duration(seconds: 3333));
+      } catch (e) {
+    //    print("error");
+    //    print(e);
+      }
   }
-//  int i = 1;
-//  while (true) {
-//    yield l.elementAt(i);
-//    i++;
-//  }
 }
 
 List<MessageDetail> loadMessage(List chatRoom) {

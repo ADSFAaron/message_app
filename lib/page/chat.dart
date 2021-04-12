@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:message_app/page/friend.dart';
+import 'register.dart';
+import 'package:http/http.dart' as http;
+import 'dart:convert';
 
 class MessageDetail {
   @required
@@ -12,36 +15,54 @@ class MessageDetail {
   void initState() {
     photoClipContainer = friend.hasPhoto
         ? Container(
-        width: 70,
-        height: 70,
-        alignment: Alignment.center,
-        decoration: BoxDecoration(
-            shape: BoxShape.circle,
-            image: DecorationImage(image: friend.photoClip)))
+            width: 70,
+            height: 70,
+            alignment: Alignment.center,
+            decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                image: DecorationImage(image: friend.photoClip)))
         : Container(
-        width: 70,
-        height: 70,
-        alignment: Alignment.center,
-        child: CircleAvatar(
-            backgroundColor: Colors.purpleAccent,
-            radius: 35,
-            child: friend.icon));
+            width: 70,
+            height: 70,
+            alignment: Alignment.center,
+            child: CircleAvatar(
+                backgroundColor: Colors.purpleAccent,
+                radius: 35,
+                child: friend.icon));
   }
 }
 
 final List<String> l = ['a', 'b', 'c'];
 
-Stream<String> count() async* {
-  int i = 1;
-  while (true) {
-    yield l.elementAt(i);
-    i++;
+Stream<List<Map<String, dynamic>>> count(FriendDetail myself) async* {
+  print("start strean");
+  try {
+    var response = await http.post(Uri.parse(baseUrl + "getChatRoom"),
+        headers: <String, String>{
+          'Content-Type': 'application/json; charset=UTF-8',
+        },
+        body: jsonEncode({"account": myself.account}));
+    print(response.body);
+
+    Map<String, dynamic> json = jsonDecode(response.body);
+    List<Map<String, dynamic>> products;
+    (json['chatRoom'] as List).map((e) => products.add(jsonDecode(e)));
+    print(products);
+    yield products;
+    await Future.delayed(Duration(seconds: 1));
+  } catch (e) {
+    print("error");
+    print(e);
   }
+//  int i = 1;
+//  while (true) {
+//    yield l.elementAt(i);
+//    i++;
+//  }
 }
 
 List<MessageDetail> loadMessage(List chatRoom) {
   List<MessageDetail> list = [];
-
 
 //  if(myself.name!="123")
 //    return list;
@@ -88,8 +109,13 @@ class _ChatPage extends State<ChatPage> {
             myself: myself,
             other: false,
           ));
-      _messages.insert(0, MessageBox(text: text, other: true,
-        friend: friend,));
+      _messages.insert(
+          0,
+          MessageBox(
+            text: text,
+            other: true,
+            friend: friend,
+          ));
     });
   }
 
@@ -113,20 +139,20 @@ class _ChatPage extends State<ChatPage> {
               ),
               SafeArea(
                   child: Row(children: [
-                    Flexible(
-                        child: TextField(
-                          decoration: InputDecoration(
-                            contentPadding: EdgeInsets.all(16.0),
-                            border: OutlineInputBorder(),
-                            hintText: '輸入文字',
-                          ),
-                          controller: _chatController,
-                          onSubmitted: _submitText, // 綁定事件給_submitText這個Function
-                        )),
-                    IconButton(
-                        icon: Icon(Icons.send),
-                        onPressed: () => _submitText(_chatController.text))
-                  ])),
+                Flexible(
+                    child: TextField(
+                  decoration: InputDecoration(
+                    contentPadding: EdgeInsets.all(16.0),
+                    border: OutlineInputBorder(),
+                    hintText: '輸入文字',
+                  ),
+                  controller: _chatController,
+                  onSubmitted: _submitText, // 綁定事件給_submitText這個Function
+                )),
+                IconButton(
+                    icon: Icon(Icons.send),
+                    onPressed: () => _submitText(_chatController.text))
+              ])),
             ],
           ),
         ));
@@ -151,76 +177,76 @@ class MessageBox extends StatelessWidget {
       margin: const EdgeInsets.symmetric(vertical: 10.0),
       child: Row(
         mainAxisAlignment:
-        other ? MainAxisAlignment.start : MainAxisAlignment.end,
+            other ? MainAxisAlignment.start : MainAxisAlignment.end,
         children: other
             ? <Widget>[
-          friend.hasPhoto
-              ? Container(
-              width: clipSize,
-              height: clipSize,
-              alignment: Alignment.center,
-              decoration: BoxDecoration(
-                  shape: BoxShape.circle,
-                  image: DecorationImage(image: friend.photoClip)))
-              : Container(
-              width: clipSize,
-              height: clipSize,
-              alignment: Alignment.center,
-              child: CircleAvatar(
-                  backgroundColor: Colors.purpleAccent,
-                  radius: 35,
-                  child: friend.icon)),
-          Container(
-            width: 5,
-          ),
-          Flexible(
-            child: Container(
-              color: Colors.grey,
-              padding: EdgeInsets.all(10.0),
-              child: Text(text,
-                  overflow: TextOverflow.ellipsis,
-                  maxLines: 5,
-                  style: TextStyle(fontSize: 18.0, color: Colors.white)),
-            ),
-          ),
-          Container(
-            width: 60,
-          ),
-        ]
+                friend.hasPhoto
+                    ? Container(
+                        width: clipSize,
+                        height: clipSize,
+                        alignment: Alignment.center,
+                        decoration: BoxDecoration(
+                            shape: BoxShape.circle,
+                            image: DecorationImage(image: friend.photoClip)))
+                    : Container(
+                        width: clipSize,
+                        height: clipSize,
+                        alignment: Alignment.center,
+                        child: CircleAvatar(
+                            backgroundColor: Colors.purpleAccent,
+                            radius: 35,
+                            child: friend.icon)),
+                Container(
+                  width: 5,
+                ),
+                Flexible(
+                  child: Container(
+                    color: Colors.grey,
+                    padding: EdgeInsets.all(10.0),
+                    child: Text(text,
+                        overflow: TextOverflow.ellipsis,
+                        maxLines: 5,
+                        style: TextStyle(fontSize: 18.0, color: Colors.white)),
+                  ),
+                ),
+                Container(
+                  width: 60,
+                ),
+              ]
             : <Widget>[
-          Container(
-            width: 60,
-          ),
-          Flexible(
-            child: Container(
-              color: Colors.lightGreen,
-              padding: EdgeInsets.all(10.0),
-              child: Text(text,
-                  overflow: TextOverflow.ellipsis,
-                  maxLines: 5,
-                  style: TextStyle(fontSize: 18.0, color: Colors.white)),
-            ),
-          ),
-          Container(
-            width: 5,
-          ),
-          myself.hasPhoto
-              ? Container(
-              width: clipSize,
-              height: clipSize,
-              alignment: Alignment.center,
-              decoration: BoxDecoration(
-                  shape: BoxShape.circle,
-                  image: DecorationImage(image: myself.photoClip)))
-              : Container(
-              width: clipSize,
-              height: clipSize,
-              alignment: Alignment.center,
-              child: CircleAvatar(
-                  backgroundColor: Colors.purpleAccent,
-                  radius: 35,
-                  child: myself.icon)),
-        ],
+                Container(
+                  width: 60,
+                ),
+                Flexible(
+                  child: Container(
+                    color: Colors.lightGreen,
+                    padding: EdgeInsets.all(10.0),
+                    child: Text(text,
+                        overflow: TextOverflow.ellipsis,
+                        maxLines: 5,
+                        style: TextStyle(fontSize: 18.0, color: Colors.white)),
+                  ),
+                ),
+                Container(
+                  width: 5,
+                ),
+                myself.hasPhoto
+                    ? Container(
+                        width: clipSize,
+                        height: clipSize,
+                        alignment: Alignment.center,
+                        decoration: BoxDecoration(
+                            shape: BoxShape.circle,
+                            image: DecorationImage(image: myself.photoClip)))
+                    : Container(
+                        width: clipSize,
+                        height: clipSize,
+                        alignment: Alignment.center,
+                        child: CircleAvatar(
+                            backgroundColor: Colors.purpleAccent,
+                            radius: 35,
+                            child: myself.icon)),
+              ],
       ),
     );
   }

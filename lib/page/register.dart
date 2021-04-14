@@ -2,9 +2,10 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
+import 'package:fluttertoast/fluttertoast.dart';
 
-//final String baseUrl = "http://140.138.152.96:3000/api/user/";
-final String baseUrl = "http://10.0.2.2:3000/api/user/";
+final String baseUrl = "http://140.138.152.96:3001/api/user/";
+//final String baseUrl = "http://10.0.2.2:3001/api/user/";
 
 class RegisterPage extends StatefulWidget {
   RegisterPage({Key key}) : super(key: key);
@@ -156,6 +157,15 @@ class _RegisterPage extends State<RegisterPage> {
       }
       else{
         print("-----------------ERROR-----------------");
+        Fluttertoast.showToast(
+            msg: uriResponse.body,
+            toastLength: Toast.LENGTH_SHORT,
+            gravity: ToastGravity.CENTER,
+            timeInSecForIosWeb: 1,
+            backgroundColor: Colors.red,
+            textColor: Colors.white,
+            fontSize: 16.0
+        );
       }
     } catch (e) {
       print(e);

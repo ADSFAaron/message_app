@@ -82,9 +82,9 @@ class _MyHomePageState extends State<MyHomePage> {
     super.initState();
     //_checkFinePosPermission();
     myself = FriendDetail(account: null, hasPhoto: false, name: "未登錄");
-    messageDetail.add(MessageDetail(friend: none, message: "12"));
-    messageDetail.add(MessageDetail(friend: none, message: "12"));
-    messageDetail.add(MessageDetail(friend: none, message: "12"));
+//    messageDetail.add(MessageDetail(friend: none, message: "12"));
+//    messageDetail.add(MessageDetail(friend: none, message: "12"));
+//    messageDetail.add(MessageDetail(friend: none, message: "12"));
     //TODO 處理login前的資訊
   }
 
@@ -93,6 +93,7 @@ class _MyHomePageState extends State<MyHomePage> {
     friendList = createFContainer(context);
 //    chatList = createChatContainer(context, []);
     return Scaffold(
+      resizeToAvoidBottomInset:false,
       key: _scaffoldKey,
       drawer: Drawer(
         child: Column(
@@ -275,7 +276,8 @@ class _MyHomePageState extends State<MyHomePage> {
                       ));
                       //result = json黨 myself資訊
                       if (result == null) print("null");
-                      handleLoginMessage(result);
+                      else
+                        handleLoginMessage(result);
                     },
                   )
                 : null,
@@ -386,8 +388,8 @@ class _MyHomePageState extends State<MyHomePage> {
   }
 
   List<Widget> createChatContainer(BuildContext context, List snapshot) {
-    print("into createChatContainer");
-    print(snapshot);
+//    print("into createChatContainer");
+//    print(snapshot);
     List<Widget> list = [];
     for (int i = 0; i < snapshot.length; i++) {
       Slidable con = Slidable(
@@ -424,29 +426,28 @@ class _MyHomePageState extends State<MyHomePage> {
               style: TextStyle(color: Colors.red),
             ),
             onTap: () {
-//              Navigator.of(context).push(PageRouteBuilder(
-//                transitionDuration: Duration(milliseconds: 800),
-//                pageBuilder: (context, animation, secondaryAnimation) =>
-//                    ChatPage(
-//                      friend: messageDetail
-//                          .elementAt(i)
-//                          .friend,
-//                      myself: myself,
-//                    ),
-//                transitionsBuilder:
-//                    (context, animation, secondaryAnimation, child) {
-//                  var begin = Offset(0.0, 1.0);
-//                  var end = Offset.zero;
-//                  var curve = Curves.ease;
-//
-//                  var tween = Tween(begin: begin, end: end)
-//                      .chain(CurveTween(curve: curve));
-//                  return SlideTransition(
-//                    position: animation.drive(tween),
-//                    child: child,
-//                  );
-//                },
-//              ));
+              Navigator.of(context).push(PageRouteBuilder(
+                transitionDuration: Duration(milliseconds: 800),
+                pageBuilder: (context, animation, secondaryAnimation) =>
+                    ChatPage(
+                      roomId: snapshot.elementAt(i)['roomId'],
+                      myself: myself,
+                      roomName: snapshot.elementAt(i)['roomName'],
+                    ),
+                transitionsBuilder:
+                    (context, animation, secondaryAnimation, child) {
+                  var begin = Offset(0.0, 1.0);
+                  var end = Offset.zero;
+                  var curve = Curves.ease;
+
+                  var tween = Tween(begin: begin, end: end)
+                      .chain(CurveTween(curve: curve));
+                  return SlideTransition(
+                    position: animation.drive(tween),
+                    child: child,
+                  );
+                },
+              ));
             },
             onLongPress: () {
               print("longPress");
@@ -670,7 +671,7 @@ class _MyHomePageState extends State<MyHomePage> {
             headers: <String, String>{
               'Content-Type': 'application/json; charset=UTF-8',
             },
-            body: jsonEncode({"chatRoomName": friend.name}));
+            body: jsonEncode({"chatRoomName": friend.name,"friendAccount":friend.account}));
     String roomId = jsonDecode(response.body);
 //    print(response.body);
     print(roomId);
@@ -737,7 +738,7 @@ class _MyHomePageState extends State<MyHomePage> {
   void _deleteMessage(int index) {
     setState(() {
       print(index);
-      print(messageDetail.elementAt(index).friend.name);
+//      print(messageDetail.elementAt(index).friend.name);
       messageDetail.removeAt(index);
     });
   }
@@ -745,7 +746,7 @@ class _MyHomePageState extends State<MyHomePage> {
   //TODO 處理登入後的資料
   void handleLoginMessage(var result) async {
     Map<String, dynamic> json = jsonDecode(result);
-//    print(json);
+    print(json);
 //    print(json);
     friendDetail = await loadFriend(json['friend']);
 

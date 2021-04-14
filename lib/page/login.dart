@@ -19,20 +19,20 @@ class _LoginPage extends State<LoginPage> {
   final TextEditingController accountController = TextEditingController();
   final TextEditingController passwordController = TextEditingController();
 
-  //final String baseUrl = "http://10.0.2.2:3000/api/user/";
   String errorText;
 
   @mustCallSuper
   void initState() {
     super.initState();
     errorText = null;
-    accountController.text = "1234567";
-    passwordController.text = "abc1234";
+//    accountController.text = "1234567";
+//    passwordController.text = "abc1234";
   }
 
   void _loginButton(String text1, String text2) async {
 //    print(text1);
 //    print(text2);
+//  print("button");
     try {
       var response = await http.post(Uri.parse(baseUrl + "login"),
           headers: <String, String>{

@@ -169,7 +169,7 @@ class _ChatPage extends State<ChatPage> {
   List<Widget> returnMess(List<Map<String, dynamic>> list) {
     List<Widget> l = [];
 //    print("create Message");
-    FriendDetail fr = FriendDetail(name: "other", hasPhoto:false, account: "1");
+    FriendDetail fr = FriendDetail(name: "other",  account: "1");
     for (int index = 0;index<list.length;index++){
       MessageBox bx = MessageBox(text: list.elementAt(index)['message'],
         other:list.elementAt(index)['SendingAccount']==myself.account?false:true,
@@ -267,7 +267,7 @@ class MessageBox extends StatelessWidget {
             other ? MainAxisAlignment.start : MainAxisAlignment.end,
         children: other
             ? <Widget>[
-                friend.hasPhoto
+                friend.photoClip!=null
                     ? Container(
                         width: clipSize,
                         height: clipSize,
@@ -317,7 +317,7 @@ class MessageBox extends StatelessWidget {
                 Container(
                   width: 5,
                 ),
-                myself.hasPhoto
+                myself.photoClip!=null
                     ? Container(
                         width: clipSize,
                         height: clipSize,
@@ -335,6 +335,81 @@ class MessageBox extends StatelessWidget {
                             child: myself.icon)),
               ],
       ),
+    );
+  }
+}
+
+class ShortCutChatRoom extends StatefulWidget{
+  final String name;
+  final int i;
+  final String photoURL;
+  ShortCutChatRoom({this.name,this.i,this.photoURL});
+
+  _ShortCutChatRoom createState()=>_ShortCutChatRoom(name,i,photoURL);
+}
+
+class _ShortCutChatRoom extends State<ShortCutChatRoom>{
+  int i;
+  String roomName;
+  String photoURL;
+  _ShortCutChatRoom(String _name,int _i,String _url){
+    roomName = _name;
+    i=_i;
+    photoURL = _url;
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return ListTile(
+      tileColor: Colors.orange[200 + (i % 4) * 100],
+      leading: Container(
+        // color: Colors.red,
+          height: 90,
+          width: 90,
+          child: CircleAvatar(
+              backgroundColor: Colors.purpleAccent,
+              radius: 60,
+              child: Icon( //TODO 未來支援圖片
+                Icons.person,
+                size: 45,
+              ))),
+      title: Text(
+        roomName,
+        style: TextStyle(fontSize: 30),
+      ),
+      contentPadding:
+      EdgeInsets.symmetric(vertical: 15.0, horizontal: 0.0),
+      subtitle: Text(
+        "壓著往左滑看看",
+        style: TextStyle(color: Colors.red),
+      ),
+      // onTap: () {
+      //   Navigator.of(context).push(PageRouteBuilder(
+      //     transitionDuration: Duration(milliseconds: 800),
+      //     pageBuilder: (context, animation, secondaryAnimation) =>
+      //         ChatPage(
+      //           roomId: snapshot.elementAt(i)['roomId'],
+      //           myself: myself,
+      //           roomName: snapshot.elementAt(i)['roomName'],
+      //         ),
+      //     transitionsBuilder:
+      //         (context, animation, secondaryAnimation, child) {
+      //       var begin = Offset(0.0, 1.0);
+      //       var end = Offset.zero;
+      //       var curve = Curves.ease;
+      //
+      //       var tween = Tween(begin: begin, end: end)
+      //           .chain(CurveTween(curve: curve));
+      //       return SlideTransition(
+      //         position: animation.drive(tween),
+      //         child: child,
+      //       );
+      //     },
+      //   ));
+      // },
+      // onLongPress: () {
+      //   print("longPress");
+      // },
     );
   }
 }

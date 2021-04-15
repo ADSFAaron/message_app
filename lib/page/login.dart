@@ -1,7 +1,13 @@
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
+import 'package:google_sign_in/google_sign_in.dart';
 import 'register.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
+import 'package:flutter_signin_button/flutter_signin_button.dart';
+import 'package:fluttertoast/fluttertoast.dart';
+
 
 class LoginPage extends StatefulWidget {
   LoginPage({Key key}) : super(key: key);
@@ -20,48 +26,90 @@ class _LoginPage extends State<LoginPage> {
   final TextEditingController passwordController = TextEditingController();
 
   String errorText;
-
+  String errorPasswordText;
+  // GoogleSignInAccount _currentUser;
+  UserCredential userCredential;
   @mustCallSuper
   void initState() {
     super.initState();
     errorText = null;
-//    accountController.text = "1234567";
-//    passwordController.text = "abc1234";
+    errorPasswordText= null;
+   accountController.text = "henry890811@gmail.com";
+   passwordController.text = "123456789";
   }
 
   void _loginButton(String text1, String text2) async {
 //    print(text1);
 //    print(text2);
 //  print("button");
+//     User user =userCredential
     try {
-      var response = await http.post(Uri.parse(baseUrl + "login"),
-          headers: <String, String>{
-            'Content-Type': 'application/json; charset=UTF-8',
-          },
-          body: jsonEncode({"account": text1, "password": text2}));
-//     print(response.body);
-      if (response.body != "not found") {
-//        var jsonD = jsonDecode(response.body);
-//        print(jsonD);
-        Navigator.of(context).pop(response.body);
-      } else {
-//        print("1");
+      userCredential = await FirebaseAuth.instance.signInWithEmailAndPassword(
+          email: text1,
+          password: text2
+      );
+    } on FirebaseAuthException catch (e) {
+      if (e.code == 'user-not-found') {
+        Fluttertoast.showToast(
+          backgroundColor: Colors.grey,
+          msg: 'No user found for that email.',
+          toastLength: Toast.LENGTH_SHORT,
+          gravity: ToastGravity.CENTER,
+        );
         setState(() {
-          errorText = "帳號或密碼錯誤";
+          errorText ="No user found for that email.";
+          errorPasswordText= errorText;
         });
+        print('No user found for that email.');
+      } else if (e.code == 'wrong-password') {
+        Fluttertoast.showToast(
+          backgroundColor: Colors.grey,
+          msg: "Wrong password provided for that user.",
+          toastLength: Toast.LENGTH_SHORT,
+          gravity: ToastGravity.CENTER,
+        );
+        setState(() {
+          errorPasswordText= "Wrong password provided for that user.";
+        });
+        print('Wrong password provided for that user.');
       }
-    } catch (e) {
-      print(e);
     }
+    print(userCredential);
+    if(userCredential!=null)
+      Navigator.of(context).pop(userCredential.user);
+  }
+
+  Future<UserCredential> signInWithGoogle() async {
+    Fluttertoast.showToast(msg: "不知為啥會有問題");
+
+    print("0");
+    // Trigger the authentication flow
+    final GoogleSignInAccount googleUser = await GoogleSignIn().signIn();
+
+    print("1");
+    // Obtain the auth details from the request
+    final GoogleSignInAuthentication googleAuth = await googleUser.authentication;
+
+    print("2");
+    // Create a new credential
+    final GoogleAuthCredential credential = GoogleAuthProvider.credential(
+      accessToken: googleAuth.accessToken,
+      idToken: googleAuth.idToken,
+    );
+  print("123");
+    // Once signed in, return the UserCredential
+    return await FirebaseAuth.instance.signInWithCredential(credential);
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+        resizeToAvoidBottomInset:false,
         appBar: AppBar(
           title: Text("登入"),
         ),
-        body: InkWell(
+        body:
+        InkWell(
             onTap: () {
               FocusScope.of(context).unfocus();
             },
@@ -90,7 +138,7 @@ class _LoginPage extends State<LoginPage> {
                       controller: passwordController,
                       obscureText: _obscureText,
                       decoration: InputDecoration(
-                        errorText: errorText,
+                        errorText: errorPasswordText,
                         prefixIcon: Icon(Icons.lock),
                         suffixIcon: IconButton(
                             icon: Icon(_iconForPassword),
@@ -155,8 +203,14 @@ class _LoginPage extends State<LoginPage> {
                       },
                     ),
                   ),
+                  Divider(),
+                  SignInButton(
+                    Buttons.Google,
+                    onPressed: ()=>print('1'),
+                  )
                 ],
               ),
-            )));
+            ))
+    );
   }
 }

@@ -1,3 +1,6 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:http/http.dart' as http;
@@ -13,22 +16,19 @@ class ReturnFValue {
 }
 
 class FriendDetail {
-  @required final String account;
-  final NetworkImage photoClip;
   @required
-  final bool hasPhoto;
+  final String account;
+  final NetworkImage photoClip;
   @required
   final String name;
   Icon icon;
 
-  FriendDetail({@required this.name, this.photoClip,@required this.hasPhoto,@required this.account})
-      : assert(hasPhoto == true || photoClip == null, "有圖片要給圖片") {
-    if (hasPhoto == false) {
-      icon = Icon(
-        Icons.person,
-        size: 60,
-      );
-    }
+  FriendDetail(
+      {@required this.name, @required this.photoClip, @required this.account}) {
+    icon = Icon(
+      Icons.person,
+      size: 60,
+    );
   }
 }
 
@@ -37,23 +37,24 @@ Future<List<FriendDetail>> loadFriend(List friendList) async {
   List<FriendDetail> list = [];
   for (int i = 0; i < friendList.length; i++) {
 //    print((friendList.elementAt(i)).runtimeType);
-    Map<String,String> json =Map<String,String>.from(friendList.elementAt(i));
+    Map<String, String> json =
+        Map<String, String>.from(friendList.elementAt(i));
 //    print("--------------------------");
-    try{
-    var response = await http.post(Uri.parse(baseUrl + "getFriendData"),
-        headers: <String, String>{
-          'Content-Type': 'application/json; charset=UTF-8',
-        },
-        body: jsonEncode({"account": json['account']}));
+    try {
+      var response = await http.post(Uri.parse(baseUrl + "getFriendData"),
+          headers: <String, String>{
+            'Content-Type': 'application/json; charset=UTF-8',
+          },
+          body: jsonEncode({"account": json['account']}));
 //    print("get response----------------");
 //    print(response.body);
-    Map<String,dynamic> toJson = jsonDecode(response.body);
-    list.add(FriendDetail(
-        account: toJson["account"],
-        name: toJson['username'],
-        hasPhoto: toJson['hasImage'],
-        photoClip: toJson['hasImage'] ? NetworkImage(toJson['imageUrl']) : null));
-  }catch(e){
+      Map<String, dynamic> toJson = jsonDecode(response.body);
+      list.add(FriendDetail(
+          account: toJson["account"],
+          name: toJson['username'],
+          photoClip:
+              toJson['hasImage'] ? NetworkImage(toJson['imageUrl']) : null));
+    } catch (e) {
       print("no account");
     }
   }
@@ -61,62 +62,64 @@ Future<List<FriendDetail>> loadFriend(List friendList) async {
 }
 
 class PersonDetailPage extends StatelessWidget {
-  final String ftag;
-  final String ntag;
-  final FriendDetail friend;
-  PersonDetailPage({
-    Key key,
-    this.friend,
-    this.ftag,
-    this.ntag,
-  });
+  final String friendEmail;
+
+  PersonDetailPage({Key key, @required this.friendEmail});
 
   Widget build(BuildContext context) {
+    CollectionReference users = FirebaseFirestore.instance.collection('users');
 //    print(friend.name);
-    return Scaffold(
-        floatingActionButtonLocation: FloatingActionButtonLocation.startTop,
-        floatingActionButton: IconButton(
-          icon: Icon(Icons.arrow_back_outlined),
-          onPressed: () {
-            Navigator.of(context)
-                .pop(ReturnFValue(friend: friend, str: "close"));
-          },
-        ),
-        body: Column(
-          children: [
-            Container(
-              color: Colors.blue,
-              height: 50,
-            ),
-            Container(
-                color: Colors.blue,
-                alignment: Alignment.center,
-                height: 300,
-                child: Hero(
-                    tag: ftag,
-                    child: Material(
-                        type: MaterialType.transparency,
-                        child: friend.hasPhoto
+    return FutureBuilder(
+        future: users.doc(friendEmail).get(),
+        builder:
+            (BuildContext context, AsyncSnapshot<DocumentSnapshot> snapshot) {
+          if (snapshot.connectionState == ConnectionState.done) {
+            Map<String, dynamic> data = snapshot.data.data();
+            if (snapshot.hasError) {
+              return Scaffold(
+                appBar: AppBar(),
+                body: Center(
+                  child: Text('Something went wrong...'),
+                ),
+              );
+            }
+            return Scaffold(
+                floatingActionButtonLocation:
+                    FloatingActionButtonLocation.startTop,
+                floatingActionButton: IconButton(
+                  icon: Icon(Icons.arrow_back_outlined),
+                  onPressed: () {
+                    Navigator.of(context).pop();
+                  },
+                ),
+                body: Column(
+                  children: [
+                    Container(
+                      color: Colors.blue,
+                      height: 50,
+                    ),
+                    Container(
+                        color: Colors.blue,
+                        alignment: Alignment.center,
+                        height: 300,
+                        child: data['photoURL'] != null
                             ? Container(
                                 alignment: Alignment.center,
                                 decoration: BoxDecoration(
                                     image: DecorationImage(
-                                        image: friend.photoClip)))
+                                        image: NetworkImage(data['photoURL']))))
                             : Container(
                                 alignment: Alignment.center,
-                                child: friend.icon)))),
-            Container(
-              height: 10,
-            ),
-            Container(
-              alignment: Alignment.center,
-              child: SizedBox(
-                  width: MediaQuery.of(context).size.width,
-                  child: Hero(
-                      tag: ntag,
-                      child: Material(
-                          type: MaterialType.transparency,
-                          child: Text(friend.name,
+                                child: Icon(
+                                  Icons.person,
+                                  size: 60,
+                                ))),
+                    Divider(),
+                    Container(
+                      alignment: Alignment.center,
+                      child: SizedBox(
+                          width: MediaQuery.of(context).size.width,
+                          child: Text(data['username'],
                               textAlign: TextAlign.center,
                               style: TextStyle(
                                   fontSize: 40,
@@ -142,93 +145,117 @@ class PersonDetailPage extends StatelessWidget {
                                       color: Colors.pink,
                                       offset: Offset(-5.0, -5.0),
                                     ),
-                                  ]))))),
+                                  ]))),
+                    ),
+                    Divider(),
+                    Container(
+                      alignment: Alignment.center,
+                      child: Text(
+                        data['bio'],
+                        style: TextStyle(
+                          fontSize: 20,
+                        ),
+                        textAlign: TextAlign.center,
+                      ),
+                    ),
+                    Expanded(child: Text("")),
+                    Container(
+                      //TODO 三個按鈕的功能 封鎖最後 刪除第二
+                      height: 100,
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          InkWell(
+                            child: Container(
+                                width: MediaQuery.of(context).size.width / 3,
+                                child: Column(
+                                  children: [
+                                    Icon(Icons.message, size: 60),
+                                    Text("傳訊息")
+                                  ],
+                                )),
+                            onTap: () {
+                              Navigator.of(context).pop(["sendMessage",friendEmail]);
+                            },
+                          ),
+                          InkWell(
+                            child: Container(
+                                width: MediaQuery.of(context).size.width / 3,
+                                child: Column(
+                                  children: [
+                                    Icon(Icons.delete, size: 60),
+                                    Text("刪除")
+                                  ],
+                                )),
+                            onTap: () {
+                              Fluttertoast.showToast(
+                                backgroundColor: Colors.grey,
+                                msg: "還沒製作",
+                                toastLength: Toast.LENGTH_SHORT,
+                                gravity: ToastGravity.CENTER,
+                              );
+                            },
+                          ),
+                          InkWell(
+                            child: Container(
+                                width: MediaQuery.of(context).size.width / 3,
+                                child: Column(
+                                  children: [
+                                    Icon(Icons.block, size: 60),
+                                    Text("封鎖")
+                                  ],
+                                )),
+                            onTap: () {
+                              Fluttertoast.showToast(
+                                backgroundColor: Colors.grey,
+                                msg: "還沒製作",
+                                toastLength: Toast.LENGTH_SHORT,
+                                gravity: ToastGravity.CENTER,
+                              );
+                            },
+                          ),
+                        ],
+                      ),
+                    )
+                  ],
+                ));
+          }
+          return Scaffold(
+            appBar: AppBar(),
+            body: Center(
+              child: CircularProgressIndicator(),
             ),
-            Container(
-              height: 10,
-            ),
-            Container(
-              alignment: Alignment.center,
-              child: Text(
-                "Detail Here\nabc\ndefg\nhijklm\nnopqrs\ntuvwxyz",
-                style: TextStyle(
-                  fontSize: 20,
-                ),
-                textAlign: TextAlign.center,
-              ),
-            ),
-            Expanded(child: Text("")),
-            Container(
-              //TODO 三個按鈕的功能 封鎖最後 刪除第二
-              height: 100,
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  InkWell(
-                    child: Container(
-                        width: MediaQuery.of(context).size.width / 3,
-                        child: Column(
-                          children: [
-                            Icon(Icons.message, size: 60),
-                            Text("傳訊息")
-                          ],
-                        )),
-                    onTap: () {
-                      Navigator.of(context).pop(
-                          ReturnFValue(friend: friend, str: "sendMessage"));
-                    },
-                  ),
-                  InkWell(
-                    child: Container(
-                        width: MediaQuery.of(context).size.width / 3,
-                        child: Column(
-                          children: [Icon(Icons.delete, size: 60), Text("刪除")],
-                        )),
-                    onTap: () {
-                      Fluttertoast.showToast(
-                        backgroundColor: Colors.grey,
-                        msg: "還沒製作",
-                        toastLength: Toast.LENGTH_SHORT,
-                        gravity: ToastGravity.CENTER,
-                      );
-                    },
-                  ),
-                  InkWell(
-                    child: Container(
-                        width: MediaQuery.of(context).size.width / 3,
-                        child: Column(
-                          children: [Icon(Icons.block, size: 60), Text("封鎖")],
-                        )),
-                    onTap: () {
-                      Fluttertoast.showToast(
-                        backgroundColor: Colors.grey,
-                        msg: "還沒製作",
-                        toastLength: Toast.LENGTH_SHORT,
-                        gravity: ToastGravity.CENTER,
-                      );
-                    },
-                  ),
-                ],
-              ),
-            )
-          ],
-        ));
+          );
+        });
   }
 }
 
 class AddFriendPage extends StatefulWidget {
-  AddFriendPage({Key key,@required this.account}) : super(key: key);
+  AddFriendPage({Key key, @required this.account}) : super(key: key);
   final String account;
+
   _AddFriendPage createState() => _AddFriendPage(account: account);
 }
 
 class _AddFriendPage extends State<AddFriendPage> {
+  FirebaseAuth auth;
+  User user;
+
   _AddFriendPage({@required this.account});
+
   final String account;
+
 //  _AddFriendPage();
   final TextEditingController _chatController = new TextEditingController();
 
   List<Widget> addFriendOutline = [];
+
+  void initState() {
+    super.initState();
+    auth = FirebaseAuth.instance;
+    user = auth.currentUser;
+    _chatController.text = "123456789@gmail.com";
+  }
 
   void _submitText(String text) async {
     addFriendOutline.clear();
@@ -240,38 +267,43 @@ class _AddFriendPage extends State<AddFriendPage> {
         ));
       });
     }
-    var response = await http.post(Uri.parse(baseUrl + "getFriendData"),
-        headers: <String, String>{
-          'Content-Type': 'application/json; charset=UTF-8',
-        },
-        body: jsonEncode({"account": text}));
-
+    // print(text);
+    CollectionReference users = FirebaseFirestore.instance.collection('users');
+    DocumentSnapshot future = await users.doc(text).get();
+    Map<String, dynamic> data = future.data();
+//     var response = await http.post(Uri.parse(baseUrl + "getFriendData"),
+//         headers: <String, String>{
+//           'Content-Type': 'application/json; charset=UTF-8',
+//         },
+//         body: jsonEncode({"account": text}));
+//
     setState(() {
 //      print("*${response.body}*");
-      if (response.body!="not found") {
-        print("go to create friend data");
+      if (data != null) {
+        // print("go to create friend data");
 
-        Map<String,dynamic> json = jsonDecode(response.body);
-        print(json);
         FriendDetail friend = FriendDetail(
-            account: json["account"],
-            name: json['username'],
-            hasPhoto: json['hasImage'],
-            photoClip: json['hasImage'] ? NetworkImage(json['imageUrl']) : null);
+            account: data["email"],
+            name: data['username'],
+            photoClip: data['photoURL'] != null
+                ? NetworkImage(data['photoURL'])
+                : null);
 
-        var photo = friend.hasPhoto?Container(
-          width: 180,
-          height: 180,
-          decoration: BoxDecoration(
-              // color: Colors.redAccent,
-              shape: BoxShape.circle,
-              image: DecorationImage(image: friend.photoClip)),
-        ):Container(
-            alignment: Alignment.center,
-            child: CircleAvatar(
-                backgroundColor: Colors.purpleAccent,
-                radius: 40,
-                child: friend.icon));
+        var photo = friend.photoClip != null
+            ? Container(
+                width: 180,
+                height: 180,
+                decoration: BoxDecoration(
+                    // color: Colors.redAccent,
+                    shape: BoxShape.circle,
+                    image: DecorationImage(image: friend.photoClip)),
+              )
+            : Container(
+                alignment: Alignment.center,
+                child: CircleAvatar(
+                    backgroundColor: Colors.purpleAccent,
+                    radius: 40,
+                    child: friend.icon));
         addFriendOutline.add(photo);
         addFriendOutline.add(Container(
           height: 10,
@@ -288,22 +320,34 @@ class _AddFriendPage extends State<AddFriendPage> {
               backgroundColor: MaterialStateProperty.all<Color>(Colors.brown),
               padding: MaterialStateProperty.all((EdgeInsets.all(5))),
             ),
-            onPressed: () async{
-//              print("------------------------------------------");
-//              print(account);
-              var response = await http.patch(
-                Uri.parse(baseUrl+account),
-                headers: <String, String>{
-                  'Content-Type': 'application/json; charset=UTF-8',
-                },
-                body: jsonEncode({"account":friend.account})
-              );
-              if(response.body!='failed'){
-                Map<String,dynamic> map = jsonDecode(response.body);
-                Navigator.pop(context,map['friend']);
-              //TODO pop後friend list 重新刷新
-              //TODO 是否需要跳到 friend personDetail page
-              }
+            onPressed: () async {
+              DocumentSnapshot document = await users.doc(user.email).get();
+              FirebaseFirestore.instance.runTransaction((transaction) async {
+                DocumentSnapshot freshSnap =
+                    await transaction.get(document.reference);
+                List<Map<String, dynamic>> list =
+                    List.from(freshSnap.data()['friend']);
+                var addThing = {
+                  "email": data['email'],
+                  "username": data['username'],
+                  "photoUrl": data['photoURL']
+                };
+                list.add(addThing);
+                await transaction.update(freshSnap.reference, {
+                  "friend": list,
+                });
+              });
+              // try {
+              //   users.doc(user.email).update({
+              //     "friend": FieldValue.arrayUnion({
+              //       "email": data['email'],
+              //       "name": data['username'],
+              //       "photoUrl": data['photoURL']
+              //     })
+              //   });
+              // } catch (e) {
+              //   print(e);
+              // }
             },
             child: Text("添加好友")));
       } else {
@@ -316,6 +360,7 @@ class _AddFriendPage extends State<AddFriendPage> {
   }
 
   Widget build(BuildContext context) {
+    // print(auth.currentUser);
     return Scaffold(
         appBar: AppBar(
           title: Text("添加好友"),
@@ -328,7 +373,7 @@ class _AddFriendPage extends State<AddFriendPage> {
             child: Column(
               children: [
                 Container(
-                    color: Colors.yellow,
+                    // color: Colors.yellow,
                     height: MediaQuery.of(context).size.height / 3.5,
                     child: Container(
                       alignment: Alignment.center,
@@ -341,8 +386,8 @@ class _AddFriendPage extends State<AddFriendPage> {
                               child: TextField(
                             textAlign: TextAlign.center,
                             decoration: InputDecoration(
-                              helperText: "輸入 123 試試看",
-                              helperStyle: TextStyle(color: Colors.red),
+                              // helperText: "輸入 123 試試看",
+                              // helperStyle: TextStyle(color: Colors.red),
                               focusedBorder: OutlineInputBorder(
                                   //點擊的時候顯示
                                   borderSide: BorderSide(
@@ -365,6 +410,7 @@ class _AddFriendPage extends State<AddFriendPage> {
                             onSubmitted:
                                 _submitText, // 綁定事件給_submitText這個Function
                           )),
+                          Divider(),
                           ElevatedButton(
                             child: Text("搜尋"),
                             onPressed: () {
@@ -383,10 +429,69 @@ class _AddFriendPage extends State<AddFriendPage> {
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: addFriendOutline,
                     )),
-                    color: Colors.green,
+                    // color: Colors.green,
                   ),
                 )
               ],
             )));
+  }
+}
+
+class ShortCutFriend extends StatelessWidget {
+  final String photoURL;
+  final String username;
+  final int i;
+
+  ShortCutFriend({this.photoURL, this.username, this.i});
+
+  @override
+  Widget build(BuildContext context) {
+    // TODO: implement build
+    return Container(
+      alignment: Alignment.center,
+      color: Colors.blue[200 + i % 4 * 100],
+      height: 100,
+      child: Stack(
+        children: [
+          photoURL != null
+              ? Container(
+                  alignment: Alignment.center,
+                  decoration: BoxDecoration(
+                      image: DecorationImage(image: NetworkImage(photoURL))))
+              : Container(
+                  alignment: Alignment.center,
+                  child: Icon(
+                    Icons.person,
+                    size: 60,
+                  )),
+          Container(
+            alignment: Alignment.bottomCenter,
+            child: Text(username,
+                style: TextStyle(color: Colors.white, shadows: [
+                  Shadow(
+                    blurRadius: 10.0,
+                    color: Colors.pink,
+                    offset: Offset(5.0, 5.0),
+                  ),
+                  Shadow(
+                    blurRadius: 10.0,
+                    color: Colors.pink,
+                    offset: Offset(-5.0, 5.0),
+                  ),
+                  Shadow(
+                    blurRadius: 10.0,
+                    color: Colors.pink,
+                    offset: Offset(5.0, -5.0),
+                  ),
+                  Shadow(
+                    blurRadius: 10.0,
+                    color: Colors.pink,
+                    offset: Offset(-5.0, -5.0),
+                  ),
+                ])),
+          ),
+        ],
+      ),
+    );
   }
 }

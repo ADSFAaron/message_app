@@ -1,8 +1,13 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 import 'package:fluttertoast/fluttertoast.dart';
+
+import 'package:firebase_core/firebase_core.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 
 final String baseUrl = "http://140.138.152.96:3001/api/user/";
 //final String baseUrl = "http://10.0.2.2:3001/api/user/";
@@ -19,7 +24,17 @@ class _RegisterPage extends State<RegisterPage> {
   final TextEditingController accountController = TextEditingController();
   final TextEditingController password = TextEditingController();
   final TextEditingController checkPassword = TextEditingController();
-  String errorText;
+  UserCredential userCredential;
+
+  bool passwordOk = false;
+  List<String> error = [null, null, null, null];
+
+  void initState(){
+    myController.text="zhon";
+    accountController.text='henry890811@gmail.com';
+    password.text="123456789";
+    checkPassword.text="123456789";
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -42,7 +57,7 @@ class _RegisterPage extends State<RegisterPage> {
                       decoration: InputDecoration(
                         icon: Icon(Icons.person),
                         labelText: "請輸入使用者名稱",
-                        errorText: checkUsername(myController.text),
+                        errorText: error[0],
                       ),
                     )),
                 Container(
@@ -52,8 +67,8 @@ class _RegisterPage extends State<RegisterPage> {
                       controller: accountController,
                       decoration: InputDecoration(
                         icon: Icon(Icons.email),
-                        labelText: "請輸入帳號",
-                        errorText: errorText,
+                        labelText: "請輸入 E-mail",
+                        errorText: error[1],
                       ),
                     )),
                 Container(
@@ -65,7 +80,7 @@ class _RegisterPage extends State<RegisterPage> {
                       decoration: InputDecoration(
                         icon: Icon(Icons.lock),
                         labelText: "請輸入密碼",
-//              errorText: "errorText",
+                        errorText: error[2],
                       ),
                     )),
                 Container(
@@ -86,8 +101,8 @@ class _RegisterPage extends State<RegisterPage> {
                 ),
                 ElevatedButton(
                   child: Text('確認'),
-                  onPressed: () => btnEvent(myController.text,
-                      accountController.text, password.text, context),
+                  onPressed: () => btnEvent(
+                      myController.text, accountController.text, password.text),
                 )
               ],
             ),
@@ -95,80 +110,69 @@ class _RegisterPage extends State<RegisterPage> {
         ));
   }
 
-  String checkUsername(String value) {
-    if ((value.length < 6 || value.length > 16 )&& value.isNotEmpty) return "密碼需要介於6~16個字之間";
-    return null;
-  }
-
-  String validatePassword(String value) {
-    if (value != password.text) {
+  String validatePassword(String s) {
+    if (password.text != s) {
+      setState(() {
+        passwordOk = false;
+      });
       return "密碼不相同";
-    }
-    return null;
+    } else
+      passwordOk = true;
   }
 
-  void btnEvent(String _username, String _account, String _password,
-      BuildContext context) async {
-//    print(_username);
-    var map = {
-      "username": _username,
-      "account": _account,
-      "password": _password,
-      "hasImage": false
-    };
-    var client = http.Client();
+  void btnEvent(
+    String _username,
+    String _account,
+    String _password,
+  ) async {
+    if (passwordOk == false) return;
     try {
-      var uriResponse = await client.post(Uri.parse(baseUrl + "create"),
-          headers: <String, String>{
-            'Content-Type': 'application/json; charset=UTF-8',
-          },
-          body: jsonEncode(map));
-//      print(await client.get(uriResponse.bodyFields['uri']));
-      print(uriResponse.body);
-      if (uriResponse.body == "success") {
-        await showDialog(
-            context: context,
-            builder: (_) => CupertinoAlertDialog(
-                  content: Text(
-                    "登入成功",
-                    style: TextStyle(fontSize: 20),
-                  ),
-                  actions: <Widget>[
-                    CupertinoButton(
-                      child: Text("登入"),
-                      onPressed: () {
-                        Navigator.pop(context);
-                      },
-                    ),
-                    CupertinoButton(
-                      child: Text("還是登入"),
-                      onPressed: () {
-                        Navigator.pop(context);
-                      },
-                    ),
-                  ],
-                ));
-        Navigator.of(context).pop();
-      }
-      else if(uriResponse.body=="is already created"){
-        setState(() {
-          errorText="帳號已被註冊";
-        });
-      }
-      else{
-        print("-----------------ERROR-----------------");
+      userCredential = await FirebaseAuth.instance
+          .createUserWithEmailAndPassword(email: _account, password: _password);
+      User user = userCredential.user;
+      user.updateProfile(displayName: _username);
+    } on FirebaseAuthException catch (e) {
+      if (e.code == 'weak-password') {
         Fluttertoast.showToast(
-            msg: uriResponse.body,
-            toastLength: Toast.LENGTH_SHORT,
-            gravity: ToastGravity.CENTER,
-            timeInSecForIosWeb: 1,
-            backgroundColor: Colors.red,
-            textColor: Colors.white,
-            fontSize: 16.0
+          backgroundColor: Colors.grey,
+          msg: "The password provided is too weak.",
+          toastLength: Toast.LENGTH_SHORT,
+          gravity: ToastGravity.CENTER,
         );
+        setState(() {
+          error[2] = 'The password provided is too weak.';
+        });
+        print('The password provided is too weak.');
+      } else if (e.code == 'email-already-in-use') {
+        Fluttertoast.showToast(
+          backgroundColor: Colors.grey,
+          msg: "The account already exists for that email.",
+          toastLength: Toast.LENGTH_SHORT,
+          gravity: ToastGravity.CENTER,
+        );
+        setState(() {
+          error[1] = 'The account already exists for that email.';
+        });
+        print('The account already exists for that email.');
       }
     } catch (e) {
       print(e);
     }
+    print(userCredential);
+    CollectionReference users = FirebaseFirestore.instance.collection('users');
+    users.doc(_account).set({
+      "email":_account,
+      "username":_username,
+      "friend":[],
+      "chatRoom":[],
+      "photoURL": null,
+      "bio":"這人很懶啥都沒留下"
+    }).then((value) => print("User Added"))
+        .catchError((error) => print("Failed to add user: $error"));
+
+
+    if (userCredential != null) {
+      Fluttertoast.showToast(msg: "創建帳號成功");
+      Navigator.pop(context);}
   }
 }

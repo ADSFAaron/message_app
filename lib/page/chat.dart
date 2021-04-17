@@ -1,12 +1,20 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:message_app/page/friend.dart';
 import 'register.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
+import 'package:timeago/timeago.dart' as timeago;
 
 //TODO modify
 //final String chatRoomUrl = "http://10.0.2.2:3001/api/message/";
-final String chatRoomUrl = "http://140.138.152.96:3001/api/message/";
+// final String chatRoomUrl = "http://140.138.152.96:3001/api/message/";
+
+//TODO
+//TODO 建 subDocument
+// CollectionReference messages = reference.collection('messages');
+// messages.add({});
 
 class MessageDetail {
 //  @required
@@ -72,29 +80,31 @@ Stream<List<Map<String, dynamic>>> count(FriendDetail myself) async* {
 class ChatPage extends StatefulWidget {
   @required
 //  final FriendDetail friend;
-  @required
-  final FriendDetail myself;
   final String roomId;
   final String roomName;
 
-  ChatPage({Key key, this.myself, this.roomId, this.roomName})
-      : super(key: key);
+  ChatPage({Key key, this.roomId, this.roomName}) : super(key: key);
 
   @override
-  _ChatPage createState() => _ChatPage(myself, roomId, roomName);
+  _ChatPage createState() => _ChatPage(roomId, roomName);
 }
 
 class _ChatPage extends State<ChatPage> {
-//  FriendDetail friend;
-  FriendDetail myself;
+  String roomID;
+  String roomName;
+  FirebaseAuth auth;
 
-  String roomId;
-  String roomName = "沒有成員";
+  User user;
 
-  _ChatPage(FriendDetail _myself, String _roomId, String _roomName) {
-    myself = _myself;
-    roomId = _roomId;
+  _ChatPage(String _roomId, String _roomName) {
+    roomID = _roomId;
     roomName = _roomName;
+  }
+
+  void initState() {
+    super.initState();
+    auth = FirebaseAuth.instance;
+    user = auth.currentUser;
   }
 
   List<Widget> _messages = [];
@@ -103,18 +113,33 @@ class _ChatPage extends State<ChatPage> {
   void _submitText(String text) async {
     if (text == '') return;
     _chatController.clear(); // 清空controller資料
-    print(roomId);
-    var response = await http.patch(Uri.parse(chatRoomUrl + roomId),
-        headers: <String, String>{
-          'Content-Type': 'application/json; charset=UTF-8',
-        },
-        body: jsonEncode({
-          "SendingAccount": myself.account,
-          "time": DateTime.now().toString(),
-          "message": text
-        }));
-    print(response.body);
-    print("end submit");
+    // print(roomID);
+
+    await FirebaseFirestore.instance
+        .collection('chatRoom')
+        .doc(roomID)
+        .collection('messages')
+        .add({
+      'email': user.email,
+      'photoURL': user.photoURL,
+      'userName': user.displayName,
+      'content': text,
+      'time': Timestamp.now()
+    });
+  setState(() {
+
+  });
+    // var response = await http.patch(Uri.parse(chatRoomUrl + roomId),
+    //     headers: <String, String>{
+    //       'Content-Type': 'application/json; charset=UTF-8',
+    //     },
+    //     body: jsonEncode({
+    //       "SendingAccount": myself.account,
+    //       "time": DateTime.now().toString(),
+    //       "message": text
+    //     }));
+    // print(response.body);
+    // print("end submit");
 //    setState(() {
 //      _messages.insert(
 //          0,
@@ -133,56 +158,51 @@ class _ChatPage extends State<ChatPage> {
 //    });
   }
 
-  @protected
-  @mustCallSuper
-  void initState() {
-    super.initState();
-  }
-
   Stream<List<Map<String, dynamic>>> loadMessage() async* {
     //TODO 獲取資料
-    try {
-//    List<Widget> l=[];
-    while (true) {
-      await Future.delayed(Duration(seconds: 1));
-      var response = await http.post(Uri.parse(chatRoomUrl + roomId));
-//      print(response.body);
-      Map<String, dynamic> json = jsonDecode(response.body)[0];
-//      print(json);
-      List<Map<String, dynamic>> messageList = [];
-      List<dynamic> list = json['messageList'];
-//        print(list);
-      list.forEach((element) {
-        messageList.add((element));
-      });
-//      print(list);
-      yield messageList;
-//      await Future.delayed(Duration(seconds: 1));
-//      await Future.delayed(Duration(seconds: 6));
-//      print(json['messageList']);
-    }
-    } catch (e) {
-      print(e);
-    }
+//     try {
+// //    List<Widget> l=[];
+//     while (true) {
+//       await Future.delayed(Duration(seconds: 1));
+//       var response = await http.post(Uri.parse(chatRoomUrl + roomId));
+// //      print(response.body);
+//       Map<String, dynamic> json = jsonDecode(response.body)[0];
+// //      print(json);
+//       List<Map<String, dynamic>> messageList = [];
+//       List<dynamic> list = json['messageList'];
+// //        print(list);
+//       list.forEach((element) {
+//         messageList.add((element));
+//       });
+// //      print(list);
+//       yield messageList;
+// //      await Future.delayed(Duration(seconds: 1));
+// //      await Future.delayed(Duration(seconds: 6));
+// //      print(json['messageList']);
+//     }
+//     } catch (e) {
+//       print(e);
+//     }
   }
 
-  List<Widget> returnMess(List<Map<String, dynamic>> list) {
-    List<Widget> l = [];
-//    print("create Message");
-    FriendDetail fr = FriendDetail(name: "other",  account: "1");
-    for (int index = 0;index<list.length;index++){
-      MessageBox bx = MessageBox(text: list.elementAt(index)['message'],
-        other:list.elementAt(index)['SendingAccount']==myself.account?false:true,
-        myself: list.elementAt(index)['SendingAccount']==myself.account?myself:null,
-        friend: list.elementAt(index)['SendingAccount']==myself.account?null:fr,
-      );
-      l.insert(0,bx);
-    }
-    return l;
-  }
+//   List<Widget> returnMess(List<Map<String, dynamic>> list) {
+// //     List<Widget> l = [];
+// // //    print("create Message");
+// //     FriendDetail fr = FriendDetail(name: "other",  account: "1");
+// //     for (int index = 0;index<list.length;index++){
+// //       MessageBox bx = MessageBox(text: list.elementAt(index)['message'],
+// //         other:list.elementAt(index)['SendingAccount']==myself.account?false:true,
+// //         myself: list.elementAt(index)['SendingAccount']==myself.account?myself:null,
+// //         friend: list.elementAt(index)['SendingAccount']==myself.account?null:fr,
+// //       );
+// //       l.insert(0,bx);
+// //     }
+// //     return l;
+//   }
 
   Widget build(BuildContext context) {
 //    print("startBuild");
+//   FirebaseFirestore.instance.collection('chatRoom').doc(roomID).collection('messages').orderBy(field)
     return Scaffold(
         appBar: AppBar(title: Text(roomName)),
         body: InkWell(
@@ -193,8 +213,12 @@ class _ChatPage extends State<ChatPage> {
             children: [
               Expanded(
                   child: StreamBuilder(
-                      stream: loadMessage(),
-                      builder: (context, snapshot) {
+                      stream: FirebaseFirestore.instance
+                          .collection('chatRoom')
+                          .doc(roomID)
+                          .collection('messages').orderBy("time",descending: true)
+                          .snapshots(),
+                      builder: (context, AsyncSnapshot<QuerySnapshot> snapshot) {
 //                        if (snapshot.hasError) {
 //                          return Container(color: Colors.red);
 //                        }
@@ -211,17 +235,33 @@ class _ChatPage extends State<ChatPage> {
 //                          );
 //                        }
                         if (!snapshot.hasData) {
-
-                        } else {
-                          _messages = returnMess(snapshot.data);
-
+                          return Center(
+                            child: CircularProgressIndicator(),
+                          );
                         }
-                        return ListView.builder(
-                          padding: EdgeInsets.all(8.0),
-                          reverse: true,
-                          // 加入reverse，讓它反轉
-                          itemBuilder: (context, index) => _messages[index],
-                          itemCount: _messages.length,
+                        // print();
+                        final int commentCount = snapshot.data.docs.length;
+                        if (commentCount > 0) {
+                          return ListView.builder(
+                            padding: EdgeInsets.all(8.0),
+                            reverse: true,
+                            // 加入reverse，讓它反轉
+                            itemBuilder: (context, index) {
+                              final QueryDocumentSnapshot document =
+                                  snapshot.data.docs[index];
+                              return MessageBox(
+                                username: document.data()['username'],
+                                time: document.data()['time'].toDate(),
+                                photoURL: document.data()['photoURL'],
+                                other: document.data()['email']==user.email? false:true,
+                                text: document.data()['content'],
+                              );
+                            },
+                            itemCount: commentCount,
+                          );
+                        }
+                        return Center(
+                          child: Text("no messages"),
                         );
                       })),
               SafeArea(
@@ -249,112 +289,94 @@ class _ChatPage extends State<ChatPage> {
 class MessageBox extends StatelessWidget {
   final String text;
   final bool other;
-  final FriendDetail friend;
-  final FriendDetail myself;
+  final String photoURL;
+  final String username;
+  final DateTime time;
 
-  MessageBox({Key key, this.text, this.other, this.friend, this.myself})
-      : assert(other == false || myself == null),
-        assert(other == true || friend == null),
-        super(key: key);
+  MessageBox(
+      {Key key, this.text, this.other, this.photoURL, this.username, this.time})
+      : super(key: key);
 
   @override
   Widget build(BuildContext context) {
     double clipSize = 60;
+    List list = <Widget>[
+      Container(
+        height: 35,
+        alignment: Alignment.bottomCenter,
+        child: Text(timeago.format(time),
+            // overflow: TextOverflow.ellipsis,
+            maxLines: 5,
+            style: TextStyle(fontSize: 12.0, color: Colors.blueGrey[800],)),
+      ),
+      VerticalDivider(),
+      Flexible(
+        child: Container(
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(10),
+            color: other?Colors.white:Colors.greenAccent,
+          ),
+          padding: EdgeInsets.all(10.0),
+          child: Text(text,
+              overflow: TextOverflow.ellipsis,
+              maxLines: 5,
+              style: TextStyle(fontSize: 18.0, color: Colors.black)),
+        ),
+      ),
+      VerticalDivider(),
+      photoURL != null
+          ? Container(
+          width: clipSize,
+          height: clipSize,
+          alignment: Alignment.center,
+          decoration: BoxDecoration(
+              shape: BoxShape.circle,
+              image:
+              DecorationImage(image: NetworkImage(photoURL))))
+          : Container(
+          width: clipSize,
+          height: clipSize,
+          alignment: Alignment.center,
+          child: CircleAvatar(
+              backgroundColor: Colors.purpleAccent,
+              radius: 35,
+              child: Icon(
+                Icons.person,
+                size: 30,
+              ))),
+    ];
+
+    // print(timeago.format(time));
     return Container(
       margin: const EdgeInsets.symmetric(vertical: 10.0),
       child: Row(
+        verticalDirection: VerticalDirection.up,
         mainAxisAlignment:
             other ? MainAxisAlignment.start : MainAxisAlignment.end,
         children: other
-            ? <Widget>[
-                friend.photoClip!=null
-                    ? Container(
-                        width: clipSize,
-                        height: clipSize,
-                        alignment: Alignment.center,
-                        decoration: BoxDecoration(
-                            shape: BoxShape.circle,
-                            image: DecorationImage(image: friend.photoClip)))
-                    : Container(
-                        width: clipSize,
-                        height: clipSize,
-                        alignment: Alignment.center,
-                        child: CircleAvatar(
-                            backgroundColor: Colors.purpleAccent,
-                            radius: 35,
-                            child: friend.icon)),
-                Container(
-                  width: 5,
-                ),
-                Flexible(
-                  child: Container(
-                    color: Colors.grey,
-                    padding: EdgeInsets.all(10.0),
-                    child: Text(text,
-                        overflow: TextOverflow.ellipsis,
-                        maxLines: 5,
-                        style: TextStyle(fontSize: 18.0, color: Colors.white)),
-                  ),
-                ),
-                Container(
-                  width: 60,
-                ),
-              ]
-            : <Widget>[
-                Container(
-                  width: 60,
-                ),
-                Flexible(
-                  child: Container(
-                    color: Colors.lightGreen,
-                    padding: EdgeInsets.all(10.0),
-                    child: Text(text,
-                        overflow: TextOverflow.ellipsis,
-                        maxLines: 5,
-                        style: TextStyle(fontSize: 18.0, color: Colors.white)),
-                  ),
-                ),
-                Container(
-                  width: 5,
-                ),
-                myself.photoClip!=null
-                    ? Container(
-                        width: clipSize,
-                        height: clipSize,
-                        alignment: Alignment.center,
-                        decoration: BoxDecoration(
-                            shape: BoxShape.circle,
-                            image: DecorationImage(image: myself.photoClip)))
-                    : Container(
-                        width: clipSize,
-                        height: clipSize,
-                        alignment: Alignment.center,
-                        child: CircleAvatar(
-                            backgroundColor: Colors.purpleAccent,
-                            radius: 35,
-                            child: myself.icon)),
-              ],
-      ),
-    );
+            ? list.reversed.toList():list
+    ));
   }
 }
 
-class ShortCutChatRoom extends StatefulWidget{
+class ShortCutChatRoom extends StatefulWidget {
   final String name;
   final int i;
   final String photoURL;
-  ShortCutChatRoom({this.name,this.i,this.photoURL});
 
-  _ShortCutChatRoom createState()=>_ShortCutChatRoom(name,i,photoURL);
+  ShortCutChatRoom({this.name, this.i, this.photoURL});
+
+  _ShortCutChatRoom createState() => _ShortCutChatRoom(name, i, photoURL);
 }
 
-class _ShortCutChatRoom extends State<ShortCutChatRoom>{
+class _ShortCutChatRoom extends State<ShortCutChatRoom> {
   int i;
   String roomName;
   String photoURL;
-  _ShortCutChatRoom(String _name,int _i,String _url){
+
+  _ShortCutChatRoom(String _name, int _i, String _url) {
     roomName = _name;
-    i=_i;
+    i = _i;
     photoURL = _url;
   }
 
@@ -363,13 +385,14 @@ class _ShortCutChatRoom extends State<ShortCutChatRoom>{
     return ListTile(
       tileColor: Colors.orange[200 + (i % 4) * 100],
       leading: Container(
-        // color: Colors.red,
+          // color: Colors.red,
           height: 90,
           width: 90,
           child: CircleAvatar(
               backgroundColor: Colors.purpleAccent,
               radius: 60,
-              child: Icon( //TODO 未來支援圖片
+              child: Icon(
+                //TODO 未來支援圖片
                 Icons.person,
                 size: 45,
               ))),
@@ -377,8 +400,7 @@ class _ShortCutChatRoom extends State<ShortCutChatRoom>{
         roomName,
         style: TextStyle(fontSize: 30),
       ),
-      contentPadding:
-      EdgeInsets.symmetric(vertical: 15.0, horizontal: 0.0),
+      contentPadding: EdgeInsets.symmetric(vertical: 15.0, horizontal: 0.0),
       subtitle: Text(
         "壓著往左滑看看",
         style: TextStyle(color: Colors.red),

@@ -175,7 +175,7 @@ class PersonDetailPage extends StatelessWidget {
                                   ],
                                 )),
                             onTap: () {
-                              Navigator.of(context).pop(["sendMessage",friendEmail]);
+                              Navigator.of(context).pop(["sendMessage",friendEmail,data['username']]);
                             },
                           ),
                           InkWell(
@@ -231,19 +231,14 @@ class PersonDetailPage extends StatelessWidget {
 }
 
 class AddFriendPage extends StatefulWidget {
-  AddFriendPage({Key key, @required this.account}) : super(key: key);
-  final String account;
+  AddFriendPage({Key key}) : super(key: key);
 
-  _AddFriendPage createState() => _AddFriendPage(account: account);
+  _AddFriendPage createState() => _AddFriendPage();
 }
 
 class _AddFriendPage extends State<AddFriendPage> {
   FirebaseAuth auth;
   User user;
-
-  _AddFriendPage({@required this.account});
-
-  final String account;
 
 //  _AddFriendPage();
   final TextEditingController _chatController = new TextEditingController();
@@ -337,6 +332,7 @@ class _AddFriendPage extends State<AddFriendPage> {
                   "friend": list,
                 });
               });
+              Navigator.pop(context);
               // try {
               //   users.doc(user.email).update({
               //     "friend": FieldValue.arrayUnion({

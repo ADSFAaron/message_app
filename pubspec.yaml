@@ -39,6 +39,7 @@ dependencies:
   flutter_signin_button: ^2.0.0
   cloud_firestore: ^1.0.5
   animations: ^2.0.0
+  timeago: ^3.0.2
 
 dev_dependencies:
   flutter_test:

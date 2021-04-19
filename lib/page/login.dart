@@ -1,10 +1,6 @@
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
-import 'package:google_sign_in/google_sign_in.dart';
 import 'register.dart';
-import 'package:http/http.dart' as http;
-import 'dart:convert';
 import 'package:flutter_signin_button/flutter_signin_button.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 
@@ -81,24 +77,24 @@ class _LoginPage extends State<LoginPage> {
 
   Future<UserCredential> signInWithGoogle() async {
     Fluttertoast.showToast(msg: "不知為啥會有問題");
-
-    print("0");
-    // Trigger the authentication flow
-    final GoogleSignInAccount googleUser = await GoogleSignIn().signIn();
-
-    print("1");
-    // Obtain the auth details from the request
-    final GoogleSignInAuthentication googleAuth = await googleUser.authentication;
-
-    print("2");
-    // Create a new credential
-    final GoogleAuthCredential credential = GoogleAuthProvider.credential(
-      accessToken: googleAuth.accessToken,
-      idToken: googleAuth.idToken,
-    );
-  print("123");
-    // Once signed in, return the UserCredential
-    return await FirebaseAuth.instance.signInWithCredential(credential);
+  //TODO 可用但資料庫得處理
+  //   print("0");
+  //   // Trigger the authentication flow
+  //   final GoogleSignInAccount googleUser = await GoogleSignIn().signIn();
+  //
+  //   print("1");
+  //   // Obtain the auth details from the request
+  //   final GoogleSignInAuthentication googleAuth = await googleUser.authentication;
+  //
+  //   print("2");
+  //   // Create a new credential
+  //   final GoogleAuthCredential credential = GoogleAuthProvider.credential(
+  //     accessToken: googleAuth.accessToken,
+  //     idToken: googleAuth.idToken,
+  //   );
+  // print("123");
+  //   // Once signed in, return the UserCredential
+  //   return await FirebaseAuth.instance.signInWithCredential(credential);
   }
 
   @override

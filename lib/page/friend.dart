@@ -3,10 +3,6 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
-import 'package:http/http.dart' as http;
-import 'dart:convert';
-
-import 'package:message_app/page/register.dart';
 
 class ReturnFValue {
   final FriendDetail friend;
@@ -30,35 +26,6 @@ class FriendDetail {
       size: 60,
     );
   }
-}
-
-Future<List<FriendDetail>> loadFriend(List friendList) async {
-//  print("into loadFriend----------------------");
-  List<FriendDetail> list = [];
-  for (int i = 0; i < friendList.length; i++) {
-//    print((friendList.elementAt(i)).runtimeType);
-    Map<String, String> json =
-        Map<String, String>.from(friendList.elementAt(i));
-//    print("--------------------------");
-    try {
-      var response = await http.post(Uri.parse(baseUrl + "getFriendData"),
-          headers: <String, String>{
-            'Content-Type': 'application/json; charset=UTF-8',
-          },
-          body: jsonEncode({"account": json['account']}));
-//    print("get response----------------");
-//    print(response.body);
-      Map<String, dynamic> toJson = jsonDecode(response.body);
-      list.add(FriendDetail(
-          account: toJson["account"],
-          name: toJson['username'],
-          photoClip:
-              toJson['hasImage'] ? NetworkImage(toJson['imageUrl']) : null));
-    } catch (e) {
-      print("no account");
-    }
-  }
-  return list;
 }
 
 class PersonDetailPage extends StatelessWidget {
@@ -328,7 +295,7 @@ class _AddFriendPage extends State<AddFriendPage> {
                   "photoUrl": data['photoURL']
                 };
                 list.add(addThing);
-                await transaction.update(freshSnap.reference, {
+                transaction.update(freshSnap.reference, {
                   "friend": list,
                 });
               });

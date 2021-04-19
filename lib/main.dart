@@ -10,7 +10,10 @@ import 'package:flutter_slidable/flutter_slidable.dart';
 import 'package:kumi_popup_window/kumi_popup_window.dart';
 import 'page/login.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:animations/animations.dart';
+import 'package:animations/animations.dart';import 'package:convex_bottom_bar/convex_bottom_bar.dart';
+import 'package:flutter_easyloading/flutter_easyloading.dart';
+import 'page/setting.dart';
+
 
 // TODO 製作快取快速讀取用戶資訊及朋友以及聊天資訊
 // TODO 串接後端 以及資料庫 儲存必要文件
@@ -31,6 +34,7 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
+      builder: EasyLoading.init(),
       title: 'Flutter Demo',
       theme: ThemeData(
         // This is the theme of your application.
@@ -76,7 +80,7 @@ class _MyHomePageState extends State<MyHomePage> {
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
 
   List<Widget> _widgetOptions(BuildContext context) =>
-      <Widget>[friendPage(), chatRoomPage()];
+      <Widget>[friendPage(), chatRoomPage(),PersonDetailPage(friendEmail: user.email,)];
 
   CollectionReference users;
   FirebaseAuth auth;
@@ -129,6 +133,9 @@ class _MyHomePageState extends State<MyHomePage> {
     initFirebase();
     super.initState();
 
+    EasyLoading.addStatusCallback((status) {
+      print('EasyLoading Status $status');
+    });
     //_checkFinePosPermission();
 //    messageDetail.add(MessageDetail(friend: none, message: "12"));
 //    messageDetail.add(MessageDetail(friend: none, message: "12"));
@@ -138,7 +145,9 @@ class _MyHomePageState extends State<MyHomePage> {
 
   @override
   Widget build(BuildContext context) {
+
 //    chatList = createChatContainer(context, []);
+
     return Scaffold(
       resizeToAvoidBottomInset: false,
       key: _scaffoldKey,
@@ -257,6 +266,30 @@ class _MyHomePageState extends State<MyHomePage> {
                     Navigator.of(context).pop();
                   },
                 ),
+                ListTile(
+                 title: Text("Setting"),
+                  onTap: (){
+                    Navigator.of(context).push(PageRouteBuilder(
+                      transitionDuration: Duration(milliseconds: 800),
+                      pageBuilder:
+                          (context, animation, secondaryAnimation) =>
+                          SettingPage(),
+                      transitionsBuilder: (context, animation,
+                          secondaryAnimation, child) {
+                        var begin = Offset(0.0, 1.0);
+                        var end = Offset.zero;
+                        var curve = Curves.ease;
+
+                        var tween = Tween(begin: begin, end: end)
+                            .chain(CurveTween(curve: curve));
+                        return SlideTransition(
+                          position: animation.drive(tween),
+                          child: child,
+                        );
+                      },
+                    ));
+                  },
+                ),
                 user != null
                     ? ListTile(
                         title: Text("登出"),
@@ -334,22 +367,22 @@ class _MyHomePageState extends State<MyHomePage> {
         IndexedStack(
               index: _selectedIndex, children: _widgetOptions(context))]),
 
-      bottomNavigationBar: BottomNavigationBar(
-        type: BottomNavigationBarType.shifting,
-        items: const <BottomNavigationBarItem>[
-          BottomNavigationBarItem(
-            icon: Icon(Icons.home),
-            label: 'Home',
-            backgroundColor: Colors.purpleAccent,
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.comment),
-            label: 'Comment',
-            backgroundColor: Colors.lightGreen,
-          ),
+      bottomNavigationBar:
+      ConvexAppBar(
+         gradient:LinearGradient(
+           begin: Alignment.topLeft,
+           end: Alignment.bottomRight,
+           colors: [Colors.yellow, Colors.redAccent, Colors.green],
+           tileMode: TileMode.repeated,
+         ),
+         //cornerRadius: 1,
+        initialActiveIndex: _selectedIndex,
+        style: TabStyle.reactCircle,
+        items:[
+          TabItem(icon: Icon(Icons.home),title: "Home"),
+          TabItem(icon: Icon(Icons.comment),title: "Comment"),
+          TabItem(icon: Icon(Icons.person),title:"myself")
         ],
-        currentIndex: _selectedIndex,
-        selectedItemColor: Colors.yellow,
         onTap: _onItemTapped,
       ),
     );
@@ -505,6 +538,7 @@ class _MyHomePageState extends State<MyHomePage> {
                   ),
                 );
               }
+
               return SliverGrid(
                 //用來建list 裡面再放東西
                 gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
@@ -513,7 +547,7 @@ class _MyHomePageState extends State<MyHomePage> {
                 delegate: SliverChildListDelegate(<Widget>[
                   Container(
                     alignment: Alignment.center,
-                    child: CircularProgressIndicator(),
+                    color:Colors.white10
                   )
                 ]),
               );
@@ -732,7 +766,6 @@ class _MyHomePageState extends State<MyHomePage> {
   void _createChat(List list) async {
     CollectionReference chatRoom =
         FirebaseFirestore.instance.collection("chatRoom");
-    CollectionReference users = FirebaseFirestore.instance.collection("users");
     String _roomName = "${list[2]},${user.displayName} Chat";
     //TODO 創建聊天室
     DocumentReference reference = await chatRoom.add({

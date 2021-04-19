@@ -1,16 +1,8 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:http/http.dart' as http;
-import 'dart:convert';
 import 'package:fluttertoast/fluttertoast.dart';
-
-import 'package:firebase_core/firebase_core.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
-
-final String baseUrl = "http://140.138.152.96:3001/api/user/";
-//final String baseUrl = "http://10.0.2.2:3001/api/user/";
 
 class RegisterPage extends StatefulWidget {
   RegisterPage({Key key}) : super(key: key);
@@ -30,6 +22,7 @@ class _RegisterPage extends State<RegisterPage> {
   List<String> error = [null, null, null, null];
 
   void initState(){
+    super.initState();
     myController.text="zhon";
     accountController.text='henry890811@gmail.com';
     password.text="123456789";
@@ -118,6 +111,7 @@ class _RegisterPage extends State<RegisterPage> {
       return "密碼不相同";
     } else
       passwordOk = true;
+    return null;
   }
 
   void btnEvent(

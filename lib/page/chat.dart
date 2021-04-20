@@ -1,8 +1,10 @@
+import 'dart:io';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:timeago/timeago.dart' as timeago;
-
+import 'package:image_picker/image_picker.dart';
 //TODO
 //TODO 建 subDocument
 
@@ -90,15 +92,7 @@ class _ChatPage extends State<ChatPage> {
                             itemBuilder: (context, index) {
                               final QueryDocumentSnapshot document =
                                   snapshot.data.docs[index];
-                              return MessageBox(
-                                username: document.data()['username'],
-                                time: document.data()['time'].toDate(),
-                                photoURL: document.data()['photoURL'],
-                                other: document.data()['email'] == user.email
-                                    ? false
-                                    : true,
-                                text: document.data()['content'],
-                              );
+                              return handleMessage(document);
                             },
                             itemCount: commentCount,
                           );
@@ -251,56 +245,124 @@ class _ShortCutChatRoom extends State<ShortCutChatRoom> {
         "壓著往左滑看看",
         style: TextStyle(color: Colors.red),
       ),
-      // onTap: () {
-      //   Navigator.of(context).push(PageRouteBuilder(
-      //     transitionDuration: Duration(milliseconds: 800),
-      //     pageBuilder: (context, animation, secondaryAnimation) =>
-      //         ChatPage(
-      //           roomId: snapshot.elementAt(i)['roomId'],
-      //           myself: myself,
-      //           roomName: snapshot.elementAt(i)['roomName'],
-      //         ),
-      //     transitionsBuilder:
-      //         (context, animation, secondaryAnimation, child) {
-      //       var begin = Offset(0.0, 1.0);
-      //       var end = Offset.zero;
-      //       var curve = Curves.ease;
-      //
-      //       var tween = Tween(begin: begin, end: end)
-      //           .chain(CurveTween(curve: curve));
-      //       return SlideTransition(
-      //         position: animation.drive(tween),
-      //         child: child,
-      //       );
-      //     },
-      //   ));
-      // },
-      // onLongPress: () {
-      //   print("longPress");
-      // },
     );
   }
 }
 
-void myBottomSheet(BuildContext context){
+Future getImage(picker,_source) async {
+  final pickedFile = await picker.getImage(source: _source);
+  print(pickedFile);
+}
+
+void myBottomSheet(BuildContext context) {
+  File _image;
+  final picker = ImagePicker();
   // showBottomSheet || showModalBottomSheet
   showModalBottomSheet<void>(
       context: context,
       builder: (BuildContext context) {
         return Container(
-          height: 200,
-            child: Flexible(child:
+            height: 200,
+            child:
             GridView.count(
-              crossAxisCount: 3,
+              crossAxisCount: 2,
               childAspectRatio: 1.0,
               children: <Widget>[
-                Icon(Icons.ac_unit),
+                InkWell(child:Column(mainAxisAlignment:MainAxisAlignment.center,children:[Icon(Icons.camera_alt),Text("相機")]),onTap:()=> getImage(picker,ImageSource.camera),),
+                InkWell(child:Column(mainAxisAlignment:MainAxisAlignment.center,children:[Icon(Icons.photo),Text("相片")]),onTap:()=> getImage(picker,ImageSource.gallery),),
                 Icon(Icons.airport_shuttle),
                 Icon(Icons.all_inclusive),
                 Icon(Icons.beach_access),
                 Icon(Icons.cake),
                 Icon(Icons.free_breakfast),
               ],
-            )));
+            ));
       });
+}
+
+FirebaseAuth auth = FirebaseAuth.instance;
+
+Widget handleMessage(QueryDocumentSnapshot document) {
+  if (document.data()['type'] == "image") {
+    return ImageBox();
+  }
+  return MessageBox(
+    username: document.data()['username'],
+    time: document.data()['time'].toDate(),
+    photoURL: document.data()['photoURL'],
+    other: document.data()['email'] == auth.currentUser.email ? false : true,
+    text: document.data()['content'],
+  );
+}
+
+class ImageBox extends StatelessWidget {
+  final String imageURL;
+  final bool other;
+  final String photoURL;
+  final String username;
+  final DateTime time;
+
+  ImageBox(
+      {Key key,
+      this.imageURL,
+      this.other,
+      this.photoURL,
+      this.username,
+      this.time})
+      : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    double clipSize = 60;
+    List list = <Widget>[
+      Container(
+        height: 35,
+        alignment: Alignment.bottomCenter,
+        child: Text(timeago.format(time),
+            // overflow: TextOverflow.ellipsis,
+            maxLines: 5,
+            style: TextStyle(
+              fontSize: 12.0,
+              color: Colors.blueGrey[800],
+            )),
+      ),
+      VerticalDivider(),
+      Flexible(
+        child: Container(
+          decoration: BoxDecoration(
+              image: DecorationImage(
+                  image: NetworkImage(imageURL), fit: BoxFit.cover)),
+        ),
+      ),
+      VerticalDivider(),
+      photoURL != null
+          ? Container(
+              width: clipSize,
+              height: clipSize,
+              alignment: Alignment.center,
+              decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  image: DecorationImage(image: NetworkImage(photoURL))))
+          : Container(
+              width: clipSize,
+              height: clipSize,
+              alignment: Alignment.center,
+              child: CircleAvatar(
+                  backgroundColor: Colors.purpleAccent,
+                  radius: 35,
+                  child: Icon(
+                    Icons.person,
+                    size: 30,
+                  ))),
+    ];
+
+    // print(timeago.format(time));
+    return Container(
+        margin: const EdgeInsets.symmetric(vertical: 10.0),
+        child: Row(
+            verticalDirection: VerticalDirection.up,
+            mainAxisAlignment:
+                other ? MainAxisAlignment.start : MainAxisAlignment.end,
+            children: other ? list.reversed.toList() : list));
+  }
 }

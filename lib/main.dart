@@ -145,9 +145,6 @@ class _MyHomePageState extends State<MyHomePage> {
 
   @override
   Widget build(BuildContext context) {
-
-//    chatList = createChatContainer(context, []);
-
     return Scaffold(
       resizeToAvoidBottomInset: false,
       key: _scaffoldKey,

@@ -20,6 +20,8 @@ class _SettingPage extends State<SettingPage> {
     auth = FirebaseAuth.instance;
   }
 
+
+
   void myBottomSheet(BuildContext context,int type) {
     //type 0改背景 1改大頭貼
     File _image;
@@ -93,12 +95,11 @@ class _SettingPage extends State<SettingPage> {
                               child: CircleAvatar(
                                 radius: 60,
                                 backgroundColor: Colors.black38,
-                                child: IconButton(
-                                    icon: FaIcon(
+                                child: FaIcon(
                                   FontAwesomeIcons.camera,
                                   color: Colors.white,
                                   size: 20,
-                                )),
+                                ),
                               )))),
                   Align(
                       alignment: Alignment(0.4,0.4),
@@ -112,12 +113,11 @@ class _SettingPage extends State<SettingPage> {
                               child: CircleAvatar(
                                 radius: 60,
                                 backgroundColor: Colors.black38,
-                                child: IconButton(
-                                    icon: FaIcon(
+                                child: FaIcon(
                                       FontAwesomeIcons.camera,
                                       color: Colors.white,
                                       size: 20,
-                                    )),
+                                    ),
                               )))),
                 ],
               ),

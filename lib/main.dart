@@ -13,7 +13,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:animations/animations.dart';import 'package:convex_bottom_bar/convex_bottom_bar.dart';
 import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'page/setting.dart';
-
+import 'page/myself.dart';
 
 // TODO 製作快取快速讀取用戶資訊及朋友以及聊天資訊
 // TODO 串接後端 以及資料庫 儲存必要文件
@@ -80,7 +80,7 @@ class _MyHomePageState extends State<MyHomePage> {
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
 
   List<Widget> _widgetOptions(BuildContext context) =>
-      <Widget>[friendPage(), chatRoomPage(),PersonDetailPage(friendEmail: user.email,)];
+      <Widget>[friendPage(), chatRoomPage()];
 
   CollectionReference users;
   FirebaseAuth auth;
@@ -372,13 +372,13 @@ class _MyHomePageState extends State<MyHomePage> {
            colors: [Colors.yellow, Colors.redAccent, Colors.green],
            tileMode: TileMode.repeated,
          ),
-         //cornerRadius: 1,
         initialActiveIndex: _selectedIndex,
+
         style: TabStyle.reactCircle,
         items:[
           TabItem(icon: Icon(Icons.home),title: "Home"),
           TabItem(icon: Icon(Icons.comment),title: "Comment"),
-          TabItem(icon: Icon(Icons.person),title:"myself")
+          // TabItem(icon: Icon(Icons.person),title:"myself")
         ],
         onTap: _onItemTapped,
       ),
@@ -798,9 +798,6 @@ class _MyHomePageState extends State<MyHomePage> {
     ));
 
     addChatRoom(list[1], reference.id, _roomName);
-    setState(() {
-      _selectedIndex = 1;
-    });
   }
 
   void _cleanMessage() {

@@ -1,10 +1,13 @@
 import 'dart:io';
-
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:timeago/timeago.dart' as timeago;
 import 'package:image_picker/image_picker.dart';
+import 'package:path_provider/path_provider.dart';
+import 'package:firebase_storage/firebase_storage.dart' as firebase_storage;
+
 //TODO
 //TODO 建 subDocument
 
@@ -39,8 +42,61 @@ class _ChatPage extends State<ChatPage> {
 
   final TextEditingController _chatController = TextEditingController();
 
-  void _submitText(String text) async {
-    if (text == '') return;
+  Future<void> getImage(picker, _source) async {
+    final pickedFile = await picker.getImage(source: _source);
+    String name = pickedFile.path.toString().split('/').last;
+    File file = File(pickedFile.path);
+    // print(pickedFile.runtimeType);
+    try {
+      TaskSnapshot snapshot = await firebase_storage.FirebaseStorage.instance
+          .ref('message/image/' + name)
+          .putFile(file);
+      String download = await snapshot.ref.getDownloadURL();
+      _submitContent(download, 'image');
+    } catch (e) {
+      print(e);
+      // e.g, e.code == 'canceled'
+    }
+    Navigator.of(context).pop();
+  }
+
+  void myBottomSheet(BuildContext context) {
+    File _image;
+    final picker = ImagePicker();
+    // showBottomSheet || showModalBottomSheet
+    showModalBottomSheet<void>(
+        context: context,
+        builder: (BuildContext context) {
+          return Container(
+              height: 200,
+              child: GridView.count(
+                crossAxisCount: 2,
+                childAspectRatio: 1.0,
+                children: <Widget>[
+                  InkWell(
+                    child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [Icon(Icons.camera_alt), Text("相機")]),
+                    onTap: () => getImage(picker, ImageSource.camera),
+                  ),
+                  InkWell(
+                    child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [Icon(Icons.photo), Text("相片")]),
+                    onTap: () => getImage(picker, ImageSource.gallery),
+                  ),
+                  Icon(Icons.airport_shuttle),
+                  Icon(Icons.all_inclusive),
+                  Icon(Icons.beach_access),
+                  Icon(Icons.cake),
+                  Icon(Icons.free_breakfast),
+                ],
+              ));
+        });
+  }
+
+  void _submitContent(String content, String type) async {
+    if (content == '') return;
     _chatController.clear(); // 清空controller資料
     // print(roomID);
 
@@ -52,8 +108,9 @@ class _ChatPage extends State<ChatPage> {
       'email': user.email,
       'photoURL': user.photoURL,
       'userName': user.displayName,
-      'content': text,
-      'time': Timestamp.now()
+      'content': content,
+      'time': Timestamp.now(),
+      'type': type
     });
     setState(() {});
   }
@@ -92,7 +149,10 @@ class _ChatPage extends State<ChatPage> {
                             itemBuilder: (context, index) {
                               final QueryDocumentSnapshot document =
                                   snapshot.data.docs[index];
-                              return handleMessage(document);
+                              return HandleMessage(
+                                document: document,
+                                auth: auth,
+                              );
                             },
                             itemCount: commentCount,
                           );
@@ -104,7 +164,7 @@ class _ChatPage extends State<ChatPage> {
               SafeArea(
                   child: Row(children: [
                 IconButton(
-                    icon: Icon(Icons.send),
+                    icon: Icon(Icons.menu),
                     onPressed: () => myBottomSheet(context)),
                 Flexible(
                     child: TextField(
@@ -114,11 +174,12 @@ class _ChatPage extends State<ChatPage> {
                     hintText: '輸入文字',
                   ),
                   controller: _chatController,
-                  onSubmitted: _submitText, // 綁定事件給_submitText這個Function
+                  // onSubmitted: _submitText, // 綁定事件給_submitText這個Function
                 )),
                 IconButton(
                     icon: Icon(Icons.send),
-                    onPressed: () => _submitText(_chatController.text))
+                    onPressed: () =>
+                        _submitContent(_chatController.text, 'text'))
               ])),
             ],
           ),
@@ -152,7 +213,6 @@ class MessageBox extends StatelessWidget {
               color: Colors.blueGrey[800],
             )),
       ),
-      VerticalDivider(),
       Flexible(
         child: Container(
           decoration: BoxDecoration(
@@ -249,50 +309,33 @@ class _ShortCutChatRoom extends State<ShortCutChatRoom> {
   }
 }
 
-Future getImage(picker,_source) async {
-  final pickedFile = await picker.getImage(source: _source);
-  print(pickedFile);
-}
+class HandleMessage extends StatelessWidget {
+  final QueryDocumentSnapshot document;
 
-void myBottomSheet(BuildContext context) {
-  File _image;
-  final picker = ImagePicker();
-  // showBottomSheet || showModalBottomSheet
-  showModalBottomSheet<void>(
-      context: context,
-      builder: (BuildContext context) {
-        return Container(
-            height: 200,
-            child:
-            GridView.count(
-              crossAxisCount: 2,
-              childAspectRatio: 1.0,
-              children: <Widget>[
-                InkWell(child:Column(mainAxisAlignment:MainAxisAlignment.center,children:[Icon(Icons.camera_alt),Text("相機")]),onTap:()=> getImage(picker,ImageSource.camera),),
-                InkWell(child:Column(mainAxisAlignment:MainAxisAlignment.center,children:[Icon(Icons.photo),Text("相片")]),onTap:()=> getImage(picker,ImageSource.gallery),),
-                Icon(Icons.airport_shuttle),
-                Icon(Icons.all_inclusive),
-                Icon(Icons.beach_access),
-                Icon(Icons.cake),
-                Icon(Icons.free_breakfast),
-              ],
-            ));
-      });
-}
+  final FirebaseAuth auth;
 
-FirebaseAuth auth = FirebaseAuth.instance;
+  HandleMessage({this.document, this.auth});
 
-Widget handleMessage(QueryDocumentSnapshot document) {
-  if (document.data()['type'] == "image") {
-    return ImageBox();
+  @override
+  Widget build(BuildContext context) {
+    if (document.data()['type'] == "image") {
+      return ImageBox(
+        username: document.data()['username'],
+        time: document.data()['time'].toDate(),
+        photoURL: document.data()['photoURL'],
+        other:
+            document.data()['email'] == auth.currentUser.email ? false : true,
+        imageURL: document.data()['content'],
+      );
+    }
+    return MessageBox(
+      username: document.data()['username'],
+      time: document.data()['time'].toDate(),
+      photoURL: document.data()['photoURL'],
+      other: document.data()['email'] == auth.currentUser.email ? false : true,
+      text: document.data()['content'],
+    );
   }
-  return MessageBox(
-    username: document.data()['username'],
-    time: document.data()['time'].toDate(),
-    photoURL: document.data()['photoURL'],
-    other: document.data()['email'] == auth.currentUser.email ? false : true,
-    text: document.data()['content'],
-  );
 }
 
 class ImageBox extends StatelessWidget {
@@ -304,19 +347,19 @@ class ImageBox extends StatelessWidget {
 
   ImageBox(
       {Key key,
-      this.imageURL,
-      this.other,
-      this.photoURL,
-      this.username,
-      this.time})
+      @required this.imageURL,
+      @required this.other,
+      @required this.photoURL,
+      @required this.username,
+      @required this.time})
       : super(key: key);
 
   @override
   Widget build(BuildContext context) {
+    Image image = Image.network(imageURL, fit: BoxFit.fill);
     double clipSize = 60;
     List list = <Widget>[
       Container(
-        height: 35,
         alignment: Alignment.bottomCenter,
         child: Text(timeago.format(time),
             // overflow: TextOverflow.ellipsis,
@@ -326,12 +369,9 @@ class ImageBox extends StatelessWidget {
               color: Colors.blueGrey[800],
             )),
       ),
-      VerticalDivider(),
       Flexible(
         child: Container(
-          decoration: BoxDecoration(
-              image: DecorationImage(
-                  image: NetworkImage(imageURL), fit: BoxFit.cover)),
+          child: image,
         ),
       ),
       VerticalDivider(),
@@ -339,14 +379,14 @@ class ImageBox extends StatelessWidget {
           ? Container(
               width: clipSize,
               height: clipSize,
-              alignment: Alignment.center,
+              alignment: Alignment.bottomCenter,
               decoration: BoxDecoration(
                   shape: BoxShape.circle,
                   image: DecorationImage(image: NetworkImage(photoURL))))
           : Container(
               width: clipSize,
               height: clipSize,
-              alignment: Alignment.center,
+              alignment: Alignment.bottomCenter,
               child: CircleAvatar(
                   backgroundColor: Colors.purpleAccent,
                   radius: 35,

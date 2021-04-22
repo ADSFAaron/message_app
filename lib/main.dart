@@ -32,6 +32,7 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    print("myApp build0");
     return MaterialApp(
       builder: EasyLoading.init(),
       title: 'Flutter Demo',
@@ -84,7 +85,7 @@ class _MyHomePageState extends State<MyHomePage> {
   CollectionReference users;
   FirebaseAuth auth;
   User user;
-
+  DocumentSnapshot document;
   void initFirebase() async {
     await Firebase.initializeApp().whenComplete(() {
       print("initial completed");
@@ -144,6 +145,7 @@ class _MyHomePageState extends State<MyHomePage> {
 
   @override
   Widget build(BuildContext context) {
+    print("start build main page------------------------------------------------");
     return Scaffold(
       resizeToAvoidBottomInset: false,
       key: _scaffoldKey,
@@ -219,6 +221,7 @@ class _MyHomePageState extends State<MyHomePage> {
                                           Icons.person,
                                           size: 60,
                                         ))),
+                            Divider(),
                             Text(
                               (user.displayName == null)
                                   ? "沒取名"

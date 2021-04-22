@@ -1,9 +1,13 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
+import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:image_picker/image_picker.dart';
 import 'dart:io';
+import 'package:firebase_storage/firebase_storage.dart' as firebase_storage;
 
 class SettingPage extends StatefulWidget {
   _SettingPage createState() => _SettingPage();
@@ -20,12 +24,43 @@ class _SettingPage extends State<SettingPage> {
     auth = FirebaseAuth.instance;
   }
 
+  void uploadPhoto(_source,int changeWhere)async{
+      // 先從 _source 獲取照片資訊並上傳至
+      File _image;
+      final picker = ImagePicker();
+      final pickedFile = await picker.getImage(source: _source);
+      String name = pickedFile.path.toString().split('/').last;
+      File file = File(pickedFile.path);
+      // print(pickedFile.runtimeType);
+      String download;
+      try {
+        TaskSnapshot snapshot = await firebase_storage.FirebaseStorage.instance
+            .ref('user/image/' + name)
+            .putFile(file);
+        download = await snapshot.ref.getDownloadURL();
+        //_submitContent(download, 'image');
+      } catch (e) {
+        print(e);
+        // e.g, e.code == 'canceled'
+      }
+      print(download);
+      //修改firestore內部使用者資料
+
+      CollectionReference users = FirebaseFirestore.instance.collection('users');
+      DocumentSnapshot future = await users.doc(auth.currentUser.email).get();
+
+      //從新刷新
+      Navigator.of(context).pop();
 
 
-  void myBottomSheet(BuildContext context,int type) {
+  }
+
+  void myBottomSheet(BuildContext context,int changeWhere) {
     //type 0改背景 1改大頭貼
-    File _image;
-    final picker = ImagePicker();
+    if(changeWhere ==0){
+      Fluttertoast.showToast(msg: "還在開發");
+      return;
+    }
     // showBottomSheet || showModalBottomSheet
     showModalBottomSheet<void>(
         context: context,
@@ -34,8 +69,8 @@ class _SettingPage extends State<SettingPage> {
               height: 120,
               child: ListView(
                 children: [
-                  ListTile(title:Text("從相片挑選",)),
-                  ListTile(title: Text("相機拍照"),),
+                  ListTile(title:Text("從相片挑選",),onTap: ()=>uploadPhoto(ImageSource.gallery, changeWhere),),
+                  ListTile(title: Text("相機拍照"),onTap: ()=>uploadPhoto(ImageSource.camera, changeWhere),),
                 ],
               )
           );
@@ -70,7 +105,10 @@ class _SettingPage extends State<SettingPage> {
                   GestureDetector(
                       onTap:()=>myBottomSheet(context,0),
                       child: Container(
-                    color: Colors.red,
+                          decoration: BoxDecoration(
+                              image: DecorationImage(
+                                  image: AssetImage("images/2.jpg"),
+                                  fit: BoxFit.cover))
                   )),
                   Center(
                       child: GestureDetector(

@@ -2,7 +2,9 @@ import 'dart:io';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_storage/firebase_storage.dart';
+import 'package:flex_color_scheme/flex_color_scheme.dart';
 import 'package:flutter/material.dart';
+import 'package:message_app/page/setting.dart';
 import 'package:timeago/timeago.dart' as timeago;
 import 'package:image_picker/image_picker.dart';
 import 'package:path_provider/path_provider.dart';
@@ -116,13 +118,16 @@ class _ChatPage extends State<ChatPage> {
   }
 
   Widget build(BuildContext context) {
+    final ThemeData theme = Theme.of(context);
     return Scaffold(
-        appBar: AppBar(title: Text(roomName)),
+        appBar: AppBar(title: Text(roomName),backgroundColor: theme.primaryColorDark,),
         body: InkWell(
           onTap: () {
             FocusScope.of(context).unfocus();
           },
-          child: Column(
+          child: Container(
+              color:theme.primaryColor.blend(theme.backgroundColor,70),
+              child:Column(
             children: [
               Expanded(
                   child: StreamBuilder(
@@ -182,7 +187,7 @@ class _ChatPage extends State<ChatPage> {
                         _submitContent(_chatController.text, 'text'))
               ])),
             ],
-          ),
+          )),
         ));
   }
 }
@@ -200,6 +205,7 @@ class MessageBox extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final ThemeData theme = Theme.of(context);
     double clipSize = 60;
     List list = <Widget>[
       Container(
@@ -210,20 +216,19 @@ class MessageBox extends StatelessWidget {
             maxLines: 5,
             style: TextStyle(
               fontSize: 12.0,
-              color: Colors.blueGrey[800],
             )),
       ),
       Flexible(
         child: Container(
           decoration: BoxDecoration(
             borderRadius: BorderRadius.circular(10),
-            color: other ? Colors.brown[300] : Colors.greenAccent,
+            color: other ? theme.secondaryHeaderColor:theme.colorScheme.secondary,
           ),
           padding: EdgeInsets.all(10.0),
           child: Text(text,
               overflow: TextOverflow.ellipsis,
               maxLines: 5,
-              style: TextStyle(fontSize: 18.0, color: Colors.black)),
+              style: TextStyle(fontSize: 18.0,color: theme.backgroundColor)),
         ),
       ),
       VerticalDivider(),
@@ -235,17 +240,18 @@ class MessageBox extends StatelessWidget {
               decoration: BoxDecoration(
                   shape: BoxShape.circle,
                   image: DecorationImage(image: NetworkImage(photoURL))))
-          : Container(
-              width: clipSize,
-              height: clipSize,
-              alignment: Alignment.center,
-              child: CircleAvatar(
-                  backgroundColor: Colors.purpleAccent,
-                  radius: 35,
-                  child: Icon(
-                    Icons.person,
-                    size: 30,
-                  ))),
+          :  Container(
+          width: clipSize,
+          height: clipSize,
+          alignment: Alignment.bottomCenter,
+          child: CircleAvatar(
+              backgroundColor:other? theme.colorScheme.secondary:theme.primaryColor,
+              radius: 35,
+              child: Icon(
+                  Icons.person,
+                  size: 30,
+                  color:theme.backgroundColor
+              ))),
     ];
 
     // print(timeago.format(time));
@@ -264,7 +270,7 @@ class ShortCutChatRoom extends StatefulWidget {
   final int i;
   final String photoURL;
 
-  ShortCutChatRoom({this.name, this.i, this.photoURL});
+  ShortCutChatRoom({this.name, this.i, this.photoURL,});
 
   _ShortCutChatRoom createState() => _ShortCutChatRoom(name, i, photoURL);
 }
@@ -282,28 +288,29 @@ class _ShortCutChatRoom extends State<ShortCutChatRoom> {
 
   @override
   Widget build(BuildContext context) {
+    final ThemeData theme = Theme.of(context);
     return ListTile(
-      tileColor: Colors.orange[200 + (i % 4) * 100],
+      tileColor: theme.colorScheme.secondary,
       leading: Container(
-          // color: Colors.red,
           height: 90,
           width: 90,
           child: CircleAvatar(
-              backgroundColor: Colors.purpleAccent,
+              backgroundColor: theme.primaryColor,
               radius: 60,
               child: Icon(
                 //TODO 未來支援圖片
                 Icons.person,
                 size: 45,
+                color:theme.secondaryHeaderColor,
               ))),
       title: Text(
         roomName,
-        style: TextStyle(fontSize: 30),
+        style: TextStyle(fontSize: 30,color: theme.backgroundColor),
       ),
       contentPadding: EdgeInsets.symmetric(vertical: 15.0, horizontal: 0.0),
       subtitle: Text(
         "壓著往左滑看看",
-        style: TextStyle(color: Colors.red),
+        style: TextStyle(color: theme.backgroundColor),
       ),
     );
   }
@@ -356,6 +363,7 @@ class ImageBox extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final ThemeData theme = Theme.of(context);
     Image image = Image.network(imageURL, fit: BoxFit.fill);
     double clipSize = 60;
     List list = <Widget>[
@@ -366,7 +374,6 @@ class ImageBox extends StatelessWidget {
             maxLines: 5,
             style: TextStyle(
               fontSize: 12.0,
-              color: Colors.blueGrey[800],
             )),
       ),
       Flexible(
@@ -388,11 +395,12 @@ class ImageBox extends StatelessWidget {
               height: clipSize,
               alignment: Alignment.bottomCenter,
               child: CircleAvatar(
-                  backgroundColor: Colors.purpleAccent,
+                backgroundColor:other? theme.colorScheme.secondary:theme.primaryColor,
                   radius: 35,
                   child: Icon(
                     Icons.person,
                     size: 30,
+                    color:theme.backgroundColor
                   ))),
     ];
 

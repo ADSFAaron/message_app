@@ -36,6 +36,7 @@ class PersonDetailPage extends StatelessWidget {
   Widget build(BuildContext context) {
     CollectionReference users = FirebaseFirestore.instance.collection('users');
 //    print(friend.name);
+    final ThemeData theme = Theme.of(context);
     return FutureBuilder(
         future: users.doc(friendEmail).get(),
         builder:
@@ -62,13 +63,9 @@ class PersonDetailPage extends StatelessWidget {
                 body: Column(
                   children: [
                     Container(
-                      color: Colors.blue,
-                      height: 50,
-                    ),
-                    Container(
-                        color: Colors.blue,
+                        color: theme.colorScheme.secondary,
                         alignment: Alignment.center,
-                        height: 300,
+                        height: 350,
                         child: data['photoURL'] != null
                             ? Container(
                                 alignment: Alignment.center,
@@ -80,8 +77,11 @@ class PersonDetailPage extends StatelessWidget {
                                 child: Icon(
                                   Icons.person,
                                   size: 60,
+                                  color:theme.primaryColor
                                 ))),
-                    Divider(),
+                   Container(
+                       height: MediaQuery.of(context).size.height-350,
+                       child:Column(children:[ Divider(),
                     Container(
                       alignment: Alignment.center,
                       child: SizedBox(
@@ -94,22 +94,22 @@ class PersonDetailPage extends StatelessWidget {
                                   shadows: [
                                     Shadow(
                                       blurRadius: 10.0,
-                                      color: Colors.pink,
+                                      color:theme.primaryColor,
                                       offset: Offset(5.0, 5.0),
                                     ),
                                     Shadow(
                                       blurRadius: 10.0,
-                                      color: Colors.pink,
+                                      color:theme.primaryColor,
                                       offset: Offset(-5.0, 5.0),
                                     ),
                                     Shadow(
                                       blurRadius: 10.0,
-                                      color: Colors.pink,
+                                      color:theme.primaryColor,
                                       offset: Offset(5.0, -5.0),
                                     ),
                                     Shadow(
                                       blurRadius: 10.0,
-                                      color: Colors.pink,
+                                      color:theme.primaryColor,
                                       offset: Offset(-5.0, -5.0),
                                     ),
                                   ]))),
@@ -184,7 +184,7 @@ class PersonDetailPage extends StatelessWidget {
                         ],
                       ),
                     )
-                  ],
+              ]))],
                 ));
           }
           return Scaffold(
@@ -206,7 +206,6 @@ class AddFriendPage extends StatefulWidget {
 class _AddFriendPage extends State<AddFriendPage> {
   FirebaseAuth auth;
   User user;
-
 //  _AddFriendPage();
   final TextEditingController _chatController = new TextEditingController();
 
@@ -220,6 +219,7 @@ class _AddFriendPage extends State<AddFriendPage> {
   }
 
   void _submitText(String text) async {
+    final ThemeData theme = Theme.of(context);
     addFriendOutline.clear();
     if (text == "") {
       setState(() {
@@ -244,6 +244,7 @@ class _AddFriendPage extends State<AddFriendPage> {
       if (data != null) {
         // print("go to create friend data");
 
+        //TODO 修改成對的形式
         FriendDetail friend = FriendDetail(
             account: data["email"],
             name: data['username'],
@@ -409,46 +410,47 @@ class ShortCutFriend extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // TODO: implement build
+    final ThemeData theme = Theme.of(context);
     return Container(
+      color: theme.colorScheme.secondary,
       alignment: Alignment.center,
-      color: Colors.blue[200 + i % 4 * 100],
       height: 100,
       child: Stack(
         children: [
           photoURL != null
               ? Container(
-                  alignment: Alignment.center,
+                  alignment:  Alignment(0,-0.3),
                   decoration: BoxDecoration(
                       image: DecorationImage(image: NetworkImage(photoURL))))
               : Container(
-                  alignment: Alignment.center,
+                  alignment: Alignment(0,-0.3),
                   child: Icon(
                     Icons.person,
                     size: 60,
-                  )),
+                  color: theme.secondaryHeaderColor,
+                    )),
           Container(
-            alignment: Alignment.bottomCenter,
+            alignment: Alignment(0,0.7),
             child: Text(username,
-                style: TextStyle(color: Colors.white, shadows: [
+                style: TextStyle( color: theme.backgroundColor,shadows: [
                   Shadow(
                     blurRadius: 10.0,
-                    color: Colors.pink,
+                    color: theme.colorScheme.primary,
                     offset: Offset(5.0, 5.0),
                   ),
                   Shadow(
                     blurRadius: 10.0,
-                    color: Colors.pink,
+                    color: theme.colorScheme.primary,
                     offset: Offset(-5.0, 5.0),
                   ),
                   Shadow(
                     blurRadius: 10.0,
-                    color: Colors.pink,
+                    color:theme.colorScheme.primary,
                     offset: Offset(5.0, -5.0),
                   ),
                   Shadow(
                     blurRadius: 10.0,
-                    color: Colors.pink,
+                    color:theme.colorScheme.primary,
                     offset: Offset(-5.0, -5.0),
                   ),
                 ])),

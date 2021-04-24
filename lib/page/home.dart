@@ -19,8 +19,15 @@ import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 
 class MyHomePage extends StatefulWidget {
   MyHomePage({Key key, this.userData, this.user,@required this.themeMode,
-    @required this.onThemeModeChanged,
-    @required this.flexSchemeData,}) : super(key: key);
+  @required this.onThemeModeChanged,
+  @required this.schemeIndex,
+  @required this.onSchemeChanged,
+  @required this.flexSchemeData,});
+  final ThemeMode themeMode;
+  final ValueChanged<ThemeMode> onThemeModeChanged;
+  final int schemeIndex;
+  final ValueChanged<int> onSchemeChanged;
+  final FlexSchemeData flexSchemeData;
 
   // This widget is the home page of your application. It is stateful, meaning
   // that it has a State object (defined below) that contains fields that affect
@@ -34,22 +41,23 @@ class MyHomePage extends StatefulWidget {
   final DocumentSnapshot userData;
   final User user;
 
-  final ThemeMode themeMode;
-  final ValueChanged<ThemeMode> onThemeModeChanged;
-  final FlexSchemeData flexSchemeData;
+
 
   @override
   _MyHomePageState createState() =>
-      _MyHomePageState(user: user, userData: userData,themeMode: themeMode,onThemeModeChanged: onThemeModeChanged,flexSchemeData: flexSchemeData);
+      _MyHomePageState(user: user, userData: userData,themeMode: themeMode,onThemeModeChanged: onThemeModeChanged,flexSchemeData: flexSchemeData,schemeIndex: schemeIndex,onSchemeChanged: onSchemeChanged);
 }
 
 class _MyHomePageState extends State<MyHomePage> {
   _MyHomePageState({this.user, this.userData,@required this.themeMode,
-    @required this.onThemeModeChanged,
-    @required this.flexSchemeData,});
-
+  @required this.onThemeModeChanged,
+  @required this.schemeIndex,
+  @required this.onSchemeChanged,
+  @required this.flexSchemeData,});
   final ThemeMode themeMode;
   final ValueChanged<ThemeMode> onThemeModeChanged;
+  final int schemeIndex;
+  final ValueChanged<int> onSchemeChanged;
   final FlexSchemeData flexSchemeData;
 
   int _selectedIndex = 1;
@@ -59,8 +67,8 @@ class _MyHomePageState extends State<MyHomePage> {
   List<Widget> chatList = [];
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
 
-  List<Widget> _widgetOptions(BuildContext context) =>
-      <Widget>[friendPage(), chatRoomPage()];
+  List<Widget> _widgetOptions(BuildContext context,ThemeData theme) =>
+      <Widget>[friendPage(theme), chatRoomPage(theme)];
 
   CollectionReference users;
   FirebaseAuth auth;
@@ -127,37 +135,38 @@ class _MyHomePageState extends State<MyHomePage> {
                           : Container(
                               alignment: Alignment.center,
                               child: CircleAvatar(
-                                  backgroundColor: Colors.purpleAccent,
+                                  backgroundColor: theme.primaryColor,
                                   radius: 40,
                                   child: Icon(
                                     Icons.person,
                                     size: 60,
+                                    color: theme.secondaryHeaderColor,
                                   ))),
                       Divider(),
                       Text(
                         (user.displayName == null) ? "沒取名" : user.displayName,
                         style: TextStyle(
                             fontSize: 30,
-                            color: Colors.white,
+                            color:theme.backgroundColor,
                             shadows: [
                               Shadow(
                                 blurRadius: 10.0,
-                                color: Colors.pink,
+                                color: theme.colorScheme.secondary,
                                 offset: Offset(5.0, 5.0),
                               ),
                               Shadow(
                                 blurRadius: 10.0,
-                                color: Colors.pink,
+                                color: theme.colorScheme.secondary,
                                 offset: Offset(-5.0, 5.0),
                               ),
                               Shadow(
                                 blurRadius: 10.0,
-                                color: Colors.pink,
+                                color: theme.colorScheme.secondary,
                                 offset: Offset(5.0, -5.0),
                               ),
                               Shadow(
                                 blurRadius: 10.0,
-                                color: Colors.pink,
+                                color:theme.colorScheme.secondary,
                                 offset: Offset(-5.0, -5.0),
                               ),
                             ]),
@@ -181,7 +190,7 @@ class _MyHomePageState extends State<MyHomePage> {
                     Navigator.of(context).push(PageRouteBuilder(
                       transitionDuration: Duration(milliseconds: 800),
                       pageBuilder: (context, animation, secondaryAnimation) =>
-                          SettingPage(themeMode: themeMode,onThemeModeChanged: onThemeModeChanged,flexSchemeData: flexSchemeData),
+                          SettingPage(themeMode: themeMode,onThemeModeChanged: onThemeModeChanged,flexSchemeData: flexSchemeData,schemeIndex: schemeIndex,onSchemeChanged: onSchemeChanged),
                       transitionsBuilder:
                           (context, animation, secondaryAnimation, child) {
                         var begin = Offset(0.0, 1.0);
@@ -222,7 +231,7 @@ class _MyHomePageState extends State<MyHomePage> {
                                 Navigator.of(context).pop();
                                 await FirebaseAuth.instance.signOut();
                                 Navigator.of(context).push(MaterialPageRoute(
-                                    builder: (context) => InitialPage(themeMode: themeMode,onThemeModeChanged: onThemeModeChanged,flexSchemeData: flexSchemeData)));
+                                    builder: (context) => InitialPage(themeMode: themeMode,onThemeModeChanged: onThemeModeChanged,flexSchemeData: flexSchemeData,schemeIndex: schemeIndex,onSchemeChanged: onSchemeChanged)));
                               },
                             ),
                             TextButton(
@@ -245,27 +254,27 @@ class _MyHomePageState extends State<MyHomePage> {
       body: Stack(children: [
         Container(
           alignment: Alignment(0, 0.3),
-          color: theme.splashColor,
+          color: theme.primaryColorLight,
           child: FaIcon(
             FontAwesomeIcons.connectdevelop,
-            //color:theme.iconTheme.color,
+            color:theme.primaryColorDark,
             size: MediaQuery.of(context).size.width / 1.5,
           ),
         ),
-        IndexedStack(index: _selectedIndex, children: _widgetOptions(context))
+        IndexedStack(index: _selectedIndex, children: _widgetOptions(context,theme))
       ]),
       bottomNavigationBar: ConvexAppBar(
-        color: theme.shadowColor,
-        activeColor: theme.accentColor.withOpacity(0.5),
+        color: theme.bottomAppBarColor,
+        activeColor: theme.bottomAppBarColor,
         gradient: LinearGradient(
           begin: Alignment.centerLeft,
           end: Alignment.centerRight,
           colors: [
-            theme.accentColor,
-            theme.accentColor.blend(Colors.white,80),
-            theme.accentColor,
-            theme.accentColor.blend(Colors.white,80),
-            theme.accentColor
+            theme.primaryColorDark,
+            theme.primaryColorLight,
+            theme.primaryColorDark,
+            theme.primaryColorLight,
+            theme.primaryColorDark
             // Colors.black,
             // Colors.grey[700],
             // Colors.grey[400],
@@ -357,14 +366,14 @@ class _MyHomePageState extends State<MyHomePage> {
     return list;
   }
 
-  Widget friendPage() {
+  Widget friendPage(ThemeData theme) {
     try {
       return CustomScrollView(
         key: ValueKey<int>(0),
         shrinkWrap: true,
         slivers: <Widget>[
           SliverAppBar(
-              backgroundColor: Theme.of(context).appBarTheme.backgroundColor,
+            backgroundColor: theme.primaryColorDark,
               pinned: true,
               snap: true,
               floating: true,
@@ -465,7 +474,7 @@ class _MyHomePageState extends State<MyHomePage> {
           shrinkWrap: true,
           slivers: <Widget>[
             SliverAppBar(
-                backgroundColor: Colors.black,
+              backgroundColor:  theme.primaryColorDark,
                 pinned: true,
                 snap: true,
                 floating: true,
@@ -524,27 +533,27 @@ class _MyHomePageState extends State<MyHomePage> {
     }
   }
 
-  Widget chatRoomPage() {
+  Widget chatRoomPage(ThemeData theme) {
     try {
       return CustomScrollView(
         key: ValueKey<int>(3),
         shrinkWrap: true,
         slivers: <Widget>[
           SliverAppBar(
+            backgroundColor: theme.primaryColorDark,
+
             leading: IconButton(
               icon: Icon(Icons.menu, size: 30),
               onPressed: () {
                 _scaffoldKey.currentState.openDrawer();
               },
             ),
-            backgroundColor: Colors.black,
             pinned: true,
             snap: true,
             floating: true,
             expandedHeight: 80.0,
-            flexibleSpace: const FlexibleSpaceBar(
-              title: Text('Message'),
-              background: FlutterLogo(),
+            flexibleSpace: FlexibleSpaceBar(
+              title: Text('Message',style: TextStyle(color:theme.backgroundColor),),
             ),
             actions: [
               IconButton(
@@ -660,13 +669,13 @@ class _MyHomePageState extends State<MyHomePage> {
                 _scaffoldKey.currentState.openDrawer();
               },
             ),
-            backgroundColor: Colors.black,
+            backgroundColor:  theme.primaryColorDark,
             pinned: true,
             snap: true,
             floating: true,
             expandedHeight: 80.0,
-            flexibleSpace: const FlexibleSpaceBar(
-              title: Text('Message'),
+            flexibleSpace: FlexibleSpaceBar(
+              title: Text('Message',style: TextStyle(color:theme.backgroundColor),),
               background: FlutterLogo(),
             ),
             actions: [

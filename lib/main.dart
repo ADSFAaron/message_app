@@ -8,6 +8,7 @@ import 'page/home.dart';
 import 'page/login.dart';
 import 'package:animated_text_kit/animated_text_kit.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:flex_color_scheme/flex_color_scheme.dart';
 
 // TODO 製作快取快速讀取用戶資訊及朋友以及聊天資訊
 // TODO 串接後端 以及資料庫 儲存必要文件
@@ -16,47 +17,77 @@ void main() {
   WidgetsFlutterBinding.ensureInitialized();
   runApp(MyApp());
 }
+class MyApp extends StatefulWidget{
+  _MyApp createState()=>_MyApp();
+}
 
-class MyApp extends StatelessWidget {
+class _MyApp extends State<MyApp> {
   // This widget is the root of your application.
   void initState() {
-    // Firebase.initializeApp().whenComplete(() {
-    //   print("completed");
-    // });
+    super.initState();
   }
+  ThemeMode themeMode = ThemeMode.light;
 //TODO 主題可透過這邊作變更
   //TODO 可套用package https://pub.dev/packages/flex_color_scheme
   @override
   Widget build(BuildContext context) {
-    print("myApp build0");
+    print("myApp build");
+    const FlexScheme usedFlexScheme = FlexScheme.green;
+    print(usedFlexScheme);
     return MaterialApp(
       builder: EasyLoading.init(),
       title: 'Flutter Demo',
-      theme: ThemeData(
-        // brightness: Brightness.dark,
-        // primaryColor: Colors.lightBlue[800],
-        // accentColor: Colors.cyan[600],
-        // This is the theme of your application.
-        //
-        // Try running your application with "flutter run". You'll see the
-        // application has a blue toolbar. Then, without quitting the app, try
-        // changing the primarySwatch below to Colors.green and then invoke
-        // "hot reload" (press "r" in the console where you ran "flutter run",
-        // or simply save your changes to "hot reload" in a Flutter IDE).
-        // Notice that the counter didn't reset back to zero; the application
-        // is not restarted.
-        primarySwatch: Colors.blue,
-      ),
-      home: InitialPage(),
+      theme: FlexColorScheme.light(
+        scheme: usedFlexScheme,
+        // Use comfortable on desktops instead of compact, devices use default.
+        visualDensity: FlexColorScheme.comfortablePlatformDensity,
+        //fontFamily: AppFonts.mainFont,
+      ).toTheme,
+      // We do the exact same definition for the dark theme, but using
+      // FlexColorScheme.dark factory and the dark FlexSchemeColor in
+      // FlexColor.schemes.
+      darkTheme: FlexColorScheme.dark(
+        scheme: usedFlexScheme,
+        visualDensity: FlexColorScheme.comfortablePlatformDensity,
+       // fontFamily: AppFonts.mainFont,
+      ).toTheme,
+      themeMode: themeMode,
+      home: InitialPage(
+        themeMode: themeMode,
+        // On the home page we can toggle theme mode between light and dark.
+        onThemeModeChanged: (ThemeMode mode) {
+          setState(() {
+            themeMode = mode;
+          });
+        },
+        // Pass in the FlexSchemeData we used for the active theme. Not really
+        // needed to use FlexColorScheme, but we will use it to show the
+        // active theme's name, descriptions and colors in the demo.
+        // We also use it for the theme mode switch that shows the theme's
+        // color's in the different theme modes.
+        flexSchemeData: FlexColor.schemes[usedFlexScheme],),
     );
   }
 }
 
 class InitialPage extends StatefulWidget {
-  _InitialPage createState() => _InitialPage();
+  InitialPage({@required this.themeMode,
+    @required this.onThemeModeChanged,
+    @required this.flexSchemeData,});
+  final ThemeMode themeMode;
+  final ValueChanged<ThemeMode> onThemeModeChanged;
+  final FlexSchemeData flexSchemeData;
+  _InitialPage createState() => _InitialPage(themeMode: themeMode,onThemeModeChanged: onThemeModeChanged,flexSchemeData: flexSchemeData);
 }
 
 class _InitialPage extends State<InitialPage> {
+  _InitialPage({@required this.themeMode,
+    @required this.onThemeModeChanged,
+    @required this.flexSchemeData,});
+  final ThemeMode themeMode;
+  final ValueChanged<ThemeMode> onThemeModeChanged;
+  final FlexSchemeData flexSchemeData;
+
   bool notLogin = false;
   String nowState = 'Loading...';
   User user;
@@ -109,7 +140,7 @@ class _InitialPage extends State<InitialPage> {
         // print(user);
         Navigator.of(context).pop();
         Navigator.of(context)
-            .push(MaterialPageRoute(builder: (context) => MyHomePage(user: user,userData: userData,)));
+            .push(MaterialPageRoute(builder: (context) => MyHomePage(user: user,userData: userData,themeMode: themeMode,onThemeModeChanged: onThemeModeChanged,flexSchemeData: flexSchemeData)));
       }
     });
   }

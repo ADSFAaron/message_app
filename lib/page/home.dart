@@ -1,5 +1,6 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
+import 'package:flex_color_scheme/flex_color_scheme.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
@@ -9,7 +10,6 @@ import 'package:message_app/page/chat.dart';
 import 'friend.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
 import 'package:kumi_popup_window/kumi_popup_window.dart';
-import 'login.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:animations/animations.dart';
 import 'package:convex_bottom_bar/convex_bottom_bar.dart';
@@ -18,7 +18,9 @@ import 'setting.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 
 class MyHomePage extends StatefulWidget {
-  MyHomePage({Key key, this.userData, this.user}) : super(key: key);
+  MyHomePage({Key key, this.userData, this.user,@required this.themeMode,
+    @required this.onThemeModeChanged,
+    @required this.flexSchemeData,}) : super(key: key);
 
   // This widget is the home page of your application. It is stateful, meaning
   // that it has a State object (defined below) that contains fields that affect
@@ -32,13 +34,23 @@ class MyHomePage extends StatefulWidget {
   final DocumentSnapshot userData;
   final User user;
 
+  final ThemeMode themeMode;
+  final ValueChanged<ThemeMode> onThemeModeChanged;
+  final FlexSchemeData flexSchemeData;
+
   @override
   _MyHomePageState createState() =>
-      _MyHomePageState(user: user, userData: userData);
+      _MyHomePageState(user: user, userData: userData,themeMode: themeMode,onThemeModeChanged: onThemeModeChanged,flexSchemeData: flexSchemeData);
 }
 
 class _MyHomePageState extends State<MyHomePage> {
-  _MyHomePageState({this.user, this.userData});
+  _MyHomePageState({this.user, this.userData,@required this.themeMode,
+    @required this.onThemeModeChanged,
+    @required this.flexSchemeData,});
+
+  final ThemeMode themeMode;
+  final ValueChanged<ThemeMode> onThemeModeChanged;
+  final FlexSchemeData flexSchemeData;
 
   int _selectedIndex = 1;
   int allMessageindex = 21;
@@ -85,6 +97,7 @@ class _MyHomePageState extends State<MyHomePage> {
   Widget build(BuildContext context) {
     print(
         "start build main page------------------------------------------------");
+    final ThemeData theme=Theme.of(context);
     // print(userData.data());
     return Scaffold(
       resizeToAvoidBottomInset: false,
@@ -168,7 +181,7 @@ class _MyHomePageState extends State<MyHomePage> {
                     Navigator.of(context).push(PageRouteBuilder(
                       transitionDuration: Duration(milliseconds: 800),
                       pageBuilder: (context, animation, secondaryAnimation) =>
-                          SettingPage(),
+                          SettingPage(themeMode: themeMode,onThemeModeChanged: onThemeModeChanged,flexSchemeData: flexSchemeData),
                       transitionsBuilder:
                           (context, animation, secondaryAnimation, child) {
                         var begin = Offset(0.0, 1.0);
@@ -209,7 +222,7 @@ class _MyHomePageState extends State<MyHomePage> {
                                 Navigator.of(context).pop();
                                 await FirebaseAuth.instance.signOut();
                                 Navigator.of(context).push(MaterialPageRoute(
-                                    builder: (context) => InitialPage()));
+                                    builder: (context) => InitialPage(themeMode: themeMode,onThemeModeChanged: onThemeModeChanged,flexSchemeData: flexSchemeData)));
                               },
                             ),
                             TextButton(
@@ -232,31 +245,36 @@ class _MyHomePageState extends State<MyHomePage> {
       body: Stack(children: [
         Container(
           alignment: Alignment(0, 0.3),
-          color: Colors.grey[850],
+          color: theme.splashColor,
           child: FaIcon(
             FontAwesomeIcons.connectdevelop,
-            color: Colors.white,
+            //color:theme.iconTheme.color,
             size: MediaQuery.of(context).size.width / 1.5,
           ),
         ),
         IndexedStack(index: _selectedIndex, children: _widgetOptions(context))
       ]),
       bottomNavigationBar: ConvexAppBar(
-        color: Colors.black,
-        activeColor: Colors.white,
+        color: theme.shadowColor,
+        activeColor: theme.accentColor.withOpacity(0.5),
         gradient: LinearGradient(
           begin: Alignment.centerLeft,
           end: Alignment.centerRight,
           colors: [
-            Colors.black,
-            Colors.grey[700],
-            Colors.grey[400],
-            Colors.grey[700],
-            Colors.black,
-            Colors.grey[700],
-            Colors.grey[400],
-            Colors.grey[700],
-            Colors.black
+            theme.accentColor,
+            theme.accentColor.blend(Colors.white,80),
+            theme.accentColor,
+            theme.accentColor.blend(Colors.white,80),
+            theme.accentColor
+            // Colors.black,
+            // Colors.grey[700],
+            // Colors.grey[400],
+            // Colors.grey[700],
+            // Colors.black,
+            // Colors.grey[700],
+            // Colors.grey[400],
+            // Colors.grey[700],
+            // Colors.black
           ],
           tileMode: TileMode.repeated,
         ),
@@ -346,7 +364,7 @@ class _MyHomePageState extends State<MyHomePage> {
         shrinkWrap: true,
         slivers: <Widget>[
           SliverAppBar(
-              backgroundColor: Colors.black,
+              backgroundColor: Theme.of(context).appBarTheme.backgroundColor,
               pinned: true,
               snap: true,
               floating: true,

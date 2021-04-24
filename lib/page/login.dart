@@ -72,7 +72,7 @@ class _LoginPage extends State<LoginPage> {
     }
     print(userCredential);
     if(userCredential!=null)
-      Navigator.of(context).pop(userCredential.user);
+      Navigator.of(context).pop();
   }
 
   Future<UserCredential> signInWithGoogle() async {

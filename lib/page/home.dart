@@ -11,12 +11,14 @@ import 'package:flutter_slidable/flutter_slidable.dart';
 import 'package:kumi_popup_window/kumi_popup_window.dart';
 import 'login.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:animations/animations.dart';import 'package:convex_bottom_bar/convex_bottom_bar.dart';
+import 'package:animations/animations.dart';
+import 'package:convex_bottom_bar/convex_bottom_bar.dart';
 import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'setting.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 
 class MyHomePage extends StatefulWidget {
-  MyHomePage({Key key, this.userData}) : super(key: key);
+  MyHomePage({Key key, this.userData, this.user}) : super(key: key);
 
   // This widget is the home page of your application. It is stateful, meaning
   // that it has a State object (defined below) that contains fields that affect
@@ -28,12 +30,16 @@ class MyHomePage extends StatefulWidget {
   // always marked "final".
 
   final DocumentSnapshot userData;
+  final User user;
 
   @override
-  _MyHomePageState createState() => _MyHomePageState();
+  _MyHomePageState createState() =>
+      _MyHomePageState(user: user, userData: userData);
 }
 
 class _MyHomePageState extends State<MyHomePage> {
+  _MyHomePageState({this.user, this.userData});
+
   int _selectedIndex = 1;
   int allMessageindex = 21;
   int beenTaped = 999;
@@ -48,6 +54,7 @@ class _MyHomePageState extends State<MyHomePage> {
   FirebaseAuth auth;
   User user;
   DocumentSnapshot userData;
+
   void initFirebase() async {
     await Firebase.initializeApp().whenComplete(() {
       print("initial completed");
@@ -55,37 +62,6 @@ class _MyHomePageState extends State<MyHomePage> {
 
     auth = FirebaseAuth.instance;
 
-    FirebaseAuth.instance.authStateChanges().listen((User _user) {
-      if (_user == null) {
-        print('User is currently signed out!');
-        user = null;
-        Navigator.of(context).push(PageRouteBuilder(
-          transitionDuration: Duration(milliseconds: 800),
-          pageBuilder:
-              (context, animation, secondaryAnimation) =>
-              LoginPage(),
-          transitionsBuilder: (context, animation,
-              secondaryAnimation, child) {
-            var begin = Offset(0.0, 1.0);
-            var end = Offset.zero;
-            var curve = Curves.ease;
-
-            var tween = Tween(begin: begin, end: end)
-                .chain(CurveTween(curve: curve));
-            return SlideTransition(
-              position: animation.drive(tween),
-              child: child,
-            );
-          },
-        ));
-      } else {
-        setState(() {
-          user = _user;
-        });
-        print('User is signed in!');
-        // print(user);
-      }
-    });
     users = FirebaseFirestore.instance.collection('users');
   }
 
@@ -107,7 +83,9 @@ class _MyHomePageState extends State<MyHomePage> {
 
   @override
   Widget build(BuildContext context) {
-    print("start build main page------------------------------------------------");
+    print(
+        "start build main page------------------------------------------------");
+    // print(userData.data());
     return Scaffold(
       resizeToAvoidBottomInset: false,
       key: _scaffoldKey,
@@ -125,69 +103,26 @@ class _MyHomePageState extends State<MyHomePage> {
                           fit: BoxFit.cover)),
                   child: Column(
                     mainAxisAlignment: MainAxisAlignment.center,
-                    children: user == null
-                        ? <Widget>[
-                      Container(
-                          alignment: Alignment.center,
-                          child: CircleAvatar(
-                              backgroundColor: Colors.purpleAccent,
-                              radius: 40,
-                              child: Icon(
-                                Icons.person,
-                                size: 60,
-                              ))),
-                      Text(
-                        "尚未登入",
-                        style: TextStyle(
-                            fontSize: 30,
-                            color: Colors.white,
-                            shadows: [
-                              Shadow(
-                                blurRadius: 10.0,
-                                color: Colors.pink,
-                                offset: Offset(5.0, 5.0),
-                              ),
-                              Shadow(
-                                blurRadius: 10.0,
-                                color: Colors.pink,
-                                offset: Offset(-5.0, 5.0),
-                              ),
-                              Shadow(
-                                blurRadius: 10.0,
-                                color: Colors.pink,
-                                offset: Offset(5.0, -5.0),
-                              ),
-                              Shadow(
-                                blurRadius: 10.0,
-                                color: Colors.pink,
-                                offset: Offset(-5.0, -5.0),
-                              ),
-                            ]),
-                      ),
-                    ]
-                        : <Widget>[
-                      user.photoURL != null
+                    children: <Widget>[
+                      (user.photoURL != null)
                           ? Container(
-                          alignment: Alignment.center,
-                          decoration: BoxDecoration(
-                              shape: BoxShape.circle,
-                              image: DecorationImage(
-                                  image:
-                                  NetworkImage(user.photoURL))))
+                              alignment: Alignment.center,
+                              decoration: BoxDecoration(
+                                  shape: BoxShape.circle,
+                                  image: DecorationImage(
+                                      image: NetworkImage(user.photoURL))))
                           : Container(
-                          alignment: Alignment.center,
-                          child: CircleAvatar(
-                              backgroundColor: Colors.purpleAccent,
-                              radius: 40,
-                              child: Icon(
-                                Icons.person,
-                                size: 60,
-                              ))),
+                              alignment: Alignment.center,
+                              child: CircleAvatar(
+                                  backgroundColor: Colors.purpleAccent,
+                                  radius: 40,
+                                  child: Icon(
+                                    Icons.person,
+                                    size: 60,
+                                  ))),
                       Divider(),
                       Text(
-                        (user.displayName == null)
-                            ? "沒取名"
-                            : user.displayName,
+                        (user.displayName == null) ? "沒取名" : user.displayName,
                         style: TextStyle(
                             fontSize: 30,
                             color: Colors.white,
@@ -229,14 +164,13 @@ class _MyHomePageState extends State<MyHomePage> {
                 ),
                 ListTile(
                   title: Text("Setting"),
-                  onTap: (){
+                  onTap: () {
                     Navigator.of(context).push(PageRouteBuilder(
                       transitionDuration: Duration(milliseconds: 800),
-                      pageBuilder:
-                          (context, animation, secondaryAnimation) =>
+                      pageBuilder: (context, animation, secondaryAnimation) =>
                           SettingPage(),
-                      transitionsBuilder: (context, animation,
-                          secondaryAnimation, child) {
+                      transitionsBuilder:
+                          (context, animation, secondaryAnimation, child) {
                         var begin = Offset(0.0, 1.0);
                         var end = Offset.zero;
                         var curve = Curves.ease;
@@ -251,8 +185,7 @@ class _MyHomePageState extends State<MyHomePage> {
                     ));
                   },
                 ),
-                user != null
-                    ? ListTile(
+                ListTile(
                   title: Text("登出"),
                   onTap: () {
                     showDialog(
@@ -273,10 +206,10 @@ class _MyHomePageState extends State<MyHomePage> {
                             TextButton(
                               child: Text('確定'),
                               onPressed: () async {
-
                                 Navigator.of(context).pop();
                                 await FirebaseAuth.instance.signOut();
-                                Navigator.of(context).push(MaterialPageRoute(builder: (context)=>InitialPage()));
+                                Navigator.of(context).push(MaterialPageRoute(
+                                    builder: (context) => InitialPage()));
                               },
                             ),
                             TextButton(
@@ -291,55 +224,50 @@ class _MyHomePageState extends State<MyHomePage> {
                     );
                   },
                 )
-                    : ListTile(
-                  title: Text("登入"),
-                  onTap: () async {
-                    user =
-                    await Navigator.of(context).push(PageRouteBuilder(
-                      transitionDuration: Duration(milliseconds: 800),
-                      pageBuilder:
-                          (context, animation, secondaryAnimation) =>
-                          LoginPage(),
-                      transitionsBuilder: (context, animation,
-                          secondaryAnimation, child) {
-                        var begin = Offset(0.0, 1.0);
-                        var end = Offset.zero;
-                        var curve = Curves.ease;
-
-                        var tween = Tween(begin: begin, end: end)
-                            .chain(CurveTween(curve: curve));
-                        return SlideTransition(
-                          position: animation.drive(tween),
-                          child: child,
-                        );
-                      },
-                    ));
-                  },
-                ),
               ]),
             )
           ],
         ),
       ),
-      body:          Stack(children:[
-        Container(color:Colors.teal[700]),
-        IndexedStack(
-            index: _selectedIndex, children: _widgetOptions(context))]),
-
-      bottomNavigationBar:
-      ConvexAppBar(
-        gradient:LinearGradient(
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-          colors: [Colors.yellow, Colors.redAccent, Colors.green],
+      body: Stack(children: [
+        Container(
+          alignment: Alignment(0, 0.3),
+          color: Colors.grey[850],
+          child: FaIcon(
+            FontAwesomeIcons.connectdevelop,
+            color: Colors.white,
+            size: MediaQuery.of(context).size.width / 1.5,
+          ),
+        ),
+        IndexedStack(index: _selectedIndex, children: _widgetOptions(context))
+      ]),
+      bottomNavigationBar: ConvexAppBar(
+        color: Colors.black,
+        activeColor: Colors.white,
+        gradient: LinearGradient(
+          begin: Alignment.centerLeft,
+          end: Alignment.centerRight,
+          colors: [
+            Colors.black,
+            Colors.grey[700],
+            Colors.grey[400],
+            Colors.grey[700],
+            Colors.black,
+            Colors.grey[700],
+            Colors.grey[400],
+            Colors.grey[700],
+            Colors.black
+          ],
           tileMode: TileMode.repeated,
         ),
         initialActiveIndex: _selectedIndex,
-
         style: TabStyle.reactCircle,
-        items:[
-          TabItem(icon: Icon(Icons.home),title: "Home"),
-          TabItem(icon: Icon(Icons.comment),title: "Comment"),
+        items: [
+          TabItem(icon: Icon(Icons.home), title: "Home"),
+          TabItem(
+            icon: Icon(Icons.comment),
+            title: "Comment",
+          ),
           // TabItem(icon: Icon(Icons.person),title:"myself")
         ],
         onTap: _onItemTapped,
@@ -387,8 +315,8 @@ class _MyHomePageState extends State<MyHomePage> {
                 color: Colors.white,
                 icon: Icons.delete,
                 onTap: () => Fluttertoast.showToast(msg: "尚未開發")
-              // _deleteMessage(i),
-            )
+                // _deleteMessage(i),
+                )
           ],
           actionExtentRatio: 1 / 4,
           child: OpenContainer(
@@ -418,14 +346,13 @@ class _MyHomePageState extends State<MyHomePage> {
         shrinkWrap: true,
         slivers: <Widget>[
           SliverAppBar(
-              backgroundColor: Colors.purple,
+              backgroundColor: Colors.black,
               pinned: true,
               snap: true,
               floating: true,
-              expandedHeight: 120.0,
+              expandedHeight: 80.0,
               flexibleSpace: const FlexibleSpaceBar(
                 title: Text('Friend'),
-                background: FlutterLogo(),
               ),
               leading: IconButton(
                 icon: Icon(Icons.menu, size: 30),
@@ -504,10 +431,7 @@ class _MyHomePageState extends State<MyHomePage> {
                   crossAxisCount: 1,
                 ),
                 delegate: SliverChildListDelegate(<Widget>[
-                  Container(
-                      alignment: Alignment.center,
-                      color:Colors.white10
-                  )
+                  Container(alignment: Alignment.center, color: Colors.white10)
                 ]),
               );
             },
@@ -515,32 +439,70 @@ class _MyHomePageState extends State<MyHomePage> {
         ],
       );
     } catch (e) {
-      print('build friend page error');
-      return Center(
-        child: ElevatedButton(
-          child: Text("登入"),
-          onPressed: () async {
-            user = await Navigator.of(context).push(PageRouteBuilder(
-              transitionDuration: Duration(milliseconds: 800),
-              pageBuilder: (context, animation, secondaryAnimation) =>
-                  LoginPage(),
-              transitionsBuilder:
-                  (context, animation, secondaryAnimation, child) {
-                var begin = Offset(0.0, 1.0);
-                var end = Offset.zero;
-                var curve = Curves.ease;
+      //print('build friend page error');
+      Map<String, dynamic> data = userData.data();
+      friendList = createFContainer(context, data['friend']);
+      return CustomScrollView(
+          key: ValueKey<int>(0),
+          shrinkWrap: true,
+          slivers: <Widget>[
+            SliverAppBar(
+                backgroundColor: Colors.black,
+                pinned: true,
+                snap: true,
+                floating: true,
+                expandedHeight: 80.0,
+                flexibleSpace: const FlexibleSpaceBar(
+                  title: Text('Friend'),
+                  background: FlutterLogo(),
+                ),
+                leading: IconButton(
+                  icon: Icon(Icons.menu, size: 30),
+                  onPressed: () {
+                    _scaffoldKey.currentState.openDrawer();
+                  },
+                ),
+                actions: <Widget>[
+                  IconButton(
+                    alignment: Alignment.centerRight,
+                    icon: const Icon(Icons.add_circle, size: 30),
+                    tooltip: 'Add Friend',
+                    onPressed: () async {
+                      // print("-------add---------");
+                      // print(myself.account);
+                      await Navigator.of(context).push(PageRouteBuilder(
+                        pageBuilder: (context, animation, secondaryAnimation) =>
+                            AddFriendPage(),
+                        transitionsBuilder:
+                            (context, animation, secondaryAnimation, child) {
+                          var begin = Offset(0.0, 1.0);
+                          var end = Offset.zero;
+                          var curve = Curves.ease;
 
-                var tween = Tween(begin: begin, end: end)
-                    .chain(CurveTween(curve: curve));
-                return SlideTransition(
-                  position: animation.drive(tween),
-                  child: child,
-                );
-              },
-            ));
-          },
-        ),
-      );
+                          var tween = Tween(begin: begin, end: end)
+                              .chain(CurveTween(curve: curve));
+
+                          return SlideTransition(
+                            position: animation.drive(tween),
+                            child: child,
+                          );
+                        },
+                      ));
+                      setState(() {});
+                    },
+                  ),
+                ]),
+            SliverGrid(
+              //用來建list 裡面再放東西
+              gridDelegate: SliverGridDelegateWithMaxCrossAxisExtent(
+                maxCrossAxisExtent: 160.0,
+                childAspectRatio: 1.0,
+              ),
+              delegate: SliverChildListDelegate(
+                friendList,
+              ),
+            )
+          ]);
     }
   }
 
@@ -557,7 +519,7 @@ class _MyHomePageState extends State<MyHomePage> {
                 _scaffoldKey.currentState.openDrawer();
               },
             ),
-            backgroundColor: Colors.lightGreen,
+            backgroundColor: Colors.black,
             pinned: true,
             snap: true,
             floating: true,
@@ -639,11 +601,11 @@ class _MyHomePageState extends State<MyHomePage> {
                   print("error snapshot");
                   return SliverList(
                       delegate: SliverChildListDelegate([
-                        Container(
-                          height: 100,
-                          child: Text('Something went wrong'),
-                        )
-                      ]));
+                    Container(
+                      height: 100,
+                      child: Text('Something went wrong'),
+                    )
+                  ]));
                 }
 
                 if (snapshot.connectionState == ConnectionState.waiting) {
@@ -666,30 +628,102 @@ class _MyHomePageState extends State<MyHomePage> {
         ],
       );
     } catch (e) {
-      return Center(
-        child: ElevatedButton(
-          child: Text("登入"),
-          onPressed: () async {
-            user = await Navigator.of(context).push(PageRouteBuilder(
-              transitionDuration: Duration(milliseconds: 800),
-              pageBuilder: (context, animation, secondaryAnimation) =>
-                  LoginPage(),
-              transitionsBuilder:
-                  (context, animation, secondaryAnimation, child) {
-                var begin = Offset(0.0, 1.0);
-                var end = Offset.zero;
-                var curve = Curves.ease;
-
-                var tween = Tween(begin: begin, end: end)
-                    .chain(CurveTween(curve: curve));
-                return SlideTransition(
-                  position: animation.drive(tween),
-                  child: child,
-                );
+      Map<String, dynamic> map = userData.data();
+      List _chatList = map['chatRoom'];
+      chatList = createChatContainer(context, _chatList);
+      return CustomScrollView(
+        key: ValueKey<int>(3),
+        shrinkWrap: true,
+        slivers: <Widget>[
+          SliverAppBar(
+            leading: IconButton(
+              icon: Icon(Icons.menu, size: 30),
+              onPressed: () {
+                _scaffoldKey.currentState.openDrawer();
               },
-            ));
-          },
-        ),
+            ),
+            backgroundColor: Colors.black,
+            pinned: true,
+            snap: true,
+            floating: true,
+            expandedHeight: 80.0,
+            flexibleSpace: const FlexibleSpaceBar(
+              title: Text('Message'),
+              background: FlutterLogo(),
+            ),
+            actions: [
+              IconButton(
+                  icon: Icon(Icons.menu),
+                  onPressed: () {
+                    showPopupWindow(
+                      context,
+                      offsetX: 5,
+                      offsetY: 70,
+                      //childSize:Size(240, 800),
+                      gravity: KumiPopupGravity.rightTop,
+                      //curve: Curves.elasticOut,
+                      duration: Duration(milliseconds: 300),
+                      bgColor: Colors.black.withOpacity(0),
+                      onShowStart: (pop) {
+                        print("showStart");
+                      },
+                      onShowFinish: (pop) {
+                        print("showFinish");
+                      },
+                      onDismissStart: (pop) {
+                        print("dismissStart");
+                      },
+                      onDismissFinish: (pop) {
+                        print("dismissFinish");
+                      },
+                      onClickOut: (pop) {
+                        print("onClickOut");
+                      },
+                      onClickBack: (pop) {
+                        print("onClickBack");
+                      },
+                      childFun: (pop) {
+                        return StatefulBuilder(
+                            key: GlobalKey(),
+                            builder: (popContext, popState) {
+                              return Container(
+                                padding: EdgeInsets.all(10),
+                                height: 76,
+                                width: 200,
+                                color: Colors.black,
+                                alignment: Alignment.center,
+                                child: Column(
+                                  children: [
+                                    ListTile(
+                                        leading: Icon(
+                                          Icons.delete,
+                                          color: Colors.white,
+                                        ),
+                                        onTap: () {
+                                          Fluttertoast.showToast(msg: "尚未實作");
+                                          // _cleanMessage();
+                                          Navigator.of(context).pop();
+                                        },
+                                        title: Text(
+                                          "全部刪除",
+                                          style: TextStyle(color: Colors.white),
+                                        ))
+                                  ],
+                                ),
+                              );
+                            });
+                      },
+                    );
+                  })
+            ],
+          ),
+          SliverList(
+            //用來建list 裡面再放東西
+            delegate: SliverChildListDelegate(
+              chatList,
+            ),
+          )
+        ],
       );
     }
   }
@@ -724,7 +758,7 @@ class _MyHomePageState extends State<MyHomePage> {
 
   void _createChat(List list) async {
     CollectionReference chatRoom =
-    FirebaseFirestore.instance.collection("chatRoom");
+        FirebaseFirestore.instance.collection("chatRoom");
     String _roomName = "${list[2]},${user.displayName} Chat";
     //TODO 創建聊天室
     DocumentReference reference = await chatRoom.add({
@@ -743,15 +777,14 @@ class _MyHomePageState extends State<MyHomePage> {
     Navigator.of(context).push(PageRouteBuilder(
       transitionDuration: Duration(milliseconds: 800),
       pageBuilder: (context, animation, secondaryAnimation) =>
-          ChatPage(roomName: _roomName,roomId: reference.id),
-      transitionsBuilder:
-          (context, animation, secondaryAnimation, child) {
+          ChatPage(roomName: _roomName, roomId: reference.id),
+      transitionsBuilder: (context, animation, secondaryAnimation, child) {
         var begin = Offset(0.0, 1.0);
         var end = Offset.zero;
         var curve = Curves.ease;
 
-        var tween = Tween(begin: begin, end: end)
-            .chain(CurveTween(curve: curve));
+        var tween =
+            Tween(begin: begin, end: end).chain(CurveTween(curve: curve));
         return SlideTransition(
           position: animation.drive(tween),
           child: child,
@@ -781,5 +814,4 @@ class _MyHomePageState extends State<MyHomePage> {
 //       messageDetail.removeAt(index);
 //     });
   }
-
 }

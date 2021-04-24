@@ -161,7 +161,8 @@ class _RegisterPage extends State<RegisterPage> {
       "chatRoom":[],
       "photoURL": null,
       "bio":"這人很懶啥都沒留下",
-      "backGroundURL":null
+      "backGroundURL":null,
+
     }).then((value) => print("User Added"))
         .catchError((error) => print("Failed to add user: $error"));
 

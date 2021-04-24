@@ -24,7 +24,8 @@ class MyApp extends StatelessWidget {
     //   print("completed");
     // });
   }
-
+//TODO 主題可透過這邊作變更
+  //TODO 可套用package https://pub.dev/packages/flex_color_scheme
   @override
   Widget build(BuildContext context) {
     print("myApp build0");
@@ -32,6 +33,9 @@ class MyApp extends StatelessWidget {
       builder: EasyLoading.init(),
       title: 'Flutter Demo',
       theme: ThemeData(
+        // brightness: Brightness.dark,
+        // primaryColor: Colors.lightBlue[800],
+        // accentColor: Colors.cyan[600],
         // This is the theme of your application.
         //
         // Try running your application with "flutter run". You'll see the
@@ -90,29 +94,28 @@ class _InitialPage extends State<InitialPage> {
           nowState = "登入成功 請稍後...";
         });
 
-        await Future.delayed(Duration(milliseconds: 50));
+        await Future.delayed(Duration(milliseconds: 60));
 
         setState(() {
           nowState = "正在獲取使用者資料...";
         });
-        await Future.delayed(Duration(milliseconds: 50));
+        await Future.delayed(Duration(milliseconds: 60));
         users = FirebaseFirestore.instance.collection('users');
         userData = await users.doc(user.email).get();
         setState(() {
           nowState = "即將進入主畫面...";
         });
-        await Future.delayed(Duration(milliseconds: 50));
+        await Future.delayed(Duration(milliseconds: 60));
         // print(user);
         Navigator.of(context).pop();
         Navigator.of(context)
-            .push(MaterialPageRoute(builder: (context) => MyHomePage()));
+            .push(MaterialPageRoute(builder: (context) => MyHomePage(user: user,userData: userData,)));
       }
     });
   }
 
   @override
   Widget build(BuildContext context) {
-    // TODO: implement build
     return Scaffold(
         body: Stack(children: [
       Container(

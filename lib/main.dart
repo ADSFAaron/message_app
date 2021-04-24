@@ -55,7 +55,6 @@ class InitialPage extends StatefulWidget {
 class _InitialPage extends State<InitialPage> {
   bool notLogin = false;
   String nowState = 'Loading...';
-  FirebaseAuth auth;
   User user;
   CollectionReference users;
   DocumentSnapshot userData;
@@ -91,18 +90,18 @@ class _InitialPage extends State<InitialPage> {
           nowState = "登入成功 請稍後...";
         });
 
-        Future.delayed(Duration(seconds: 1));
+        await Future.delayed(Duration(milliseconds: 50));
 
         setState(() {
           nowState = "正在獲取使用者資料...";
         });
-        Future.delayed(Duration(seconds: 1));
+        await Future.delayed(Duration(milliseconds: 50));
         users = FirebaseFirestore.instance.collection('users');
         userData = await users.doc(user.email).get();
         setState(() {
-          nowState = "即將進入主畫面";
+          nowState = "即將進入主畫面...";
         });
-        Future.delayed(Duration(seconds: 1));
+        await Future.delayed(Duration(milliseconds: 50));
         // print(user);
         Navigator.of(context).pop();
         Navigator.of(context)
@@ -135,15 +134,6 @@ class _InitialPage extends State<InitialPage> {
         child: (notLogin == false)
             ? AnimatedTextKit(
                 animatedTexts: [
-                  // TypewriterAnimatedText(
-                  //   'Loading...',
-                  //   textStyle: const TextStyle(
-                  //     color: Colors.white,
-                  //     fontSize: 22.0,
-                  //     fontWeight: FontWeight.bold,
-                  //   ),
-                  //   speed: const Duration(milliseconds: 100),
-                  // ),
                   TypewriterAnimatedText(
                     nowState,
                     textStyle: const TextStyle(

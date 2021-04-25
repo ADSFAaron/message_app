@@ -121,9 +121,10 @@ class SettingPage extends StatelessWidget {
             ),
             onPressed: () => Navigator.of(context).pop(),
           ),
-          title: Center(
+          title: Container(
+            alignment: Alignment(-0.2,0),
             child: Text(
-              "個人資料",
+              "設定",
               style: TextStyle(color: Colors.black),
             ),
           ),
@@ -386,23 +387,20 @@ class ThemePage extends StatelessWidget {
           // automatically. No idea why, just something I noticed by accident.
           child: Scaffold(
             appBar: AppBar(
-              title: const Text('FlexColorScheme Example 4'),
+              title: const Text('主題設定'),
               actions: const <Widget>[AboutIconButton()],
             ),
             body: PageBody(
               child: ListView(
                 padding: const EdgeInsets.all(AppConst.edgePadding),
                 children: <Widget>[
-                  Text('Theme', style: headline4),
+                  Text('主題', style: headline4),
                   const Text(
-                    'This example shows how you can use all the built in '
-                    'color schemes in FlexColorScheme, add 3 custom schemes to '
-                    'it and how to interactively select which scheme is used '
-                    'to define the active theme.\n\n'
-                    'The example also uses medium strength branded '
-                    'background and surface colors. '
-                    'A theme showcase widget shows the theme with several '
-                    'common Material widgets.',
+                   '這裡可以簡單預覽所選擇的主題\n'
+                       '選擇包含明亮或暗色主題\n'
+                       '\n\n另外也可以選擇主題的配色\n'
+                       '下方右邊圓圈圈點擊可觀看有那些顏色的主題可供選擇\n'
+                       '並提供即時預覽大概顏色給您看'
                   ),
                   // A 3-way theme mode toggle switch.
                   Padding(

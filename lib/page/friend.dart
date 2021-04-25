@@ -233,12 +233,6 @@ class _AddFriendPage extends State<AddFriendPage> {
     CollectionReference users = FirebaseFirestore.instance.collection('users');
     DocumentSnapshot future = await users.doc(text).get();
     Map<String, dynamic> data = future.data();
-//     var response = await http.post(Uri.parse(baseUrl + "getFriendData"),
-//         headers: <String, String>{
-//           'Content-Type': 'application/json; charset=UTF-8',
-//         },
-//         body: jsonEncode({"account": text}));
-//
     setState(() {
 //      print("*${response.body}*");
       if (data != null) {

@@ -28,21 +28,8 @@ class MyHomePage extends StatefulWidget {
   final int schemeIndex;
   final ValueChanged<int> onSchemeChanged;
   final FlexSchemeData flexSchemeData;
-
-  // This widget is the home page of your application. It is stateful, meaning
-  // that it has a State object (defined below) that contains fields that affect
-  // how it looks.
-
-  // This class is the configuration for the state. It holds the values (in this
-  // case the title) provided by the parent (in this case the App widget) and
-  // used by the build method of the State. Fields in a Widget subclass are
-  // always marked "final".
-
   final DocumentSnapshot userData;
   final User user;
-
-
-
   @override
   _MyHomePageState createState() =>
       _MyHomePageState(user: user, userData: userData,themeMode: themeMode,onThemeModeChanged: onThemeModeChanged,flexSchemeData: flexSchemeData,schemeIndex: schemeIndex,onSchemeChanged: onSchemeChanged);
@@ -454,9 +441,10 @@ class _MyHomePageState extends State<MyHomePage> {
 
               return SliverGrid(
                 //用來建list 裡面再放東西
-                gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                  crossAxisCount: 1,
-                ),
+                gridDelegate:SliverGridDelegateWithFixedCrossAxisCount(
+                crossAxisCount: 1,
+                childAspectRatio: 1.0,
+              ),
                 delegate: SliverChildListDelegate(<Widget>[
                   Container(alignment: Alignment.center, color: Colors.white10)
                 ]),
@@ -481,7 +469,6 @@ class _MyHomePageState extends State<MyHomePage> {
                 expandedHeight: 80.0,
                 flexibleSpace: const FlexibleSpaceBar(
                   title: Text('Friend'),
-                  background: FlutterLogo(),
                 ),
                 leading: IconButton(
                   icon: Icon(Icons.menu, size: 30),
@@ -521,8 +508,8 @@ class _MyHomePageState extends State<MyHomePage> {
                 ]),
             SliverGrid(
               //用來建list 裡面再放東西
-              gridDelegate: SliverGridDelegateWithMaxCrossAxisExtent(
-                maxCrossAxisExtent: 160.0,
+              gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                crossAxisCount: 2,
                 childAspectRatio: 1.0,
               ),
               delegate: SliverChildListDelegate(
@@ -676,7 +663,6 @@ class _MyHomePageState extends State<MyHomePage> {
             expandedHeight: 80.0,
             flexibleSpace: FlexibleSpaceBar(
               title: Text('Message',style: TextStyle(color:theme.backgroundColor),),
-              background: FlutterLogo(),
             ),
             actions: [
               IconButton(

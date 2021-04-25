@@ -162,7 +162,7 @@ class _RegisterPage extends State<RegisterPage> {
       "photoURL": null,
       "bio":"這人很懶啥都沒留下",
       "backGroundURL":null,
-
+      "friendRequire":[]
     }).then((value) => print("User Added"))
         .catchError((error) => print("Failed to add user: $error"));
 

@@ -317,8 +317,6 @@ class _MyHomePageState extends State<MyHomePage> {
   }
 
   List<Widget> createChatContainer(BuildContext context, List snapshot) {
-//    print("into createChatContainer");
-//    print(snapshot);
     List<Widget> list = [];
     for (int i = 0; i < snapshot.length; i++) {
       Slidable con = Slidable(
@@ -440,7 +438,6 @@ class _MyHomePageState extends State<MyHomePage> {
               }
 
               return SliverGrid(
-                //用來建list 裡面再放東西
                 gridDelegate:SliverGridDelegateWithFixedCrossAxisCount(
                 crossAxisCount: 1,
                 childAspectRatio: 1.0,
@@ -507,7 +504,6 @@ class _MyHomePageState extends State<MyHomePage> {
                   ),
                 ]),
             SliverGrid(
-              //用來建list 裡面再放東西
               gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
                 crossAxisCount: 2,
                 childAspectRatio: 1.0,

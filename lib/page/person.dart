@@ -64,127 +64,126 @@ class PersonDetailPage extends StatelessWidget {
                   children: [
                     Container(
                         color: theme.colorScheme.secondary,
+                        //TODO 將這改成別人的背景圖案
+                        //decoration: BoxDecoration(),
                         alignment: Alignment.center,
-                        height: 350,
-                        child: data['photoURL'] != null
-                            ? Container(
-                                alignment: Alignment.center,
-                                decoration: BoxDecoration(
-                                    image: DecorationImage(
-                                        image: NetworkImage(data['photoURL']))))
-                            : Container(
-                                alignment: Alignment.center,
-                                child: Icon(
-                                  Icons.person,
-                                  size: 60,
-                                  color:theme.primaryColor
-                                ))),
-                   Container(
-                       height: MediaQuery.of(context).size.height-350,
-                       child:Column(children:[ Divider(),
+                        height:MediaQuery.of(context).size.height / 2,
+                        child:FaceImage(faceURL: data['photoURL'],)),
                     Container(
-                      alignment: Alignment.center,
-                      child: SizedBox(
-                          width: MediaQuery.of(context).size.width,
-                          child: Text(data['username'],
-                              textAlign: TextAlign.center,
+                        height: MediaQuery.of(context).size.height / 2,
+                        child: Column(children: [
+                          Divider(),
+                          Container(
+                            alignment: Alignment.center,
+                            child: SizedBox(
+                                width: MediaQuery.of(context).size.width,
+                                child: Text(data['username'],
+                                    textAlign: TextAlign.center,
+                                    style: TextStyle(
+                                        fontSize: 40,
+                                        color: Colors.white,
+                                        shadows: [
+                                          Shadow(
+                                            blurRadius: 10.0,
+                                            color: theme.primaryColor,
+                                            offset: Offset(5.0, 5.0),
+                                          ),
+                                          Shadow(
+                                            blurRadius: 10.0,
+                                            color: theme.primaryColor,
+                                            offset: Offset(-5.0, 5.0),
+                                          ),
+                                          Shadow(
+                                            blurRadius: 10.0,
+                                            color: theme.primaryColor,
+                                            offset: Offset(5.0, -5.0),
+                                          ),
+                                          Shadow(
+                                            blurRadius: 10.0,
+                                            color: theme.primaryColor,
+                                            offset: Offset(-5.0, -5.0),
+                                          ),
+                                        ]))),
+                          ),
+                          Divider(),
+                          Container(
+                            alignment: Alignment.center,
+                            child: Text(
+                              data['bio'],
                               style: TextStyle(
-                                  fontSize: 40,
-                                  color: Colors.white,
-                                  shadows: [
-                                    Shadow(
-                                      blurRadius: 10.0,
-                                      color:theme.primaryColor,
-                                      offset: Offset(5.0, 5.0),
-                                    ),
-                                    Shadow(
-                                      blurRadius: 10.0,
-                                      color:theme.primaryColor,
-                                      offset: Offset(-5.0, 5.0),
-                                    ),
-                                    Shadow(
-                                      blurRadius: 10.0,
-                                      color:theme.primaryColor,
-                                      offset: Offset(5.0, -5.0),
-                                    ),
-                                    Shadow(
-                                      blurRadius: 10.0,
-                                      color:theme.primaryColor,
-                                      offset: Offset(-5.0, -5.0),
-                                    ),
-                                  ]))),
-                    ),
-                    Divider(),
-                    Container(
-                      alignment: Alignment.center,
-                      child: Text(
-                        data['bio'],
-                        style: TextStyle(
-                          fontSize: 20,
-                        ),
-                        textAlign: TextAlign.center,
-                      ),
-                    ),
-                    Expanded(child: Text("")),
-                    Container(
-                      //TODO 三個按鈕的功能 封鎖最後 刪除第二
-                      height: 100,
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          InkWell(
-                            child: Container(
-                                width: MediaQuery.of(context).size.width / 3,
-                                child: Column(
-                                  children: [
-                                    Icon(Icons.message, size: 60),
-                                    Text("傳訊息")
-                                  ],
-                                )),
-                            onTap: () {
-                              Navigator.of(context).pop(["sendMessage",friendEmail,data['username']]);
-                            },
+                                fontSize: 20,
+                              ),
+                              textAlign: TextAlign.center,
+                            ),
                           ),
-                          InkWell(
-                            child: Container(
-                                width: MediaQuery.of(context).size.width / 3,
-                                child: Column(
-                                  children: [
-                                    Icon(Icons.delete, size: 60),
-                                    Text("刪除")
-                                  ],
-                                )),
-                            onTap: () {
-                              Fluttertoast.showToast(
-                                backgroundColor: Colors.grey,
-                                msg: "還沒製作",
-                                toastLength: Toast.LENGTH_SHORT,
-                                gravity: ToastGravity.CENTER,
-                              );
-                            },
-                          ),
-                          InkWell(
-                            child: Container(
-                                width: MediaQuery.of(context).size.width / 3,
-                                child: Column(
-                                  children: [
-                                    Icon(Icons.block, size: 60),
-                                    Text("封鎖")
-                                  ],
-                                )),
-                            onTap: () {
-                              Fluttertoast.showToast(
-                                backgroundColor: Colors.grey,
-                                msg: "還沒製作",
-                                toastLength: Toast.LENGTH_SHORT,
-                                gravity: ToastGravity.CENTER,
-                              );
-                            },
-                          ),
-                        ],
-                      ),
-                    )
-              ]))],
+                          Expanded(child: Text("")),
+                          Container(
+                            //TODO 三個按鈕的功能 封鎖最後 刪除第二
+                            height: 100,
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                InkWell(
+                                  child: Container(
+                                      width:
+                                          MediaQuery.of(context).size.width / 3,
+                                      child: Column(
+                                        children: [
+                                          Icon(Icons.message, size: 60),
+                                          Text("傳訊息")
+                                        ],
+                                      )),
+                                  onTap: () {
+                                    Navigator.of(context).pop([
+                                      "sendMessage",
+                                      friendEmail,
+                                      data['username']
+                                    ]);
+                                  },
+                                ),
+                                InkWell(
+                                  child: Container(
+                                      width:
+                                          MediaQuery.of(context).size.width / 3,
+                                      child: Column(
+                                        children: [
+                                          Icon(Icons.delete, size: 60),
+                                          Text("刪除")
+                                        ],
+                                      )),
+                                  onTap: () {
+                                    Fluttertoast.showToast(
+                                      backgroundColor: Colors.grey,
+                                      msg: "還沒製作",
+                                      toastLength: Toast.LENGTH_SHORT,
+                                      gravity: ToastGravity.CENTER,
+                                    );
+                                  },
+                                ),
+                                InkWell(
+                                  child: Container(
+                                      width:
+                                          MediaQuery.of(context).size.width / 3,
+                                      child: Column(
+                                        children: [
+                                          Icon(Icons.block, size: 60),
+                                          Text("封鎖")
+                                        ],
+                                      )),
+                                  onTap: () {
+                                    Fluttertoast.showToast(
+                                      backgroundColor: Colors.grey,
+                                      msg: "還沒製作",
+                                      toastLength: Toast.LENGTH_SHORT,
+                                      gravity: ToastGravity.CENTER,
+                                    );
+                                  },
+                                ),
+                              ],
+                            ),
+                          )
+                        ]))
+                  ],
                 ));
           }
           return Scaffold(
@@ -197,6 +196,84 @@ class PersonDetailPage extends StatelessWidget {
   }
 }
 
+class NameText extends StatelessWidget {
+  final String userName;
+  final double siz;
+
+  NameText({this.userName, this.siz});
+
+  @override
+  Widget build(BuildContext context) {
+    // TODO: implement build
+    ThemeData theme = Theme.of(context);
+    return Text(
+      (userName == null) ? "沒取名" : userName,
+      style: TextStyle(fontSize: siz, color: theme.backgroundColor, shadows: [
+        Shadow(
+          blurRadius: 10.0,
+          color: theme.colorScheme.secondary,
+          offset: Offset(5.0, 5.0),
+        ),
+        Shadow(
+          blurRadius: 10.0,
+          color: theme.colorScheme.secondary,
+          offset: Offset(-5.0, 5.0),
+        ),
+        Shadow(
+          blurRadius: 10.0,
+          color: theme.colorScheme.secondary,
+          offset: Offset(5.0, -5.0),
+        ),
+        Shadow(
+          blurRadius: 10.0,
+          color: theme.colorScheme.secondary,
+          offset: Offset(-5.0, -5.0),
+        ),
+      ]),
+    );
+  }
+}
+// class BackGroundImage extends StatelessWidget{
+//   final String URL;
+//   BackGroundImage({this.URL});
+//   @override
+//   Widget build(BuildContext context) {
+//     // TODO: implement build
+//     throw UnimplementedError();
+//   }
+// }
+
+class FaceImage extends StatelessWidget {
+  final String faceURL;
+  final double size;
+  FaceImage({this.faceURL,this.size});
+
+  @override
+  Widget build(BuildContext context) {
+    final ThemeData theme = Theme.of(context);
+    return (faceURL != null)
+        ? Container(
+             width: 80,
+            height: 80,
+            alignment: Alignment.center,
+            decoration: BoxDecoration(
+              color: theme.primaryColor,
+                shape: BoxShape.circle,
+                image: DecorationImage(
+                    fit: BoxFit.cover, image: NetworkImage(faceURL))))
+        : Container(
+            alignment: Alignment.center,
+            child: CircleAvatar(
+                backgroundColor: theme.primaryColor,
+                radius: 40,
+                child: Icon(
+                  Icons.person,
+                  size: 60,
+                  color: theme.secondaryHeaderColor,
+                )));
+  }
+}
+
 class AddFriendPage extends StatefulWidget {
   AddFriendPage({Key key}) : super(key: key);
 
@@ -206,6 +283,7 @@ class AddFriendPage extends StatefulWidget {
 class _AddFriendPage extends State<AddFriendPage> {
   FirebaseAuth auth;
   User user;
+
 //  _AddFriendPage();
   final TextEditingController _chatController = new TextEditingController();
 
@@ -411,43 +489,17 @@ class ShortCutFriend extends StatelessWidget {
       height: 100,
       child: Stack(
         children: [
-          photoURL != null
-              ? Container(
-                  alignment:  Alignment(0,-0.3),
-                  decoration: BoxDecoration(
-                      image: DecorationImage(image: NetworkImage(photoURL))))
-              : Container(
-                  alignment: Alignment(0,-0.3),
-                  child: Icon(
-                    Icons.person,
-                    size: 60,
-                  color: theme.secondaryHeaderColor,
-                    )),
           Container(
-            alignment: Alignment(0,0.7),
-            child: Text(username,
-                style: TextStyle( color: theme.backgroundColor,shadows: [
-                  Shadow(
-                    blurRadius: 10.0,
-                    color: theme.colorScheme.primary,
-                    offset: Offset(5.0, 5.0),
-                  ),
-                  Shadow(
-                    blurRadius: 10.0,
-                    color: theme.colorScheme.primary,
-                    offset: Offset(-5.0, 5.0),
-                  ),
-                  Shadow(
-                    blurRadius: 10.0,
-                    color:theme.colorScheme.primary,
-                    offset: Offset(5.0, -5.0),
-                  ),
-                  Shadow(
-                    blurRadius: 10.0,
-                    color:theme.colorScheme.primary,
-                    offset: Offset(-5.0, -5.0),
-                  ),
-                ])),
+              alignment: Alignment(0, -0.3),
+              child: FaceImage(
+                faceURL: photoURL,
+              )),
+          Container(
+            alignment: Alignment.bottomCenter,
+            child: NameText(
+              userName: username,
+              siz: 20,
+            ),
           ),
         ],
       ),

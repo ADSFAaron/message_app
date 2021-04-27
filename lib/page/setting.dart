@@ -4,11 +4,13 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flex_color_scheme/flex_color_scheme.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:image_picker/image_picker.dart';
 import 'dart:io';
 import 'package:firebase_storage/firebase_storage.dart' as firebase_storage;
+import 'package:message_app/page/person.dart';
 import '../all_shared_imports.dart';
 
 // Create a custom flex scheme color for a light theme.
@@ -102,6 +104,8 @@ class SettingPage extends StatelessWidget {
     @required this.schemeIndex,
     @required this.onSchemeChanged,
     @required this.flexSchemeData,
+    @required this.userPhotoURL,
+    @required this.backGroundURL
   });
 
   final ThemeMode themeMode;
@@ -110,6 +114,8 @@ class SettingPage extends StatelessWidget {
   final ValueChanged<int> onSchemeChanged;
   final FlexSchemeData flexSchemeData;
 
+  final String backGroundURL;
+  final String userPhotoURL;
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -136,7 +142,7 @@ class SettingPage extends StatelessWidget {
               title: Text("個人設定"),
               onTap: () => Navigator.of(context).push(PageRouteBuilder(
                 pageBuilder: (context, animation, secondaryAnimation) =>
-                    PersonSettingPage(),
+                    PersonSettingPage(backGroundURL: backGroundURL,userPhotoURL: userPhotoURL),
                 transitionsBuilder:
                     (context, animation, secondaryAnimation, child) {
                   var begin = Offset(0.0, 1.0);
@@ -184,26 +190,33 @@ class SettingPage extends StatelessWidget {
   }
 }
 
+// ignore: must_be_immutable
 class PersonSettingPage extends StatefulWidget {
+  String backGroundURL;
+  String userPhotoURL;
+  PersonSettingPage({@required this.backGroundURL,@required this.userPhotoURL});
   _PersonSettingPage createState() => _PersonSettingPage();
 }
 
 class _PersonSettingPage extends State<PersonSettingPage> {
   FirebaseAuth auth;
+  _PersonSettingPage();
 
   @override
   void initState() {
-    // TODO: implement initState
     Firebase.initializeApp();
     super.initState();
     auth = FirebaseAuth.instance;
   }
 
   void uploadPhoto(_source, int changeWhere) async {
+    //changeWhere 0改背景 1改大頭貼
     // 先從 _source 獲取照片資訊並上傳至
     File _image;
     final picker = ImagePicker();
     final pickedFile = await picker.getImage(source: _source);
+
+    EasyLoading.show(status: 'loading...');
     String name = pickedFile.path.toString().split('/').last;
     File file = File(pickedFile.path);
     // print(pickedFile.runtimeType);
@@ -220,20 +233,21 @@ class _PersonSettingPage extends State<PersonSettingPage> {
     }
     print(download);
     //修改firestore內部使用者資料
-
     CollectionReference users = FirebaseFirestore.instance.collection('users');
-    DocumentSnapshot future = await users.doc(auth.currentUser.email).get();
+    String changeWhereString = (changeWhere==0)? 'backGroundURL':'photoURL';
+    await users.doc(auth.currentUser.email).update({changeWhereString:download});
 
+    EasyLoading.dismiss();
     //從新刷新
     Navigator.of(context).pop();
+    setState(() {
+
+    });
   }
 
   void myBottomSheet(BuildContext context, int changeWhere) {
     //type 0改背景 1改大頭貼
-    if (changeWhere == 0) {
-      Fluttertoast.showToast(msg: "還在開發");
-      return;
-    }
+
     // showBottomSheet || showModalBottomSheet
     showModalBottomSheet<void>(
         context: context,
@@ -259,7 +273,97 @@ class _PersonSettingPage extends State<PersonSettingPage> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
+    return
+      FutureBuilder(
+          future: FirebaseFirestore.instance.collection('users').doc(auth.currentUser.email).get(),
+          builder: (context, AsyncSnapshot<DocumentSnapshot> snapshot){
+    if (snapshot.connectionState == ConnectionState.done) {
+      EasyLoading.dismiss();
+      return Scaffold(
+        appBar: AppBar(
+          leading: IconButton(
+            icon: FaIcon(
+              FontAwesomeIcons.times,
+              color: Colors.black,
+            ),
+            onPressed: () => Navigator.of(context).pop(),
+          ),
+          title: Center(
+            child: Text(
+              "個人資料",
+              style: TextStyle(color: Colors.black),
+            ),
+          ),
+          backgroundColor: Colors.white,
+        ),
+        body: ListView(
+          children: [
+            Container(
+              height: MediaQuery.of(context).size.height / 2,
+              child: Stack(
+                children: [
+                  GestureDetector(
+                      onTap: () => myBottomSheet(context, 0),
+                      child: Container(
+                          decoration: BoxDecoration(
+                              image: DecorationImage(
+                                  image: AssetImage("images/2.jpg"),
+                                  fit: BoxFit.cover)))),
+                  Center(
+                      child: GestureDetector(
+                        onTap: () => myBottomSheet(context, 1),
+                        child: FaceImage(faceURL: snapshot.data.data()['photoURL'],),
+                      )),
+                  Align(
+                      alignment: Alignment.bottomRight,
+                      child: GestureDetector(
+                          onTap: () => myBottomSheet(context, 0),
+                          child: Container(
+                              padding: EdgeInsets.all(10),
+                              height: 60,
+                              width: 60,
+                              // color: Colors.yellow,
+                              child: CircleAvatar(
+                                radius: 60,
+                                backgroundColor: Colors.black38,
+                                child: FaIcon(
+                                  FontAwesomeIcons.camera,
+                                  color: Colors.white,
+                                  size: 20,
+                                ),
+                              )))),
+                  Align(
+                      alignment: Alignment(0.2, 0.2),
+                      child: GestureDetector(
+                          onTap: () => myBottomSheet(context, 1),
+                          child: Container(
+                              padding: EdgeInsets.all(10),
+                              height: 60,
+                              width: 60,
+                              // color: Colors.yellow,
+                              child: CircleAvatar(
+                                radius: 60,
+                                backgroundColor: Colors.black38,
+                                child: FaIcon(
+                                  FontAwesomeIcons.camera,
+                                  color: Colors.white,
+                                  size: 20,
+                                ),
+                              )))),
+                ],
+              ),
+            ),
+            //BIO
+            Container(
+              height: MediaQuery.of(context).size.height / 2,
+              child: Center(
+                child: TextField(),
+              ),
+            ),
+          ],
+        ));}
+    EasyLoading.show(status: 'loading...');
+     return Scaffold(
         appBar: AppBar(
           leading: IconButton(
             icon: FaIcon(
@@ -292,14 +396,8 @@ class _PersonSettingPage extends State<PersonSettingPage> {
                   Center(
                       child: GestureDetector(
                           onTap: () => myBottomSheet(context, 1),
-                          child: Container(
-                            height: MediaQuery.of(context).size.height / 4,
-                            width: MediaQuery.of(context).size.height / 4,
-                            decoration: BoxDecoration(
-                              shape: BoxShape.circle,
-                              color: Colors.white,
-                            ),
-                          ))),
+                          child: FaceImage(faceURL: null,),
+                          )),
                   Align(
                       alignment: Alignment.bottomRight,
                       child: GestureDetector(
@@ -319,7 +417,7 @@ class _PersonSettingPage extends State<PersonSettingPage> {
                                 ),
                               )))),
                   Align(
-                      alignment: Alignment(0.4, 0.4),
+                      alignment: Alignment(0.2, 0.2),
                       child: GestureDetector(
                           onTap: () => myBottomSheet(context, 1),
                           child: Container(
@@ -336,6 +434,7 @@ class _PersonSettingPage extends State<PersonSettingPage> {
                                   size: 20,
                                 ),
                               )))),
+
                 ],
               ),
             ),
@@ -347,7 +446,7 @@ class _PersonSettingPage extends State<PersonSettingPage> {
               ),
             ),
           ],
-        ));
+        ));});
   }
 }
 
@@ -378,13 +477,6 @@ class ThemePage extends StatelessWidget {
       children: <Widget>[
         const SizedBox(width: 0.01),
         Expanded(
-          // Wrapping the Scaffold in a Row, with an almost zero width SizedBox
-          // before the Scaffold that is in an Expanded widget so it fills the
-          // available screen, causes the PopupMenu to open up right aligned on
-          // its ListTile child used as its activation button. Without this, it
-          // is always left aligned on the ListTile and would require a
-          // computed offset. This trick or maybe a bit of a hack, does it
-          // automatically. No idea why, just something I noticed by accident.
           child: Scaffold(
             appBar: AppBar(
               title: const Text('主題設定'),

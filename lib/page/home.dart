@@ -7,7 +7,7 @@ import 'package:fluttertoast/fluttertoast.dart';
 import 'package:message_app/main.dart';
 import 'chat.dart';
 import 'package:message_app/page/chat.dart';
-import 'friend.dart';
+import 'person.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
 import 'package:kumi_popup_window/kumi_popup_window.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -112,52 +112,9 @@ class _MyHomePageState extends State<MyHomePage> {
                   child: Column(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: <Widget>[
-                      (user.photoURL != null)
-                          ? Container(
-                              alignment: Alignment.center,
-                              decoration: BoxDecoration(
-                                  shape: BoxShape.circle,
-                                  image: DecorationImage(
-                                      image: NetworkImage(user.photoURL))))
-                          : Container(
-                              alignment: Alignment.center,
-                              child: CircleAvatar(
-                                  backgroundColor: theme.primaryColor,
-                                  radius: 40,
-                                  child: Icon(
-                                    Icons.person,
-                                    size: 60,
-                                    color: theme.secondaryHeaderColor,
-                                  ))),
+                      FaceImage(faceURL: userData['photoURL'],),
                       Divider(),
-                      Text(
-                        (user.displayName == null) ? "沒取名" : user.displayName,
-                        style: TextStyle(
-                            fontSize: 30,
-                            color:theme.backgroundColor,
-                            shadows: [
-                              Shadow(
-                                blurRadius: 10.0,
-                                color: theme.colorScheme.secondary,
-                                offset: Offset(5.0, 5.0),
-                              ),
-                              Shadow(
-                                blurRadius: 10.0,
-                                color: theme.colorScheme.secondary,
-                                offset: Offset(-5.0, 5.0),
-                              ),
-                              Shadow(
-                                blurRadius: 10.0,
-                                color: theme.colorScheme.secondary,
-                                offset: Offset(5.0, -5.0),
-                              ),
-                              Shadow(
-                                blurRadius: 10.0,
-                                color:theme.colorScheme.secondary,
-                                offset: Offset(-5.0, -5.0),
-                              ),
-                            ]),
-                      ),
+                      NameText(userName: userData['username'],siz: 30,)
                     ],
                   ),
                 ),
@@ -177,7 +134,9 @@ class _MyHomePageState extends State<MyHomePage> {
                     Navigator.of(context).push(PageRouteBuilder(
                       transitionDuration: Duration(milliseconds: 800),
                       pageBuilder: (context, animation, secondaryAnimation) =>
-                          SettingPage(themeMode: themeMode,onThemeModeChanged: onThemeModeChanged,flexSchemeData: flexSchemeData,schemeIndex: schemeIndex,onSchemeChanged: onSchemeChanged),
+                          SettingPage(
+                              backGroundURL: userData['backGroundURL'],userPhotoURL: userData['photoURL'],
+                              themeMode: themeMode,onThemeModeChanged: onThemeModeChanged,flexSchemeData: flexSchemeData,schemeIndex: schemeIndex,onSchemeChanged: onSchemeChanged),
                       transitionsBuilder:
                           (context, animation, secondaryAnimation, child) {
                         var begin = Offset(0.0, 1.0);
@@ -191,7 +150,9 @@ class _MyHomePageState extends State<MyHomePage> {
                           child: child,
                         );
                       },
-                    ));
+                    )).then((value) => (){setState(() {
+                      print("change");
+                    });});
                   },
                 ),
                 ListTile(

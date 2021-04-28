@@ -3,6 +3,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 
 class ReturnFValue {
   final FriendDetail friend;
@@ -67,8 +68,10 @@ class PersonDetailPage extends StatelessWidget {
                         //TODO 將這改成別人的背景圖案
                         //decoration: BoxDecoration(),
                         alignment: Alignment.center,
-                        height:MediaQuery.of(context).size.height / 2,
-                        child:FaceImage(faceURL: data['photoURL'],)),
+                        height: MediaQuery.of(context).size.height / 2,
+                        child: FaceImage(
+                          faceURL: data['photoURL'],
+                        )),
                     Container(
                         height: MediaQuery.of(context).size.height / 2,
                         child: Column(children: [
@@ -233,31 +236,23 @@ class NameText extends StatelessWidget {
     );
   }
 }
-// class BackGroundImage extends StatelessWidget{
-//   final String URL;
-//   BackGroundImage({this.URL});
-//   @override
-//   Widget build(BuildContext context) {
-//     // TODO: implement build
-//     throw UnimplementedError();
-//   }
-// }
 
 class FaceImage extends StatelessWidget {
   final String faceURL;
   final double size;
-  FaceImage({this.faceURL,this.size});
+
+  FaceImage({this.faceURL, this.size});
 
   @override
   Widget build(BuildContext context) {
     final ThemeData theme = Theme.of(context);
     return (faceURL != null)
         ? Container(
-             width: 80,
+            width: 80,
             height: 80,
             alignment: Alignment.center,
             decoration: BoxDecoration(
-              color: theme.primaryColor,
+                color: theme.primaryColor,
                 shape: BoxShape.circle,
                 image: DecorationImage(
                     fit: BoxFit.cover, image: NetworkImage(faceURL))))
@@ -504,5 +499,31 @@ class ShortCutFriend extends StatelessWidget {
         ],
       ),
     );
+  }
+}
+
+class BackGroundImage extends StatelessWidget {
+  final String imageURL;
+  final double siz;
+
+  BackGroundImage({this.siz, this.imageURL});
+
+  @override
+  Widget build(BuildContext context) {
+    return imageURL != null
+        ? Container(
+            decoration: BoxDecoration(
+                color: Theme.of(context).colorScheme.secondary,
+                image: DecorationImage(
+                    image: NetworkImage(imageURL), fit: BoxFit.cover)))
+        : Container(
+            alignment: Alignment.center,
+            color: Theme.of(context).colorScheme.secondary,
+            child: FaIcon(
+              FontAwesomeIcons.cloudMoon,
+              color: Theme.of(context).colorScheme.primaryVariant,
+              size: siz,
+            ),
+          );
   }
 }

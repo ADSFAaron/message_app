@@ -18,11 +18,17 @@ import 'setting.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 
 class MyHomePage extends StatefulWidget {
-  MyHomePage({Key key, this.userData, this.user,@required this.themeMode,
-  @required this.onThemeModeChanged,
-  @required this.schemeIndex,
-  @required this.onSchemeChanged,
-  @required this.flexSchemeData,});
+  MyHomePage({
+    Key key,
+    this.userData,
+    this.user,
+    @required this.themeMode,
+    @required this.onThemeModeChanged,
+    @required this.schemeIndex,
+    @required this.onSchemeChanged,
+    @required this.flexSchemeData,
+  });
+
   final ThemeMode themeMode;
   final ValueChanged<ThemeMode> onThemeModeChanged;
   final int schemeIndex;
@@ -30,17 +36,29 @@ class MyHomePage extends StatefulWidget {
   final FlexSchemeData flexSchemeData;
   final DocumentSnapshot userData;
   final User user;
+
   @override
-  _MyHomePageState createState() =>
-      _MyHomePageState(user: user, userData: userData,themeMode: themeMode,onThemeModeChanged: onThemeModeChanged,flexSchemeData: flexSchemeData,schemeIndex: schemeIndex,onSchemeChanged: onSchemeChanged);
+  _MyHomePageState createState() => _MyHomePageState(
+      user: user,
+      userData: userData,
+      themeMode: themeMode,
+      onThemeModeChanged: onThemeModeChanged,
+      flexSchemeData: flexSchemeData,
+      schemeIndex: schemeIndex,
+      onSchemeChanged: onSchemeChanged);
 }
 
 class _MyHomePageState extends State<MyHomePage> {
-  _MyHomePageState({this.user, this.userData,@required this.themeMode,
-  @required this.onThemeModeChanged,
-  @required this.schemeIndex,
-  @required this.onSchemeChanged,
-  @required this.flexSchemeData,});
+  _MyHomePageState({
+    this.user,
+    this.userData,
+    @required this.themeMode,
+    @required this.onThemeModeChanged,
+    @required this.schemeIndex,
+    @required this.onSchemeChanged,
+    @required this.flexSchemeData,
+  });
+
   final ThemeMode themeMode;
   final ValueChanged<ThemeMode> onThemeModeChanged;
   final int schemeIndex;
@@ -54,7 +72,7 @@ class _MyHomePageState extends State<MyHomePage> {
   List<Widget> chatList = [];
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
 
-  List<Widget> _widgetOptions(BuildContext context,ThemeData theme) =>
+  List<Widget> _widgetOptions(BuildContext context, ThemeData theme) =>
       <Widget>[friendPage(theme), chatRoomPage(theme)];
 
   CollectionReference users;
@@ -92,7 +110,7 @@ class _MyHomePageState extends State<MyHomePage> {
   Widget build(BuildContext context) {
     print(
         "start build main page------------------------------------------------");
-    final ThemeData theme=Theme.of(context);
+    final ThemeData theme = Theme.of(context);
     // print(userData.data());
     return Scaffold(
       resizeToAvoidBottomInset: false,
@@ -102,23 +120,12 @@ class _MyHomePageState extends State<MyHomePage> {
           children: [
             Expanded(
               flex: 1,
-              child: Container(
-                width: MediaQuery.of(context).size.width * 0.85,
-                child: DrawerHeader(
-                  decoration: BoxDecoration(
-                      image: DecorationImage(
-                          image: AssetImage("images/2.jpg"),
-                          fit: BoxFit.cover)),
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: <Widget>[
-                      FaceImage(faceURL: userData['photoURL'],),
-                      Divider(),
-                      NameText(userName: userData['username'],siz: 30,)
-                    ],
+              child:  Container(
+                  width: MediaQuery.of(context).size.width * 0.85,
+                  child: MyDrawerHeader(
+                    userData: userData,
                   ),
                 ),
-              ),
             ),
             Expanded(
               child: ListView(children: [
@@ -130,13 +137,18 @@ class _MyHomePageState extends State<MyHomePage> {
                 ),
                 ListTile(
                   title: Text("Setting"),
-                  onTap: () {
-                    Navigator.of(context).push(PageRouteBuilder(
+                  onTap: () async {
+                    await Navigator.of(context).push(PageRouteBuilder(
                       transitionDuration: Duration(milliseconds: 800),
                       pageBuilder: (context, animation, secondaryAnimation) =>
                           SettingPage(
-                              backGroundURL: userData['backGroundURL'],userPhotoURL: userData['photoURL'],
-                              themeMode: themeMode,onThemeModeChanged: onThemeModeChanged,flexSchemeData: flexSchemeData,schemeIndex: schemeIndex,onSchemeChanged: onSchemeChanged),
+                              backGroundURL: userData['backGroundURL'],
+                              userPhotoURL: userData['photoURL'],
+                              themeMode: themeMode,
+                              onThemeModeChanged: onThemeModeChanged,
+                              flexSchemeData: flexSchemeData,
+                              schemeIndex: schemeIndex,
+                              onSchemeChanged: onSchemeChanged),
                       transitionsBuilder:
                           (context, animation, secondaryAnimation, child) {
                         var begin = Offset(0.0, 1.0);
@@ -150,9 +162,8 @@ class _MyHomePageState extends State<MyHomePage> {
                           child: child,
                         );
                       },
-                    )).then((value) => (){setState(() {
-                      print("change");
-                    });});
+                    ));
+                    reloadUserDate();
                   },
                 ),
                 ListTile(
@@ -179,7 +190,12 @@ class _MyHomePageState extends State<MyHomePage> {
                                 Navigator.of(context).pop();
                                 await FirebaseAuth.instance.signOut();
                                 Navigator.of(context).push(MaterialPageRoute(
-                                    builder: (context) => InitialPage(themeMode: themeMode,onThemeModeChanged: onThemeModeChanged,flexSchemeData: flexSchemeData,schemeIndex: schemeIndex,onSchemeChanged: onSchemeChanged)));
+                                    builder: (context) => InitialPage(
+                                        themeMode: themeMode,
+                                        onThemeModeChanged: onThemeModeChanged,
+                                        flexSchemeData: flexSchemeData,
+                                        schemeIndex: schemeIndex,
+                                        onSchemeChanged: onSchemeChanged)));
                               },
                             ),
                             TextButton(
@@ -205,11 +221,12 @@ class _MyHomePageState extends State<MyHomePage> {
           color: theme.primaryColorLight,
           child: FaIcon(
             FontAwesomeIcons.connectdevelop,
-            color:theme.primaryColorDark,
+            color: theme.primaryColorDark,
             size: MediaQuery.of(context).size.width / 1.5,
           ),
         ),
-        IndexedStack(index: _selectedIndex, children: _widgetOptions(context,theme))
+        IndexedStack(
+            index: _selectedIndex, children: _widgetOptions(context, theme))
       ]),
       bottomNavigationBar: ConvexAppBar(
         color: theme.bottomAppBarColor,
@@ -223,15 +240,6 @@ class _MyHomePageState extends State<MyHomePage> {
             theme.primaryColorDark,
             theme.primaryColorLight,
             theme.primaryColorDark
-            // Colors.black,
-            // Colors.grey[700],
-            // Colors.grey[400],
-            // Colors.grey[700],
-            // Colors.black,
-            // Colors.grey[700],
-            // Colors.grey[400],
-            // Colors.grey[700],
-            // Colors.black
           ],
           tileMode: TileMode.repeated,
         ),
@@ -319,7 +327,7 @@ class _MyHomePageState extends State<MyHomePage> {
         shrinkWrap: true,
         slivers: <Widget>[
           SliverAppBar(
-            backgroundColor: theme.primaryColorDark,
+              backgroundColor: theme.primaryColorDark,
               pinned: true,
               snap: true,
               floating: true,
@@ -399,10 +407,10 @@ class _MyHomePageState extends State<MyHomePage> {
               }
 
               return SliverGrid(
-                gridDelegate:SliverGridDelegateWithFixedCrossAxisCount(
-                crossAxisCount: 1,
-                childAspectRatio: 1.0,
-              ),
+                gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                  crossAxisCount: 1,
+                  childAspectRatio: 1.0,
+                ),
                 delegate: SliverChildListDelegate(<Widget>[
                   Container(alignment: Alignment.center, color: Colors.white10)
                 ]),
@@ -420,7 +428,7 @@ class _MyHomePageState extends State<MyHomePage> {
           shrinkWrap: true,
           slivers: <Widget>[
             SliverAppBar(
-              backgroundColor:  theme.primaryColorDark,
+                backgroundColor: theme.primaryColorDark,
                 pinned: true,
                 snap: true,
                 floating: true,
@@ -485,7 +493,6 @@ class _MyHomePageState extends State<MyHomePage> {
         slivers: <Widget>[
           SliverAppBar(
             backgroundColor: theme.primaryColorDark,
-
             leading: IconButton(
               icon: Icon(Icons.menu, size: 30),
               onPressed: () {
@@ -497,7 +504,10 @@ class _MyHomePageState extends State<MyHomePage> {
             floating: true,
             expandedHeight: 80.0,
             flexibleSpace: FlexibleSpaceBar(
-              title: Text('Message',style: TextStyle(color:theme.backgroundColor),),
+              title: Text(
+                'Message',
+                style: TextStyle(color: theme.backgroundColor),
+              ),
             ),
             actions: [
               IconButton(
@@ -613,13 +623,16 @@ class _MyHomePageState extends State<MyHomePage> {
                 _scaffoldKey.currentState.openDrawer();
               },
             ),
-            backgroundColor:  theme.primaryColorDark,
+            backgroundColor: theme.primaryColorDark,
             pinned: true,
             snap: true,
             floating: true,
             expandedHeight: 80.0,
             flexibleSpace: FlexibleSpaceBar(
-              title: Text('Message',style: TextStyle(color:theme.backgroundColor),),
+              title: Text(
+                'Message',
+                style: TextStyle(color: theme.backgroundColor),
+              ),
             ),
             actions: [
               IconButton(
@@ -783,5 +796,62 @@ class _MyHomePageState extends State<MyHomePage> {
 // //      print(messageDetail.elementAt(index).friend.name);
 //       messageDetail.removeAt(index);
 //     });
+  }
+
+  Future<void> reloadUserDate()async{
+    EasyLoading.show(status: 'loading...');
+   DocumentSnapshot data = await users.doc(user.email).get();
+     setState(() {
+      userData = data;
+    });
+    EasyLoading.dismiss();
+  }
+}
+
+class MyDrawerHeader extends StatelessWidget {
+  final DocumentSnapshot userData;
+
+  MyDrawerHeader({this.userData});
+
+  @override
+  Widget build(BuildContext context) {
+    return userData['backGroundURL'] != null
+        ? DrawerHeader(
+            decoration: BoxDecoration(
+                color: Theme.of(context).colorScheme.secondary,
+                image: DecorationImage(
+                    image: NetworkImage(userData['backGroundURL']),
+                    fit: BoxFit.cover)),
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: <Widget>[
+                FaceImage(
+                  faceURL: userData['photoURL'],
+                ),
+                Divider(),
+                NameText(
+                  userName: userData['username'],
+                  siz: 30,
+                )
+              ],
+            ),
+          )
+        : DrawerHeader(
+            decoration: BoxDecoration(
+                image: DecorationImage(
+                    image: AssetImage("images/2.jpg"), fit: BoxFit.cover)),
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: <Widget>[
+                FaceImage(
+                  faceURL: userData['photoURL'],
+                ),
+                Divider(),
+                NameText(
+                  userName: userData['username'],
+                  siz: 30,
+                )
+              ],
+            ));
   }
 }

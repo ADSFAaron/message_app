@@ -154,21 +154,22 @@ class _RegisterPage extends State<RegisterPage> {
     }
     print(userCredential);
     CollectionReference users = FirebaseFirestore.instance.collection('users');
-    users.doc(_account).set({
-      "email":_account,
-      "username":_username,
-      "friend":[],
-      "chatRoom":[],
-      "photoURL": null,
-      "bio":"這人很懶啥都沒留下",
-      "backGroundURL":null,
-      "friendRequire":[]
-    }).then((value) => print("User Added"))
-        .catchError((error) => print("Failed to add user: $error"));
+    if(users.doc(_account).get()==null) {
+      users.doc(_account).set({
+        "email": _account,
+        "username": _username,
+        "friend": [],
+        "chatRoom": [],
+        "photoURL": null,
+        "bio": "這人很懶啥都沒留下",
+        "backGroundURL": null,
+        "friendRequire": [],
+      }).then((value) => print("User Added"))
+          .catchError((error) => print("Failed to add user: $error"));
+      if (userCredential != null) {
+        Fluttertoast.showToast(msg: "創建帳號成功");
+        Navigator.pop(context);}
+    }
+    }
 
-
-    if (userCredential != null) {
-      Fluttertoast.showToast(msg: "創建帳號成功");
-      Navigator.pop(context);}
-  }
 }

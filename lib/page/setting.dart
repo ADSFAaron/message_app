@@ -217,13 +217,14 @@ class _PersonSettingPage extends State<PersonSettingPage> {
     final pickedFile = await picker.getImage(source: _source);
 
     EasyLoading.show(status: 'loading...');
-    String name = pickedFile.path.toString().split('/').last;
+    String subTitle = pickedFile.path.toString().split('.').last;
     File file = File(pickedFile.path);
     // print(pickedFile.runtimeType);
     String download;
+    String changeWhereString = (changeWhere==0)? 'backGroundURL':'photoURL';
     try {
       TaskSnapshot snapshot = await firebase_storage.FirebaseStorage.instance
-          .ref('user/image/' + name)
+          .ref('user/'+changeWhereString+'/' + auth.currentUser.email.toString())
           .putFile(file);
       download = await snapshot.ref.getDownloadURL();
       //_submitContent(download, 'image');
@@ -234,14 +235,12 @@ class _PersonSettingPage extends State<PersonSettingPage> {
     print(download);
     //修改firestore內部使用者資料
     CollectionReference users = FirebaseFirestore.instance.collection('users');
-    String changeWhereString = (changeWhere==0)? 'backGroundURL':'photoURL';
     await users.doc(auth.currentUser.email).update({changeWhereString:download});
 
     EasyLoading.dismiss();
     //從新刷新
     Navigator.of(context).pop();
     setState(() {
-
     });
   }
 
@@ -300,15 +299,16 @@ class _PersonSettingPage extends State<PersonSettingPage> {
           children: [
             Container(
               height: MediaQuery.of(context).size.height / 2,
+              width: MediaQuery.of(context).size.width,
               child: Stack(
                 children: [
-                  GestureDetector(
+              Container(
+              height: MediaQuery.of(context).size.height / 2,
+              width: MediaQuery.of(context).size.width,
+       // alignment: Alignment.center,
+        child: GestureDetector(
                       onTap: () => myBottomSheet(context, 0),
-                      child: Container(
-                          decoration: BoxDecoration(
-                              image: DecorationImage(
-                                  image: AssetImage("images/2.jpg"),
-                                  fit: BoxFit.cover)))),
+                      child: BackGroundImage(imageURL: snapshot.data.data()['backGroundURL'],siz: MediaQuery.of(context).size.width/1.5,))),
                   Center(
                       child: GestureDetector(
                         onTap: () => myBottomSheet(context, 1),

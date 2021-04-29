@@ -154,7 +154,8 @@ class _RegisterPage extends State<RegisterPage> {
     }
     print(userCredential);
     CollectionReference users = FirebaseFirestore.instance.collection('users');
-    if(users.doc(_account).get()==null) {
+    DocumentSnapshot doc =await users.doc(_account).get();
+    if(doc.data()==null) {
       users.doc(_account).set({
         "email": _account,
         "username": _username,

@@ -141,6 +141,7 @@ class _InitialPage extends State<InitialPage> {
           notLogin = true;
         });
       } else {
+        print('User is sign in!');
         setState(() {
           user = _user;
           notLogin = false;
@@ -155,6 +156,7 @@ class _InitialPage extends State<InitialPage> {
         await Future.delayed(Duration(milliseconds: 60));
         users = FirebaseFirestore.instance.collection('users');
         userData = await users.doc(user.email).get();
+        print(userData.data());
         setState(() {
           nowState = "即將進入主畫面...";
         });
@@ -176,6 +178,7 @@ class _InitialPage extends State<InitialPage> {
 
   @override
   Widget build(BuildContext context) {
+    //print("initial build");
     return Scaffold(
         body:GestureDetector(child: Container(
       height: MediaQuery.of(context).size.height,

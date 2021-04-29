@@ -422,6 +422,7 @@ class _MyHomePageState extends State<MyHomePage> {
     } catch (e) {
       //print('build friend page error');
       Map<String, dynamic> data = userData.data();
+      print(data);
       friendList = createFContainer(context, data['friend']);
       return CustomScrollView(
           key: ValueKey<int>(0),
@@ -468,7 +469,7 @@ class _MyHomePageState extends State<MyHomePage> {
                           );
                         },
                       ));
-                      setState(() {});
+                      await reloadUserDate();
                     },
                   ),
                 ]),

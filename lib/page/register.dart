@@ -1,6 +1,7 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 
@@ -21,12 +22,12 @@ class _RegisterPage extends State<RegisterPage> {
   bool passwordOk = false;
   List<String> error = [null, null, null, null];
 
-  void initState(){
+  void initState() {
     super.initState();
-    myController.text="zhon";
-    accountController.text='henry890811@gmail.com';
-    password.text="123456789";
-    checkPassword.text="123456789";
+    myController.text = "zhon";
+    accountController.text = 'henry890811@gmail.com';
+    password.text = "123456789";
+    checkPassword.text = "123456789";
   }
 
   @override
@@ -114,18 +115,39 @@ class _RegisterPage extends State<RegisterPage> {
     return null;
   }
 
-  void btnEvent(
+  Future<void> btnEvent(
     String _username,
     String _account,
     String _password,
   ) async {
     if (passwordOk == false) return;
     try {
+      EasyLoading.show(status: 'loading...');
+
+      CollectionReference users = FirebaseFirestore.instance.collection('users');
+      DocumentSnapshot doc = await users.doc(_account).get();
+      if (doc.data() != null) { return; }
+      await users
+          .doc(_account)
+          .set({
+        "email": _account,
+        "username": _username,
+        "friend": [],
+        "chatRoom": [],
+        "photoURL": null,
+        "bio": "這人很懶啥都沒留下",
+        "backGroundURL": null,
+        "friendRequire": [],
+      })
+          .then((value) => print("User Added"))
+          .catchError((error) => print("Failed to add user: $error"));
+
       userCredential = await FirebaseAuth.instance
           .createUserWithEmailAndPassword(email: _account, password: _password);
       User user = userCredential.user;
       user.updateProfile(displayName: _username);
     } on FirebaseAuthException catch (e) {
+      EasyLoading.dismiss();
       if (e.code == 'weak-password') {
         Fluttertoast.showToast(
           backgroundColor: Colors.grey,
@@ -150,27 +172,13 @@ class _RegisterPage extends State<RegisterPage> {
         print('The account already exists for that email.');
       }
     } catch (e) {
+      EasyLoading.dismiss();
       print(e);
     }
     print(userCredential);
-    CollectionReference users = FirebaseFirestore.instance.collection('users');
-    DocumentSnapshot doc =await users.doc(_account).get();
-    if(doc.data()==null) {
-      users.doc(_account).set({
-        "email": _account,
-        "username": _username,
-        "friend": [],
-        "chatRoom": [],
-        "photoURL": null,
-        "bio": "這人很懶啥都沒留下",
-        "backGroundURL": null,
-        "friendRequire": [],
-      }).then((value) => print("User Added"))
-          .catchError((error) => print("Failed to add user: $error"));
-      if (userCredential != null) {
-        Fluttertoast.showToast(msg: "創建帳號成功");
-        Navigator.pop(context);}
-    }
-    }
 
+    EasyLoading.dismiss();
+    Fluttertoast.showToast(msg: "創建帳號成功");
+   // Navigator.pop(context);
+  }
 }

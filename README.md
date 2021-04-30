@@ -2,6 +2,15 @@
 
 一款真正的聊天軟體
 
+## 預計會做
+
+- [ ] ChatSetting 下方用GridView或其他顯示所有member (Star 1)
+- [ ] ChatSetting 修改圖片或聊天室名稱，要能修改firestore 及 所有 member 在firestore存的chatRoom (Star 4)
+- [ ] mainPage 那的 friendPage 修改成可分組功能 如有需要可把添加好友拉到drawer 裡面 (Star 3)
+- [ ] 已讀功能 (Star 5)
+- [ ] 將主題設定 設定成 可預覽app畫面 (Star 3)
+- [ ] 用ListTile 來製作被添加好友page 需順便修改 addFriend 設定fireStore 來存 (Star 3)
+
 ## 已知問題
 
 - member page
@@ -20,11 +29,9 @@
   2. 還沒做出已讀功能
   3. 還沒測試別人的訊息的部分
 - setting page
+  
   2. 並不能記憶上次使用的主題是哪個主題/可能需記錄到firestore user裡面
 
-## 預計實作
+## 未來隱憂
 
-- [ ] 已讀功能
-- [ ] 好友分群功能
-- [ ] 聊天室名稱及頭貼自定義
-- [x] 個人頭貼及背景圖片自定義
+- 如果chatRoom的message 變多了可能會有doc.get 會容量超大的問題，如要上市fireStore 需改成 chatRoom message分開

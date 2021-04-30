@@ -4,6 +4,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flex_color_scheme/flex_color_scheme.dart';
 import 'package:flutter/material.dart';
+import 'package:message_app/page/chat/chatSetting.dart';
 import 'package:message_app/page/setting.dart';
 import 'package:timeago/timeago.dart' as timeago;
 import 'package:image_picker/image_picker.dart';
@@ -16,24 +17,27 @@ import 'package:firebase_storage/firebase_storage.dart' as firebase_storage;
 class ChatPage extends StatefulWidget {
   final String roomId;
   final String roomName;
+  final String photoURL;
 
-  ChatPage({Key key, @required this.roomId, @required this.roomName})
+  ChatPage({Key key, @required this.roomId, @required this.roomName,@required this.photoURL})
       : super(key: key);
 
   @override
-  _ChatPage createState() => _ChatPage(roomId, roomName);
+  _ChatPage createState() => _ChatPage(roomId, roomName,photoURL);
 }
 
 class _ChatPage extends State<ChatPage> {
+  String photoURL;
   String roomID;
   String roomName;
   FirebaseAuth auth;
 
   User user;
 
-  _ChatPage(String _roomId, String _roomName) {
+  _ChatPage(String _roomId, String _roomName,String _url) {
     roomID = _roomId;
     roomName = _roomName;
+    photoURL= _url;
   }
 
   void initState() {
@@ -120,74 +124,85 @@ class _ChatPage extends State<ChatPage> {
   Widget build(BuildContext context) {
     final ThemeData theme = Theme.of(context);
     return Scaffold(
-        appBar: AppBar(title: Text(roomName),backgroundColor: theme.primaryColorDark,),
+        appBar: AppBar(
+          title: Text(roomName),
+          backgroundColor: theme.primaryColorDark,
+          actions: [
+            IconButton(
+                icon: Icon(Icons.settings),
+                onPressed: () => Navigator.of(context)
+                        .push(MaterialPageRoute(builder: (context) {
+                      return ChatSetting(roomName: roomName,docId: roomID,photoURL: photoURL,member: [],);
+                    })))
+          ],
+        ),
         body: InkWell(
           onTap: () {
             FocusScope.of(context).unfocus();
           },
           child: Container(
-              color:theme.primaryColor.blend(theme.backgroundColor,70),
-              child:Column(
-            children: [
-              Expanded(
-                  child: StreamBuilder(
-                      stream: FirebaseFirestore.instance
-                          .collection('chatRoom')
-                          .doc(roomID)
-                          .collection('messages')
-                          .orderBy("time", descending: true)
-                          .snapshots(),
-                      builder:
-                          (context, AsyncSnapshot<QuerySnapshot> snapshot) {
-                        if (!snapshot.hasData) {
-                          return Center(
-                            child: CircularProgressIndicator(),
-                          );
-                        }
-                        // print();
-                        final int commentCount = snapshot.data.docs.length;
-                        if (commentCount > 0) {
-                          return ListView.builder(
-                            padding: EdgeInsets.all(8.0),
-                            reverse: true,
-                            // 加入reverse，讓它反轉
-                            itemBuilder: (context, index) {
-                              final QueryDocumentSnapshot document =
-                                  snapshot.data.docs[index];
-                              return HandleMessage(
-                                document: document,
-                                auth: auth,
+              color: theme.primaryColor.blend(theme.backgroundColor, 70),
+              child: Column(
+                children: [
+                  Expanded(
+                      child: StreamBuilder(
+                          stream: FirebaseFirestore.instance
+                              .collection('chatRoom')
+                              .doc(roomID)
+                              .collection('messages')
+                              .orderBy("time", descending: true)
+                              .snapshots(),
+                          builder:
+                              (context, AsyncSnapshot<QuerySnapshot> snapshot) {
+                            if (!snapshot.hasData) {
+                              return Center(
+                                child: CircularProgressIndicator(),
                               );
-                            },
-                            itemCount: commentCount,
-                          );
-                        }
-                        return Center(
-                          child: Text("no messages"),
-                        );
-                      })),
-              SafeArea(
-                  child: Row(children: [
-                IconButton(
-                    icon: Icon(Icons.menu),
-                    onPressed: () => myBottomSheet(context)),
-                Flexible(
-                    child: TextField(
-                  decoration: InputDecoration(
-                    contentPadding: EdgeInsets.all(16.0),
-                    border: OutlineInputBorder(),
-                    hintText: '輸入文字',
-                  ),
-                  controller: _chatController,
-                  // onSubmitted: _submitText, // 綁定事件給_submitText這個Function
-                )),
-                IconButton(
-                    icon: Icon(Icons.send),
-                    onPressed: () =>
-                        _submitContent(_chatController.text, 'text'))
-              ])),
-            ],
-          )),
+                            }
+                            // print();
+                            final int commentCount = snapshot.data.docs.length;
+                            if (commentCount > 0) {
+                              return ListView.builder(
+                                padding: EdgeInsets.all(8.0),
+                                reverse: true,
+                                // 加入reverse，讓它反轉
+                                itemBuilder: (context, index) {
+                                  final QueryDocumentSnapshot document =
+                                      snapshot.data.docs[index];
+                                  return HandleMessage(
+                                    document: document,
+                                    auth: auth,
+                                  );
+                                },
+                                itemCount: commentCount,
+                              );
+                            }
+                            return Center(
+                              child: Text("no messages"),
+                            );
+                          })),
+                  SafeArea(
+                      child: Row(children: [
+                    IconButton(
+                        icon: Icon(Icons.menu),
+                        onPressed: () => myBottomSheet(context)),
+                    Flexible(
+                        child: TextField(
+                      decoration: InputDecoration(
+                        contentPadding: EdgeInsets.all(16.0),
+                        border: OutlineInputBorder(),
+                        hintText: '輸入文字',
+                      ),
+                      controller: _chatController,
+                      // onSubmitted: _submitText, // 綁定事件給_submitText這個Function
+                    )),
+                    IconButton(
+                        icon: Icon(Icons.send),
+                        onPressed: () =>
+                            _submitContent(_chatController.text, 'text'))
+                  ])),
+                ],
+              )),
         ));
   }
 }
@@ -222,13 +237,15 @@ class MessageBox extends StatelessWidget {
         child: Container(
           decoration: BoxDecoration(
             borderRadius: BorderRadius.circular(10),
-            color: other ? theme.secondaryHeaderColor:theme.colorScheme.secondary,
+            color: other
+                ? theme.secondaryHeaderColor
+                : theme.colorScheme.secondary,
           ),
           padding: EdgeInsets.all(10.0),
           child: Text(text,
               overflow: TextOverflow.ellipsis,
               maxLines: 5,
-              style: TextStyle(fontSize: 18.0,color: theme.backgroundColor)),
+              style: TextStyle(fontSize: 18.0, color: theme.backgroundColor)),
         ),
       ),
       VerticalDivider(),
@@ -240,18 +257,16 @@ class MessageBox extends StatelessWidget {
               decoration: BoxDecoration(
                   shape: BoxShape.circle,
                   image: DecorationImage(image: NetworkImage(photoURL))))
-          :  Container(
-          width: clipSize,
-          height: clipSize,
-          alignment: Alignment.bottomCenter,
-          child: CircleAvatar(
-              backgroundColor:other? theme.colorScheme.secondary:theme.primaryColor,
-              radius: 35,
-              child: Icon(
-                  Icons.person,
-                  size: 30,
-                  color:theme.backgroundColor
-              ))),
+          : Container(
+              width: clipSize,
+              height: clipSize,
+              alignment: Alignment.bottomCenter,
+              child: CircleAvatar(
+                  backgroundColor:
+                      other ? theme.colorScheme.secondary : theme.primaryColor,
+                  radius: 35,
+                  child: Icon(Icons.person,
+                      size: 30, color: theme.backgroundColor))),
     ];
 
     // print(timeago.format(time));
@@ -270,7 +285,11 @@ class ShortCutChatRoom extends StatefulWidget {
   final int i;
   final String photoURL;
 
-  ShortCutChatRoom({this.name, this.i, this.photoURL,});
+  ShortCutChatRoom({
+    this.name,
+    this.i,
+    this.photoURL,
+  });
 
   _ShortCutChatRoom createState() => _ShortCutChatRoom(name, i, photoURL);
 }
@@ -301,11 +320,11 @@ class _ShortCutChatRoom extends State<ShortCutChatRoom> {
                 //TODO 未來支援圖片
                 Icons.person,
                 size: 45,
-                color:theme.secondaryHeaderColor,
+                color: theme.secondaryHeaderColor,
               ))),
       title: Text(
         roomName,
-        style: TextStyle(fontSize: 30,color: theme.backgroundColor),
+        style: TextStyle(fontSize: 30, color: theme.backgroundColor),
       ),
       contentPadding: EdgeInsets.symmetric(vertical: 15.0, horizontal: 0.0),
       subtitle: Text(
@@ -395,13 +414,11 @@ class ImageBox extends StatelessWidget {
               height: clipSize,
               alignment: Alignment.bottomCenter,
               child: CircleAvatar(
-                backgroundColor:other? theme.colorScheme.secondary:theme.primaryColor,
+                  backgroundColor:
+                      other ? theme.colorScheme.secondary : theme.primaryColor,
                   radius: 35,
-                  child: Icon(
-                    Icons.person,
-                    size: 30,
-                    color:theme.backgroundColor
-                  ))),
+                  child: Icon(Icons.person,
+                      size: 30, color: theme.backgroundColor))),
     ];
 
     // print(timeago.format(time));

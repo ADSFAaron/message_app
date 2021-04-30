@@ -5,8 +5,8 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:message_app/main.dart';
-import 'chat.dart';
-import 'package:message_app/page/chat.dart';
+import 'chat/chat.dart';
+import 'package:message_app/page/chat/chat.dart';
 import 'person.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
 import 'package:kumi_popup_window/kumi_popup_window.dart';
@@ -310,6 +310,7 @@ class _MyHomePageState extends State<MyHomePage> {
             },
             openBuilder: (BuildContext context, VoidCallback openContainer) {
               return ChatPage(
+                photoURL: snapshot[i]['photoURL'],
                 roomId: snapshot[i]['roomID'],
                 roomName: snapshot[i]['roomName'],
               );
@@ -744,7 +745,6 @@ class _MyHomePageState extends State<MyHomePage> {
     CollectionReference chatRoom =
         FirebaseFirestore.instance.collection("chatRoom");
     String _roomName = "${list[2]},${user.displayName} Chat";
-    //TODO 創建聊天室
     DocumentReference reference = await chatRoom.add({
       'member': [list[1], user.email], // John Doe
       'roomName': _roomName, // Stokes and Sons
@@ -761,7 +761,7 @@ class _MyHomePageState extends State<MyHomePage> {
     Navigator.of(context).push(PageRouteBuilder(
       transitionDuration: Duration(milliseconds: 800),
       pageBuilder: (context, animation, secondaryAnimation) =>
-          ChatPage(roomName: _roomName, roomId: reference.id),
+          ChatPage(roomName: _roomName, roomId: reference.id,photoURL: null,),
       transitionsBuilder: (context, animation, secondaryAnimation, child) {
         var begin = Offset(0.0, 1.0);
         var end = Offset.zero;

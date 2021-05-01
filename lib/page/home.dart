@@ -780,9 +780,6 @@ class _MyHomePageState extends State<MyHomePage> {
   }
 
   void _cleanMessage() {
-    // setState(() {
-    //   messageDetail.clear();
-    // });
   }
 
   void _onItemTapped(int index) {

@@ -789,11 +789,6 @@ class _MyHomePageState extends State<MyHomePage> {
   }
 
   void _deleteMessage(int index) {
-//     setState(() {
-//       print(index);
-// //      print(messageDetail.elementAt(index).friend.name);
-//       messageDetail.removeAt(index);
-//     });
   }
 
   Future<void> reloadUserDate()async{

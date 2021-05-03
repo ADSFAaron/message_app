@@ -95,7 +95,7 @@ class _LoginPage extends State<LoginPage> {
     //   );
     // print("123");
     //   // Once signed in, return the UserCredential
-    //   return await FirebaseAuth.instance.signInWithCredential(credential);
+    //   return await FirebaseAuth.instance.signInWithCredential(credential)
   }
 
   @override

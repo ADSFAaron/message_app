@@ -42,7 +42,6 @@ class _LoginPage extends State<LoginPage> {
 //    print(text1);
 //    print(text2);
 //  print("button");
-//     User user =userCredential
     try {
       userCredential = await FirebaseAuth.instance
           .signInWithEmailAndPassword(email: text1, password: text2);

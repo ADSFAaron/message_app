@@ -302,11 +302,37 @@ class _MyHomePageState extends State<MyHomePage> {
           actionExtentRatio: 1 / 4,
           child: OpenContainer(
             closedBuilder: (BuildContext context, VoidCallback openContainer) {
-              return ShortCutChatRoom(
-                name: snapshot[i]['roomName'],
-                i: i,
-                photoURL: snapshot[i]['photoURL'],
+              ThemeData theme = Theme.of(context);
+              return ListTile(
+                tileColor: theme.colorScheme.secondary,
+                leading: Container(
+                    height: 90,
+                    width: 90,
+                    child: CircleAvatar(
+                        backgroundColor: theme.primaryColor,
+                        radius: 60,
+                        child: Icon(
+                          //TODO 未來支援圖片
+                          Icons.person,
+                          size: 45,
+                          color: theme.secondaryHeaderColor,
+                        ))),
+                title: Text(
+                  snapshot[i]['roomName'],
+                  style: TextStyle(fontSize: 30, color: theme.backgroundColor),
+                ),
+                contentPadding: EdgeInsets.symmetric(vertical: 15.0, horizontal: 0.0),
+                subtitle: Text(
+                  "壓著往左滑看看",
+                  style: TextStyle(color: theme.backgroundColor),
+                ),
               );
+              //TODO 修正 shortCutChatRoom
+                // ShortCutChatRoom(
+                // name: snapshot[i]['roomName'],
+                // i: i,
+                // photoURL: snapshot[i]['photoURL'],
+              // );
             },
             openBuilder: (BuildContext context, VoidCallback openContainer) {
               return ChatPage(
@@ -314,6 +340,9 @@ class _MyHomePageState extends State<MyHomePage> {
                 roomId: snapshot[i]['roomID'],
                 roomName: snapshot[i]['roomName'],
               );
+            },
+            onClosed:(element){print('ad');
+            setState(() {});
             },
           ));
       list.add(con);

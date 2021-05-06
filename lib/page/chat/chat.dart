@@ -288,9 +288,9 @@ class MessageBox extends StatelessWidget {
 }
 
 class ShortCutChatRoom extends StatefulWidget {
-  final String name;
-  final int i;
-  final String photoURL;
+  String name;
+  int i;
+  String photoURL;
 
   ShortCutChatRoom({
     this.name,
@@ -314,6 +314,7 @@ class _ShortCutChatRoom extends State<ShortCutChatRoom> {
 
   @override
   Widget build(BuildContext context) {
+    print(roomName);
     final ThemeData theme = Theme.of(context);
     return ListTile(
       tileColor: theme.colorScheme.secondary,

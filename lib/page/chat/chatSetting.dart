@@ -97,7 +97,7 @@ class _ChatSetting extends State<ChatSetting> {
                       padding: EdgeInsets.all(15),
                       alignment: Alignment.center,
                       width: MediaQuery.of(context).size.width,
-                      height: 200,
+                      height: 100,
                       child:
                         TextField(
                           controller: controller,
@@ -106,13 +106,12 @@ class _ChatSetting extends State<ChatSetting> {
                                 icon: FaIcon(FontAwesomeIcons.check),
                                 onPressed: (){
                                   //TODO 更改當前葉面 所有member 的 chatroom ID 等等
-
+                                  changeRoomName();
                                   setState(() {
                                   modifyName = false;
                                 });})
                           ),
                         ),
-
                     ),
               Container(
                 height: 50,
@@ -139,5 +138,9 @@ class _ChatSetting extends State<ChatSetting> {
             ],
           ),
         ]));
+  }
+
+  void changeRoomName(){
+
   }
 }

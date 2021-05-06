@@ -263,10 +263,32 @@ class _MyHomePageState extends State<MyHomePage> {
     for (int i = 0; i < friendDetail.length; i++) {
       list.add(OpenContainer(
         closedBuilder: (BuildContext context, VoidCallback openContainer) {
-          return ShortCutFriend(
-              photoURL: friendDetail.elementAt(i)['photoURL'],
-              username: friendDetail.elementAt(i)['username'],
-              i: i);
+          final ThemeData theme = Theme.of(context);
+          return Container(
+            color: theme.colorScheme.secondary,
+            alignment: Alignment.center,
+            height: 100,
+            child: Stack(
+              children: [
+                Container(
+                    alignment: Alignment(0, -0.3),
+                    child: FaceImage(
+                      faceURL: friendDetail.elementAt(i)['photoUrl'],
+                    )),
+                Container(
+                  alignment: Alignment.bottomCenter,
+                  child: NameText(
+                    userName:  friendDetail.elementAt(i)['username'],
+                    siz: 20,
+                  ),
+                ),
+              ],
+            ),
+          );
+            // ShortCutFriend(
+            //   photoURL: friendDetail.elementAt(i)['photoURL'],
+            //   username: friendDetail.elementAt(i)['username'],
+            //   i: i);
         },
         openBuilder: (BuildContext context, VoidCallback openContainer) {
           return PersonDetailPage(

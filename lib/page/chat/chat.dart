@@ -58,19 +58,21 @@ class _ChatPage extends State<ChatPage> {
     File file = File(pickedFile.path);
     // print(pickedFile.runtimeType);
 
-    EasyLoading.show(status: 'loading...');
     try {
+
+      EasyLoading.show(status: 'loading...');
       TaskSnapshot snapshot = await firebase_storage.FirebaseStorage.instance
           .ref('message/image/' + name)
           .putFile(file);
       String download = await snapshot.ref.getDownloadURL();
+
+      EasyLoading.dismiss();
       _submitContent(download, 'image');
     } catch (e) {
       print(e);
       // e.g, e.code == 'canceled'
     }
 
-    EasyLoading.dismiss();
     Navigator.of(context).pop();
   }
 

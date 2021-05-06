@@ -288,7 +288,7 @@ class _AddFriendPage extends State<AddFriendPage> {
     super.initState();
     auth = FirebaseAuth.instance;
     user = auth.currentUser;
-    _chatController.text = "123456789@gmail.com";
+    _chatController.text = "jeff6050101@gmail.com";
   }
 
   void _submitText(String text) async {
@@ -362,6 +362,7 @@ class _AddFriendPage extends State<AddFriendPage> {
                   "username": data['username'],
                   "photoUrl": data['photoURL']
                 };
+                print(addThing);
                 list.add(addThing);
                 transaction.update(freshSnap.reference, {
                   "friend": list,

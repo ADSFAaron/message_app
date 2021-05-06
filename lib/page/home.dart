@@ -339,6 +339,7 @@ class _MyHomePageState extends State<MyHomePage> {
                 photoURL: snapshot[i]['photoURL'],
                 roomId: snapshot[i]['roomID'],
                 roomName: snapshot[i]['roomName'],
+                user: userData
               );
             },
             onClosed:(element){print('ad');
@@ -773,7 +774,7 @@ class _MyHomePageState extends State<MyHomePage> {
   void _createChat(List list) async {
     CollectionReference chatRoom =
         FirebaseFirestore.instance.collection("chatRoom");
-    String _roomName = "${list[2]},${user.displayName} Chat";
+    String _roomName = "${userData['username']},${list[2]} Chat";
     DocumentReference reference = await chatRoom.add({
       'member': [list[1], user.email], // John Doe
       'roomName': _roomName, // Stokes and Sons
@@ -790,7 +791,8 @@ class _MyHomePageState extends State<MyHomePage> {
     Navigator.of(context).push(PageRouteBuilder(
       transitionDuration: Duration(milliseconds: 800),
       pageBuilder: (context, animation, secondaryAnimation) =>
-          ChatPage(roomName: _roomName, roomId: reference.id,photoURL: null,),
+          ChatPage(roomName: _roomName, roomId: reference.id,photoURL: null,
+              user: userData),
       transitionsBuilder: (context, animation, secondaryAnimation, child) {
         var begin = Offset(0.0, 1.0);
         var end = Offset.zero;

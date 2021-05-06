@@ -4,6 +4,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flex_color_scheme/flex_color_scheme.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:message_app/page/chat/chatSetting.dart';
 import 'package:message_app/page/setting.dart';
 import 'package:timeago/timeago.dart' as timeago;
@@ -19,11 +20,13 @@ class ChatPage extends StatefulWidget {
   final String roomName;
   final String photoURL;
 
-  ChatPage({Key key, @required this.roomId, @required this.roomName,@required this.photoURL})
+  final DocumentSnapshot user;
+
+  ChatPage({Key key, @required this.user,@required this.roomId, @required this.roomName,@required this.photoURL})
       : super(key: key);
 
   @override
-  _ChatPage createState() => _ChatPage(roomId, roomName,photoURL);
+  _ChatPage createState() => _ChatPage(roomId, roomName,photoURL,user);
 }
 
 class _ChatPage extends State<ChatPage> {
@@ -32,18 +35,19 @@ class _ChatPage extends State<ChatPage> {
   String roomName;
   FirebaseAuth auth;
 
-  User user;
+  DocumentSnapshot user;
 
-  _ChatPage(String _roomId, String _roomName,String _url) {
+  _ChatPage(String _roomId, String _roomName,String _url,DocumentSnapshot _data) {
     roomID = _roomId;
     roomName = _roomName;
     photoURL= _url;
+    user = _data;
   }
 
   void initState() {
     super.initState();
     auth = FirebaseAuth.instance;
-    user = auth.currentUser;
+
   }
 
   final TextEditingController _chatController = TextEditingController();
@@ -53,6 +57,8 @@ class _ChatPage extends State<ChatPage> {
     String name = pickedFile.path.toString().split('/').last;
     File file = File(pickedFile.path);
     // print(pickedFile.runtimeType);
+
+    EasyLoading.show(status: 'loading...');
     try {
       TaskSnapshot snapshot = await firebase_storage.FirebaseStorage.instance
           .ref('message/image/' + name)
@@ -63,6 +69,8 @@ class _ChatPage extends State<ChatPage> {
       print(e);
       // e.g, e.code == 'canceled'
     }
+
+    EasyLoading.dismiss();
     Navigator.of(context).pop();
   }
 
@@ -105,15 +113,14 @@ class _ChatPage extends State<ChatPage> {
     if (content == '') return;
     _chatController.clear(); // 清空controller資料
     // print(roomID);
-
     await FirebaseFirestore.instance
         .collection('chatRoom')
         .doc(roomID)
         .collection('messages')
         .add({
-      'email': user.email,
-      'photoURL': user.photoURL,
-      'userName': user.displayName,
+      'email': user.data()['email'],
+      'photoURL': user.data()['photoURL'],
+      'userName': user.data()['username'],
       'content': content,
       'time': Timestamp.now(),
       'type': type

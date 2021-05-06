@@ -130,10 +130,17 @@ class _ChatPage extends State<ChatPage> {
           actions: [
             IconButton(
                 icon: Icon(Icons.settings),
-                onPressed: () => Navigator.of(context)
+                onPressed: () async{
+                  await Navigator.of(context)
                         .push(MaterialPageRoute(builder: (context) {
                       return ChatSetting(roomName: roomName,docId: roomID,photoURL: photoURL,member: [],);
-                    })))
+                    }));
+                DocumentSnapshot data = await FirebaseFirestore.instance.collection('chatRoom').doc(roomID).get();
+                setState(() {
+                  roomName = data.data()['roomName'];
+                  photoURL = data.data()['phototURL'];
+                });
+                })
           ],
         ),
         body: InkWell(

@@ -28,8 +28,8 @@ class ThemeShowcase extends StatefulWidget {
 }
 
 class _ThemeShowcaseState extends State<ThemeShowcase> {
-   TextEditingController textController1;
-   TextEditingController textController2;
+  TextEditingController textController1;
+  TextEditingController textController2;
   bool error1 = false;
   bool error2 = false;
   int _buttonIndex = 0;

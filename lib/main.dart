@@ -1,15 +1,16 @@
+import 'package:animated_text_kit/animated_text_kit.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
+import 'package:flex_color_scheme/flex_color_scheme.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_easyloading/flutter_easyloading.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:message_app/shared/constants.dart';
+
 import 'page/home.dart';
 import 'page/login.dart';
-import 'package:animated_text_kit/animated_text_kit.dart';
-import 'package:font_awesome_flutter/font_awesome_flutter.dart';
-import 'package:flex_color_scheme/flex_color_scheme.dart';
 
 // TODO 製作快取快速讀取用戶資訊及朋友以及聊天資訊
 // TODO 串接後端 以及資料庫 儲存必要文件
@@ -180,67 +181,71 @@ class _InitialPage extends State<InitialPage> {
   Widget build(BuildContext context) {
     //print("initial build");
     return Scaffold(
-        body:GestureDetector(child: Container(
-      height: MediaQuery.of(context).size.height,
-      width: MediaQuery.of(context).size.width,
-      child: SingleChildScrollView(
-          child: Column(children: [
-        Container(
-          height: MediaQuery.of(context).size.height/1.8,
-            child: Column(
-                mainAxisAlignment: MainAxisAlignment.end,
-                children: [
+        body: GestureDetector(
+      child: Container(
+        height: MediaQuery.of(context).size.height,
+        width: MediaQuery.of(context).size.width,
+        child: SingleChildScrollView(
+            child: Column(children: [
           Container(
-            // color: Colors.black,
-           // alignment: Alignment(0, -0.5),
-            child: FaIcon(
-              FontAwesomeIcons.connectdevelop,
-              color: Colors.white,
-              size: MediaQuery.of(context).size.width / 2,
-            ),
-          ),
-          Container(
-              child: Center(
-            child: Text("聊天go",
-                style: TextStyle(fontSize: 60, color: Colors.white)),
-          ))
-        ])),
-        (notLogin == false)
-            ? Container(
-            height: MediaQuery.of(context).size.height-MediaQuery.of(context).size.height/1.8,
-                alignment: Alignment(0, 0.5),
-                child:AnimatedTextKit(
-                  animatedTexts: [
-                    TypewriterAnimatedText(
-                      nowState,
-                      textStyle: const TextStyle(
-                        color: Colors.white,
-                        fontSize: 22.0,
-                        fontWeight: FontWeight.bold,
+              height: MediaQuery.of(context).size.height / 1.8,
+              child:
+                  Column(mainAxisAlignment: MainAxisAlignment.end, children: [
+                Container(
+                  // color: Colors.black,
+                  // alignment: Alignment(0, -0.5),
+                  child: FaIcon(
+                    FontAwesomeIcons.connectdevelop,
+                    color: Colors.white,
+                    size: MediaQuery.of(context).size.width / 2,
+                  ),
+                ),
+                Container(
+                    child: Center(
+                  child: Text("聊天go",
+                      style: TextStyle(fontSize: 60, color: Colors.white)),
+                ))
+              ])),
+          (notLogin == false)
+              ? Container(
+                  height: MediaQuery.of(context).size.height -
+                      MediaQuery.of(context).size.height / 1.8,
+                  alignment: Alignment(0, 0.5),
+                  child: AnimatedTextKit(
+                    animatedTexts: [
+                      TypewriterAnimatedText(
+                        nowState,
+                        textStyle: const TextStyle(
+                          color: Colors.white,
+                          fontSize: 22.0,
+                          fontWeight: FontWeight.bold,
+                        ),
+                        speed: const Duration(milliseconds: 50),
                       ),
-                      speed: const Duration(milliseconds: 50),
-                    ),
-                  ],
-                  repeatForever: true,
-                  //totalRepeatCount: 4,
-                  // pause: const Duration(milliseconds: 1),
-                  displayFullTextOnTap: true,
-                  stopPauseOnTap: true,
-                ))
-            : Container(
-                alignment: Alignment(0, 1.3),
-                height: MediaQuery.of(context).size.height-MediaQuery.of(context).size.height/1.8,
-                //color: Colors.red,
-                child: LoginPage(
-                  loginChange: (bool login){
-                    setState(() {
-                      notLogin = login;
-                    });
-                  },
-                ))
-      ])),
-      color: Colors.black,
-    ),onTap: ()=>FocusScope.of(context).unfocus(),));
+                    ],
+                    repeatForever: true,
+                    //totalRepeatCount: 4,
+                    // pause: const Duration(milliseconds: 1),
+                    displayFullTextOnTap: true,
+                    stopPauseOnTap: true,
+                  ))
+              : Container(
+                  alignment: Alignment(0, 1.3),
+                  height: MediaQuery.of(context).size.height -
+                      MediaQuery.of(context).size.height / 1.8,
+                  //color: Colors.red,
+                  child: LoginPage(
+                    loginChange: (bool login) {
+                      setState(() {
+                        notLogin = login;
+                      });
+                    },
+                  ))
+        ])),
+        color: Colors.black,
+      ),
+      onTap: () => FocusScope.of(context).unfocus(),
+    ));
   }
 }
 

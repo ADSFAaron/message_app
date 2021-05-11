@@ -1,9 +1,9 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:fluttertoast/fluttertoast.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
 
 class RegisterPage extends StatefulWidget {
   RegisterPage({Key key}) : super(key: key);
@@ -124,21 +124,24 @@ class _RegisterPage extends State<RegisterPage> {
     try {
       EasyLoading.show(status: 'loading...');
 
-      CollectionReference users = FirebaseFirestore.instance.collection('users');
+      CollectionReference users =
+          FirebaseFirestore.instance.collection('users');
       DocumentSnapshot doc = await users.doc(_account).get();
-      if (doc.data() != null) { return; }
+      if (doc.data() != null) {
+        return;
+      }
       await users
           .doc(_account)
           .set({
-        "email": _account,
-        "username": _username,
-        "friend": [],
-        "chatRoom": [],
-        "photoURL": null,
-        "bio": "這人很懶啥都沒留下",
-        "backGroundURL": null,
-        "friendRequire": [],
-      })
+            "email": _account,
+            "username": _username,
+            "friend": [],
+            "chatRoom": [],
+            "photoURL": null,
+            "bio": "這人很懶啥都沒留下",
+            "backGroundURL": null,
+            "friendRequire": [],
+          })
           .then((value) => print("User Added"))
           .catchError((error) => print("Failed to add user: $error"));
 
@@ -179,6 +182,6 @@ class _RegisterPage extends State<RegisterPage> {
 
     EasyLoading.dismiss();
     Fluttertoast.showToast(msg: "創建帳號成功");
-   // Navigator.pop(context);
+    // Navigator.pop(context);
   }
 }

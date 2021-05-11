@@ -7,5 +7,5 @@ export 'shared/show_theme_colors.dart';
 export 'shared/side_menu.dart';
 export 'shared/splash_page_one.dart';
 export 'shared/splash_page_two.dart';
-export 'shared/theme_showcase.dart';
 export 'shared/subpage.dart';
+export 'shared/theme_showcase.dart';

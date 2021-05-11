@@ -1,21 +1,22 @@
+import 'package:animations/animations.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:convex_bottom_bar/convex_bottom_bar.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flex_color_scheme/flex_color_scheme.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:fluttertoast/fluttertoast.dart';
-import 'package:message_app/main.dart';
-import 'chat/chat.dart';
-import 'package:message_app/page/chat/chat.dart';
-import 'person.dart';
-import 'package:flutter_slidable/flutter_slidable.dart';
-import 'package:kumi_popup_window/kumi_popup_window.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:animations/animations.dart';
-import 'package:convex_bottom_bar/convex_bottom_bar.dart';
 import 'package:flutter_easyloading/flutter_easyloading.dart';
-import 'setting.dart';
+import 'package:flutter_slidable/flutter_slidable.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:kumi_popup_window/kumi_popup_window.dart';
+import 'package:message_app/main.dart';
+import 'package:message_app/page/chat/chat.dart';
+
+import 'chat/chat.dart';
+import 'person.dart';
+import 'setting.dart';
 
 class MyHomePage extends StatefulWidget {
   MyHomePage({
@@ -120,12 +121,12 @@ class _MyHomePageState extends State<MyHomePage> {
           children: [
             Expanded(
               flex: 1,
-              child:  Container(
-                  width: MediaQuery.of(context).size.width * 0.85,
-                  child: MyDrawerHeader(
-                    userData: userData,
-                  ),
+              child: Container(
+                width: MediaQuery.of(context).size.width * 0.85,
+                child: MyDrawerHeader(
+                  userData: userData,
                 ),
+              ),
             ),
             Expanded(
               child: ListView(children: [
@@ -278,17 +279,17 @@ class _MyHomePageState extends State<MyHomePage> {
                 Container(
                   alignment: Alignment.bottomCenter,
                   child: NameText(
-                    userName:  friendDetail.elementAt(i)['username'],
+                    userName: friendDetail.elementAt(i)['username'],
                     siz: 20,
                   ),
                 ),
               ],
             ),
           );
-            // ShortCutFriend(
-            //   photoURL: friendDetail.elementAt(i)['photoURL'],
-            //   username: friendDetail.elementAt(i)['username'],
-            //   i: i);
+          // ShortCutFriend(
+          //   photoURL: friendDetail.elementAt(i)['photoURL'],
+          //   username: friendDetail.elementAt(i)['username'],
+          //   i: i);
         },
         openBuilder: (BuildContext context, VoidCallback openContainer) {
           return PersonDetailPage(
@@ -343,29 +344,30 @@ class _MyHomePageState extends State<MyHomePage> {
                   snapshot[i]['roomName'],
                   style: TextStyle(fontSize: 30, color: theme.backgroundColor),
                 ),
-                contentPadding: EdgeInsets.symmetric(vertical: 15.0, horizontal: 0.0),
+                contentPadding:
+                    EdgeInsets.symmetric(vertical: 15.0, horizontal: 0.0),
                 subtitle: Text(
                   "壓著往左滑看看",
                   style: TextStyle(color: theme.backgroundColor),
                 ),
               );
               //TODO 修正 shortCutChatRoom
-                // ShortCutChatRoom(
-                // name: snapshot[i]['roomName'],
-                // i: i,
-                // photoURL: snapshot[i]['photoURL'],
+              // ShortCutChatRoom(
+              // name: snapshot[i]['roomName'],
+              // i: i,
+              // photoURL: snapshot[i]['photoURL'],
               // );
             },
             openBuilder: (BuildContext context, VoidCallback openContainer) {
               return ChatPage(
-                photoURL: snapshot[i]['photoURL'],
-                roomId: snapshot[i]['roomID'],
-                roomName: snapshot[i]['roomName'],
-                user: userData
-              );
+                  photoURL: snapshot[i]['photoURL'],
+                  roomId: snapshot[i]['roomID'],
+                  roomName: snapshot[i]['roomName'],
+                  user: userData);
             },
-            onClosed:(element){print('ad');
-            setState(() {});
+            onClosed: (element) {
+              print('ad');
+              setState(() {});
             },
           ));
       list.add(con);
@@ -812,9 +814,11 @@ class _MyHomePageState extends State<MyHomePage> {
     //TODO 現有作法 創建後須等待幾秒才會出現
     Navigator.of(context).push(PageRouteBuilder(
       transitionDuration: Duration(milliseconds: 800),
-      pageBuilder: (context, animation, secondaryAnimation) =>
-          ChatPage(roomName: _roomName, roomId: reference.id,photoURL: null,
-              user: userData),
+      pageBuilder: (context, animation, secondaryAnimation) => ChatPage(
+          roomName: _roomName,
+          roomId: reference.id,
+          photoURL: null,
+          user: userData),
       transitionsBuilder: (context, animation, secondaryAnimation, child) {
         var begin = Offset(0.0, 1.0);
         var end = Offset.zero;
@@ -832,8 +836,7 @@ class _MyHomePageState extends State<MyHomePage> {
     addChatRoom(list[1], reference.id, _roomName);
   }
 
-  void _cleanMessage() {
-  }
+  void _cleanMessage() {}
 
   void _onItemTapped(int index) {
     setState(() {
@@ -841,13 +844,12 @@ class _MyHomePageState extends State<MyHomePage> {
     });
   }
 
-  void _deleteMessage(int index) {
-  }
+  void _deleteMessage(int index) {}
 
-  Future<void> reloadUserDate()async{
+  Future<void> reloadUserDate() async {
     EasyLoading.show(status: 'loading...');
-   DocumentSnapshot data = await users.doc(user.email).get();
-     setState(() {
+    DocumentSnapshot data = await users.doc(user.email).get();
+    setState(() {
       userData = data;
     });
     EasyLoading.dismiss();

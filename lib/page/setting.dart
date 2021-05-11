@@ -1,16 +1,17 @@
+import 'dart:io';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_storage/firebase_storage.dart';
+import 'package:firebase_storage/firebase_storage.dart' as firebase_storage;
 import 'package:flex_color_scheme/flex_color_scheme.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_easyloading/flutter_easyloading.dart';
-import 'package:fluttertoast/fluttertoast.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:image_picker/image_picker.dart';
-import 'dart:io';
-import 'package:firebase_storage/firebase_storage.dart' as firebase_storage;
 import 'package:message_app/page/person.dart';
+
 import '../all_shared_imports.dart';
 
 // Create a custom flex scheme color for a light theme.
@@ -98,15 +99,14 @@ final List<FlexSchemeData> myFlexSchemes = <FlexSchemeData>[
 ];
 
 class SettingPage extends StatelessWidget {
-  SettingPage({
-    @required this.themeMode,
-    @required this.onThemeModeChanged,
-    @required this.schemeIndex,
-    @required this.onSchemeChanged,
-    @required this.flexSchemeData,
-    @required this.userPhotoURL,
-    @required this.backGroundURL
-  });
+  SettingPage(
+      {@required this.themeMode,
+      @required this.onThemeModeChanged,
+      @required this.schemeIndex,
+      @required this.onSchemeChanged,
+      @required this.flexSchemeData,
+      @required this.userPhotoURL,
+      @required this.backGroundURL});
 
   final ThemeMode themeMode;
   final ValueChanged<ThemeMode> onThemeModeChanged;
@@ -116,77 +116,80 @@ class SettingPage extends StatelessWidget {
 
   final String backGroundURL;
   final String userPhotoURL;
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        appBar: AppBar(
-          leading: IconButton(
-            icon: FaIcon(
-              FontAwesomeIcons.times,
-              color: Colors.black,
-            ),
-            onPressed: () => Navigator.of(context).pop(),
+      appBar: AppBar(
+        leading: IconButton(
+          icon: FaIcon(
+            FontAwesomeIcons.times,
+            color: Colors.black,
           ),
-          title: Container(
-            alignment: Alignment(-0.2,0),
-            child: Text(
-              "設定",
-              style: TextStyle(color: Colors.black),
-            ),
-          ),
-          backgroundColor: Colors.white,
+          onPressed: () => Navigator.of(context).pop(),
         ),
-        body: ListView(
-          children: [
-            ListTile(
-              title: Text("個人設定"),
-              onTap: () => Navigator.of(context).push(PageRouteBuilder(
-                pageBuilder: (context, animation, secondaryAnimation) =>
-                    PersonSettingPage(backGroundURL: backGroundURL,userPhotoURL: userPhotoURL),
-                transitionsBuilder:
-                    (context, animation, secondaryAnimation, child) {
-                  var begin = Offset(0.0, 1.0);
-                  var end = Offset.zero;
-                  var curve = Curves.ease;
+        title: Container(
+          alignment: Alignment(-0.2, 0),
+          child: Text(
+            "設定",
+            style: TextStyle(color: Colors.black),
+          ),
+        ),
+        backgroundColor: Colors.white,
+      ),
+      body: ListView(
+        children: [
+          ListTile(
+            title: Text("個人設定"),
+            onTap: () => Navigator.of(context).push(PageRouteBuilder(
+              pageBuilder: (context, animation, secondaryAnimation) =>
+                  PersonSettingPage(
+                      backGroundURL: backGroundURL, userPhotoURL: userPhotoURL),
+              transitionsBuilder:
+                  (context, animation, secondaryAnimation, child) {
+                var begin = Offset(0.0, 1.0);
+                var end = Offset.zero;
+                var curve = Curves.ease;
 
-                  var tween = Tween(begin: begin, end: end)
-                      .chain(CurveTween(curve: curve));
+                var tween = Tween(begin: begin, end: end)
+                    .chain(CurveTween(curve: curve));
 
-                  return SlideTransition(
-                    position: animation.drive(tween),
-                    child: child,
-                  );
-                },
-              )),
-            ),
-            ListTile(
-              title: Text("主題設定"),
-              onTap: () => Navigator.of(context).push(PageRouteBuilder(
-                pageBuilder: (context, animation, secondaryAnimation) =>
-                    ThemePage(
-                        themeMode: themeMode,
-                        onThemeModeChanged: onThemeModeChanged,
-                        flexSchemeData: flexSchemeData,
-                        schemeIndex: schemeIndex,
-                        onSchemeChanged: onSchemeChanged),
-                transitionsBuilder:
-                    (context, animation, secondaryAnimation, child) {
-                  var begin = Offset(0.0, 1.0);
-                  var end = Offset.zero;
-                  var curve = Curves.ease;
+                return SlideTransition(
+                  position: animation.drive(tween),
+                  child: child,
+                );
+              },
+            )),
+          ),
+          ListTile(
+            title: Text("主題設定"),
+            onTap: () => Navigator.of(context).push(PageRouteBuilder(
+              pageBuilder: (context, animation, secondaryAnimation) =>
+                  ThemePage(
+                      themeMode: themeMode,
+                      onThemeModeChanged: onThemeModeChanged,
+                      flexSchemeData: flexSchemeData,
+                      schemeIndex: schemeIndex,
+                      onSchemeChanged: onSchemeChanged),
+              transitionsBuilder:
+                  (context, animation, secondaryAnimation, child) {
+                var begin = Offset(0.0, 1.0);
+                var end = Offset.zero;
+                var curve = Curves.ease;
 
-                  var tween = Tween(begin: begin, end: end)
-                      .chain(CurveTween(curve: curve));
+                var tween = Tween(begin: begin, end: end)
+                    .chain(CurveTween(curve: curve));
 
-                  return SlideTransition(
-                    position: animation.drive(tween),
-                    child: child,
-                  );
-                },
-              )),
-            ),
-          ],
-        ));
+                return SlideTransition(
+                  position: animation.drive(tween),
+                  child: child,
+                );
+              },
+            )),
+          ),
+        ],
+      ),
+    );
   }
 }
 
@@ -194,12 +197,16 @@ class SettingPage extends StatelessWidget {
 class PersonSettingPage extends StatefulWidget {
   String backGroundURL;
   String userPhotoURL;
-  PersonSettingPage({@required this.backGroundURL,@required this.userPhotoURL});
+
+  PersonSettingPage(
+      {@required this.backGroundURL, @required this.userPhotoURL});
+
   _PersonSettingPage createState() => _PersonSettingPage();
 }
 
 class _PersonSettingPage extends State<PersonSettingPage> {
   FirebaseAuth auth;
+
   _PersonSettingPage();
 
   @override
@@ -221,10 +228,14 @@ class _PersonSettingPage extends State<PersonSettingPage> {
     File file = File(pickedFile.path);
     // print(pickedFile.runtimeType);
     String download;
-    String changeWhereString = (changeWhere==0)? 'backGroundURL':'photoURL';
+    String changeWhereString =
+        (changeWhere == 0) ? 'backGroundURL' : 'photoURL';
     try {
       TaskSnapshot snapshot = await firebase_storage.FirebaseStorage.instance
-          .ref('user/'+changeWhereString+'/' + auth.currentUser.email.toString())
+          .ref('user/' +
+              changeWhereString +
+              '/' +
+              auth.currentUser.email.toString())
           .putFile(file);
       download = await snapshot.ref.getDownloadURL();
       //_submitContent(download, 'image');
@@ -235,13 +246,14 @@ class _PersonSettingPage extends State<PersonSettingPage> {
     print(download);
     //修改firestore內部使用者資料
     CollectionReference users = FirebaseFirestore.instance.collection('users');
-    await users.doc(auth.currentUser.email).update({changeWhereString:download});
+    await users
+        .doc(auth.currentUser.email)
+        .update({changeWhereString: download});
 
     EasyLoading.dismiss();
     //從新刷新
     Navigator.of(context).pop();
-    setState(() {
-    });
+    setState(() {});
   }
 
   void myBottomSheet(BuildContext context, int changeWhere) {
@@ -252,73 +264,84 @@ class _PersonSettingPage extends State<PersonSettingPage> {
         context: context,
         builder: (BuildContext context) {
           return Container(
-              height: 120,
-              child: ListView(
-                children: [
-                  ListTile(
-                    title: Text(
-                      "從相片挑選",
-                    ),
-                    onTap: () => uploadPhoto(ImageSource.gallery, changeWhere),
+            height: 120,
+            child: ListView(
+              children: [
+                ListTile(
+                  title: Text(
+                    "從相片挑選",
                   ),
-                  ListTile(
-                    title: Text("相機拍照"),
-                    onTap: () => uploadPhoto(ImageSource.camera, changeWhere),
-                  ),
-                ],
-              ));
+                  onTap: () => uploadPhoto(ImageSource.gallery, changeWhere),
+                ),
+                ListTile(
+                  title: Text("相機拍照"),
+                  onTap: () => uploadPhoto(ImageSource.camera, changeWhere),
+                ),
+              ],
+            ),
+          );
         });
   }
 
   @override
   Widget build(BuildContext context) {
-    return
-      FutureBuilder(
-          future: FirebaseFirestore.instance.collection('users').doc(auth.currentUser.email).get(),
-          builder: (context, AsyncSnapshot<DocumentSnapshot> snapshot){
-    if (snapshot.connectionState == ConnectionState.done) {
-      EasyLoading.dismiss();
-      return Scaffold(
-        appBar: AppBar(
-          leading: IconButton(
-            icon: FaIcon(
-              FontAwesomeIcons.times,
-              color: Colors.black,
-            ),
-            onPressed: () => Navigator.of(context).pop(),
-          ),
-          title: Center(
-            child: Text(
-              "個人資料",
-              style: TextStyle(color: Colors.black),
-            ),
-          ),
-          backgroundColor: Colors.white,
-        ),
-        body: ListView(
-          children: [
-            Container(
-              height: MediaQuery.of(context).size.height / 2,
-              width: MediaQuery.of(context).size.width,
-              child: Stack(
+    return FutureBuilder(
+        future: FirebaseFirestore.instance
+            .collection('users')
+            .doc(auth.currentUser.email)
+            .get(),
+        builder: (context, AsyncSnapshot<DocumentSnapshot> snapshot) {
+          if (snapshot.connectionState == ConnectionState.done) {
+            EasyLoading.dismiss();
+            return Scaffold(
+              appBar: AppBar(
+                leading: IconButton(
+                  icon: FaIcon(
+                    FontAwesomeIcons.times,
+                    color: Colors.black,
+                  ),
+                  onPressed: () => Navigator.of(context).pop(),
+                ),
+                title: Center(
+                  child: Text(
+                    "個人資料",
+                    style: TextStyle(color: Colors.black),
+                  ),
+                ),
+                backgroundColor: Colors.white,
+              ),
+              body: ListView(
                 children: [
-              Container(
-              height: MediaQuery.of(context).size.height / 2,
-              width: MediaQuery.of(context).size.width,
-       // alignment: Alignment.center,
-        child: GestureDetector(
-                      onTap: () => myBottomSheet(context, 0),
-                      child: BackGroundImage(imageURL: snapshot.data.data()['backGroundURL'],siz: MediaQuery.of(context).size.width/1.5,))),
-                  Center(
-                      child: GestureDetector(
-                        onTap: () => myBottomSheet(context, 1),
-                        child: FaceImage(faceURL: snapshot.data.data()['photoURL'],),
-                      )),
-                  Align(
-                      alignment: Alignment.bottomRight,
-                      child: GestureDetector(
-                          onTap: () => myBottomSheet(context, 0),
-                          child: Container(
+                  Container(
+                    height: MediaQuery.of(context).size.height / 2,
+                    width: MediaQuery.of(context).size.width,
+                    child: Stack(
+                      children: [
+                        Container(
+                          height: MediaQuery.of(context).size.height / 2,
+                          width: MediaQuery.of(context).size.width,
+                          // alignment: Alignment.center,
+                          child: GestureDetector(
+                            onTap: () => myBottomSheet(context, 0),
+                            child: BackGroundImage(
+                              imageURL: snapshot.data.data()['backGroundURL'],
+                              siz: MediaQuery.of(context).size.width / 1.5,
+                            ),
+                          ),
+                        ),
+                        Center(
+                          child: GestureDetector(
+                            onTap: () => myBottomSheet(context, 1),
+                            child: FaceImage(
+                              faceURL: snapshot.data.data()['photoURL'],
+                            ),
+                          ),
+                        ),
+                        Align(
+                          alignment: Alignment.bottomRight,
+                          child: GestureDetector(
+                            onTap: () => myBottomSheet(context, 0),
+                            child: Container(
                               padding: EdgeInsets.all(10),
                               height: 60,
                               width: 60,
@@ -331,12 +354,15 @@ class _PersonSettingPage extends State<PersonSettingPage> {
                                   color: Colors.white,
                                   size: 20,
                                 ),
-                              )))),
-                  Align(
-                      alignment: Alignment(0.2, 0.2),
-                      child: GestureDetector(
-                          onTap: () => myBottomSheet(context, 1),
-                          child: Container(
+                              ),
+                            ),
+                          ),
+                        ),
+                        Align(
+                          alignment: Alignment(0.2, 0.2),
+                          child: GestureDetector(
+                            onTap: () => myBottomSheet(context, 1),
+                            child: Container(
                               padding: EdgeInsets.all(10),
                               height: 60,
                               width: 60,
@@ -349,104 +375,119 @@ class _PersonSettingPage extends State<PersonSettingPage> {
                                   color: Colors.white,
                                   size: 20,
                                 ),
-                              )))),
+                              ),
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  //BIO
+                  Container(
+                    height: MediaQuery.of(context).size.height / 2,
+                    child: Center(
+                      child: TextField(),
+                    ),
+                  ),
                 ],
               ),
-            ),
-            //BIO
-            Container(
-              height: MediaQuery.of(context).size.height / 2,
-              child: Center(
-                child: TextField(),
+            );
+          }
+          EasyLoading.show(status: 'loading...');
+          return Scaffold(
+            appBar: AppBar(
+              leading: IconButton(
+                icon: FaIcon(
+                  FontAwesomeIcons.times,
+                  color: Colors.black,
+                ),
+                onPressed: () => Navigator.of(context).pop(),
               ),
+              title: Center(
+                child: Text(
+                  "個人資料",
+                  style: TextStyle(color: Colors.black),
+                ),
+              ),
+              backgroundColor: Colors.white,
             ),
-          ],
-        ));}
-    EasyLoading.show(status: 'loading...');
-     return Scaffold(
-        appBar: AppBar(
-          leading: IconButton(
-            icon: FaIcon(
-              FontAwesomeIcons.times,
-              color: Colors.black,
-            ),
-            onPressed: () => Navigator.of(context).pop(),
-          ),
-          title: Center(
-            child: Text(
-              "個人資料",
-              style: TextStyle(color: Colors.black),
-            ),
-          ),
-          backgroundColor: Colors.white,
-        ),
-        body: ListView(
-          children: [
-            Container(
-              height: MediaQuery.of(context).size.height / 2,
-              child: Stack(
-                children: [
-                  GestureDetector(
-                      onTap: () => myBottomSheet(context, 0),
-                      child: Container(
-                          decoration: BoxDecoration(
-                              image: DecorationImage(
-                                  image: AssetImage("images/2.jpg"),
-                                  fit: BoxFit.cover)))),
-                  Center(
-                      child: GestureDetector(
-                          onTap: () => myBottomSheet(context, 1),
-                          child: FaceImage(faceURL: null,),
-                          )),
-                  Align(
-                      alignment: Alignment.bottomRight,
-                      child: GestureDetector(
+            body: ListView(
+              children: [
+                Container(
+                  height: MediaQuery.of(context).size.height / 2,
+                  child: Stack(
+                    children: [
+                      GestureDetector(
                           onTap: () => myBottomSheet(context, 0),
                           child: Container(
-                              padding: EdgeInsets.all(10),
-                              height: 60,
-                              width: 60,
-                              // color: Colors.yellow,
-                              child: CircleAvatar(
-                                radius: 60,
-                                backgroundColor: Colors.black38,
-                                child: FaIcon(
-                                  FontAwesomeIcons.camera,
-                                  color: Colors.white,
-                                  size: 20,
-                                ),
-                              )))),
-                  Align(
-                      alignment: Alignment(0.2, 0.2),
-                      child: GestureDetector(
+                              decoration: BoxDecoration(
+                                  image: DecorationImage(
+                                      image: AssetImage("images/2.jpg"),
+                                      fit: BoxFit.cover)))),
+                      Center(
+                        child: GestureDetector(
+                          onTap: () => myBottomSheet(context, 1),
+                          child: FaceImage(
+                            faceURL: null,
+                          ),
+                        ),
+                      ),
+                      Align(
+                        alignment: Alignment.bottomRight,
+                        child: GestureDetector(
+                          onTap: () => myBottomSheet(context, 0),
+                          child: Container(
+                            padding: EdgeInsets.all(10),
+                            height: 60,
+                            width: 60,
+                            // color: Colors.yellow,
+                            child: CircleAvatar(
+                              radius: 60,
+                              backgroundColor: Colors.black38,
+                              child: FaIcon(
+                                FontAwesomeIcons.camera,
+                                color: Colors.white,
+                                size: 20,
+                              ),
+                            ),
+                          ),
+                        ),
+                      ),
+                      Align(
+                        alignment: Alignment(0.2, 0.2),
+                        child: GestureDetector(
                           onTap: () => myBottomSheet(context, 1),
                           child: Container(
-                              padding: EdgeInsets.all(10),
-                              height: 60,
-                              width: 60,
-                              // color: Colors.yellow,
-                              child: CircleAvatar(
-                                radius: 60,
-                                backgroundColor: Colors.black38,
-                                child: FaIcon(
-                                  FontAwesomeIcons.camera,
-                                  color: Colors.white,
-                                  size: 20,
-                                ),
-                              )))),
-
-                ],
-              ),
+                            padding: EdgeInsets.all(10),
+                            height: 60,
+                            width: 60,
+                            // color: Colors.yellow,
+                            child: CircleAvatar(
+                              radius: 60,
+                              backgroundColor: Colors.black38,
+                              child: FaIcon(
+                                FontAwesomeIcons.camera,
+                                color: Colors.white,
+                                size: 20,
+                              ),
+                            ),
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                //BIO
+                Container(
+                  height: MediaQuery.of(context).size.height / 2,
+                  child: Center(
+                    child: TextField(),
+                  ),
+                ),
+              ],
             ),
-            //BIO
-            Container(
-              height: MediaQuery.of(context).size.height / 2,
-              child: Center(
-                child: TextField(),
-              ),
-            ),
-          ],
-        ));});
+          );
+        });
   }
 }
 
@@ -487,13 +528,11 @@ class ThemePage extends StatelessWidget {
                 padding: const EdgeInsets.all(AppConst.edgePadding),
                 children: <Widget>[
                   Text('主題', style: headline4),
-                  const Text(
-                   '這裡可以簡單預覽所選擇的主題\n'
-                       '選擇包含明亮或暗色主題\n'
-                       '\n\n另外也可以選擇主題的配色\n'
-                       '下方右邊圓圈圈點擊可觀看有那些顏色的主題可供選擇\n'
-                       '並提供即時預覽大概顏色給您看'
-                  ),
+                  const Text('這裡可以簡單預覽所選擇的主題\n'
+                      '選擇包含明亮或暗色主題\n'
+                      '\n\n另外也可以選擇主題的配色\n'
+                      '下方右邊圓圈圈點擊可觀看有那些顏色的主題可供選擇\n'
+                      '並提供即時預覽大概顏色給您看'),
                   // A 3-way theme mode toggle switch.
                   Padding(
                     padding: const EdgeInsets.symmetric(

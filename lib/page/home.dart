@@ -132,12 +132,14 @@ class _MyHomePageState extends State<MyHomePage> {
               child: ListView(children: [
                 ListTile(
                   title: Text("Home"),
+                  leading: Icon(Icons.home_outlined),
                   onTap: () {
                     Navigator.of(context).pop();
                   },
                 ),
                 ListTile(
                   title: Text("Setting"),
+                  leading: Icon(Icons.settings_outlined),
                   onTap: () async {
                     await Navigator.of(context).push(PageRouteBuilder(
                       transitionDuration: Duration(milliseconds: 800),
@@ -168,7 +170,8 @@ class _MyHomePageState extends State<MyHomePage> {
                   },
                 ),
                 ListTile(
-                  title: Text("登出"),
+                  title: Text("Logout"),
+                  leading: Icon(Icons.logout_outlined),
                   onTap: () {
                     showDialog(
                       context: context,
@@ -386,44 +389,47 @@ class _MyHomePageState extends State<MyHomePage> {
               pinned: true,
               snap: true,
               floating: true,
-              expandedHeight: 80.0,
               flexibleSpace: const FlexibleSpaceBar(
                 title: Text('Friend'),
               ),
               leading: IconButton(
-                icon: Icon(Icons.menu, size: 30),
+                icon: Icon(Icons.menu, size: 28),
                 onPressed: () {
                   _scaffoldKey.currentState.openDrawer();
                 },
               ),
               actions: <Widget>[
-                IconButton(
-                  alignment: Alignment.centerRight,
-                  icon: const Icon(Icons.add_circle, size: 30),
-                  tooltip: 'Add Friend',
-                  onPressed: () async {
-                    // print("-------add---------");
-                    // print(myself.account);
-                    await Navigator.of(context).push(PageRouteBuilder(
-                      pageBuilder: (context, animation, secondaryAnimation) =>
-                          AddFriendPage(),
-                      transitionsBuilder:
-                          (context, animation, secondaryAnimation, child) {
-                        var begin = Offset(0.0, 1.0);
-                        var end = Offset.zero;
-                        var curve = Curves.ease;
+                Padding(
+                  padding: const EdgeInsets.only(right: 8.0),
+                  child: IconButton(
+                    alignment: Alignment.centerRight,
+                    icon:
+                        const Icon(Icons.add_circle_outline_outlined, size: 24),
+                    tooltip: 'Add Friend',
+                    onPressed: () async {
+                      // print("-------add---------");
+                      // print(myself.account);
+                      await Navigator.of(context).push(PageRouteBuilder(
+                        pageBuilder: (context, animation, secondaryAnimation) =>
+                            AddFriendPage(),
+                        transitionsBuilder:
+                            (context, animation, secondaryAnimation, child) {
+                          var begin = Offset(0.0, 1.0);
+                          var end = Offset.zero;
+                          var curve = Curves.ease;
 
-                        var tween = Tween(begin: begin, end: end)
-                            .chain(CurveTween(curve: curve));
+                          var tween = Tween(begin: begin, end: end)
+                              .chain(CurveTween(curve: curve));
 
-                        return SlideTransition(
-                          position: animation.drive(tween),
-                          child: child,
-                        );
-                      },
-                    ));
-                    setState(() {});
-                  },
+                          return SlideTransition(
+                            position: animation.drive(tween),
+                            child: child,
+                          );
+                        },
+                      ));
+                      setState(() {});
+                    },
+                  ),
                 ),
               ]),
           FutureBuilder(
@@ -550,7 +556,7 @@ class _MyHomePageState extends State<MyHomePage> {
           SliverAppBar(
             backgroundColor: theme.primaryColorDark,
             leading: IconButton(
-              icon: Icon(Icons.menu, size: 30),
+              icon: Icon(Icons.menu, size: 28),
               onPressed: () {
                 _scaffoldKey.currentState.openDrawer();
               },
@@ -558,16 +564,14 @@ class _MyHomePageState extends State<MyHomePage> {
             pinned: true,
             snap: true,
             floating: true,
-            expandedHeight: 80.0,
             flexibleSpace: FlexibleSpaceBar(
               title: Text(
                 'Message',
-                style: TextStyle(color: theme.backgroundColor),
               ),
             ),
             actions: [
               IconButton(
-                  icon: Icon(Icons.menu),
+                  icon: Icon(Icons.more_vert_outlined),
                   onPressed: () {
                     showPopupWindow(
                       context,

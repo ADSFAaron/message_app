@@ -1,16 +1,15 @@
 import 'dart:io';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_storage/firebase_storage.dart';
+import 'package:firebase_storage/firebase_storage.dart' as firebase_storage;
 import 'package:flex_color_scheme/flex_color_scheme.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_easyloading/flutter_easyloading.dart';
-import 'package:message_app/page/chat/chatSetting.dart';
-import 'package:message_app/page/setting.dart';
-import 'package:timeago/timeago.dart' as timeago;
 import 'package:image_picker/image_picker.dart';
-import 'package:path_provider/path_provider.dart';
-import 'package:firebase_storage/firebase_storage.dart' as firebase_storage;
+import 'package:message_app/page/chat/chatSetting.dart';
+import 'package:timeago/timeago.dart' as timeago;
 
 //TODO
 //TODO 建 subDocument
@@ -22,11 +21,16 @@ class ChatPage extends StatefulWidget {
 
   final DocumentSnapshot user;
 
-  ChatPage({Key key, @required this.user,@required this.roomId, @required this.roomName,@required this.photoURL})
+  ChatPage(
+      {Key key,
+      @required this.user,
+      @required this.roomId,
+      @required this.roomName,
+      @required this.photoURL})
       : super(key: key);
 
   @override
-  _ChatPage createState() => _ChatPage(roomId, roomName,photoURL,user);
+  _ChatPage createState() => _ChatPage(roomId, roomName, photoURL, user);
 }
 
 class _ChatPage extends State<ChatPage> {
@@ -37,17 +41,17 @@ class _ChatPage extends State<ChatPage> {
 
   DocumentSnapshot user;
 
-  _ChatPage(String _roomId, String _roomName,String _url,DocumentSnapshot _data) {
+  _ChatPage(
+      String _roomId, String _roomName, String _url, DocumentSnapshot _data) {
     roomID = _roomId;
     roomName = _roomName;
-    photoURL= _url;
+    photoURL = _url;
     user = _data;
   }
 
   void initState() {
     super.initState();
     auth = FirebaseAuth.instance;
-
   }
 
   final TextEditingController _chatController = TextEditingController();
@@ -59,7 +63,6 @@ class _ChatPage extends State<ChatPage> {
     // print(pickedFile.runtimeType);
 
     try {
-
       EasyLoading.show(status: 'loading...');
       TaskSnapshot snapshot = await firebase_storage.FirebaseStorage.instance
           .ref('message/image/' + name)
@@ -139,16 +142,24 @@ class _ChatPage extends State<ChatPage> {
           actions: [
             IconButton(
                 icon: Icon(Icons.settings),
-                onPressed: () async{
+                onPressed: () async {
                   await Navigator.of(context)
-                        .push(MaterialPageRoute(builder: (context) {
-                      return ChatSetting(roomName: roomName,docId: roomID,photoURL: photoURL,member: [],);
-                    }));
-                DocumentSnapshot data = await FirebaseFirestore.instance.collection('chatRoom').doc(roomID).get();
-                setState(() {
-                  roomName = data.data()['roomName'];
-                  photoURL = data.data()['phototURL'];
-                });
+                      .push(MaterialPageRoute(builder: (context) {
+                    return ChatSetting(
+                      roomName: roomName,
+                      docId: roomID,
+                      photoURL: photoURL,
+                      member: [],
+                    );
+                  }));
+                  DocumentSnapshot data = await FirebaseFirestore.instance
+                      .collection('chatRoom')
+                      .doc(roomID)
+                      .get();
+                  setState(() {
+                    roomName = data.data()['roomName'];
+                    photoURL = data.data()['phototURL'];
+                  });
                 })
           ],
         ),

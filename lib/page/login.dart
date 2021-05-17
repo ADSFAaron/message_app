@@ -1,13 +1,14 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'register.dart';
-import 'package:flutter_signin_button/flutter_signin_button.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 
+import 'register.dart';
+
 class LoginPage extends StatefulWidget {
-  LoginPage({Key key,@required this.loginChange}) : super(key: key);
+  LoginPage({Key key, @required this.loginChange}) : super(key: key);
   final ValueChanged<bool> loginChange;
+
   @override
   _LoginPage createState() => _LoginPage(loginChange: loginChange);
 }
@@ -15,6 +16,7 @@ class LoginPage extends StatefulWidget {
 //TODO 回傳登入資訊
 class _LoginPage extends State<LoginPage> {
   _LoginPage({this.loginChange});
+
   // Initially password is obscure
   bool _obscureText = true;
   IconData _iconForPassword = Icons.visibility_off;
@@ -106,18 +108,25 @@ class _LoginPage extends State<LoginPage> {
         child: Column(
           children: <Widget>[
             Container(
-              padding: EdgeInsets.symmetric(horizontal: 24.0),//, vertical: 3.0),
+              padding: EdgeInsets.symmetric(horizontal: 24.0),
+              //, vertical: 3.0),
               child: TextField(
-                style: TextStyle(color:Colors.white),
+                style: TextStyle(color: Colors.white),
                 controller: accountController,
                 decoration: InputDecoration(
-                  labelStyle: TextStyle(color:Colors.grey),
-                  helperStyle: TextStyle(color:Colors.grey),
-                  border: UnderlineInputBorder(borderSide: BorderSide(color: Colors.red)),
-                  focusedBorder: UnderlineInputBorder(borderSide: BorderSide(color: Colors.white)),
-                  enabledBorder: UnderlineInputBorder(borderSide: BorderSide(color: Colors.white)),
-                 // fillColor: Colors.white,
-                  prefixIcon: Icon(Icons.person,color: Colors.white,),
+                  labelStyle: TextStyle(color: Colors.grey),
+                  helperStyle: TextStyle(color: Colors.grey),
+                  border: UnderlineInputBorder(
+                      borderSide: BorderSide(color: Colors.red)),
+                  focusedBorder: UnderlineInputBorder(
+                      borderSide: BorderSide(color: Colors.white)),
+                  enabledBorder: UnderlineInputBorder(
+                      borderSide: BorderSide(color: Colors.white)),
+                  // fillColor: Colors.white,
+                  prefixIcon: Icon(
+                    Icons.person,
+                    color: Colors.white,
+                  ),
                   labelText: "帳號",
                   helperText: "請輸入帳號",
                   // hintText: "使用者帳號",
@@ -126,20 +135,27 @@ class _LoginPage extends State<LoginPage> {
               ),
             ),
             Container(
-              padding: EdgeInsets.symmetric(horizontal: 24.0),//, vertical: 3.0),
+              padding: EdgeInsets.symmetric(horizontal: 24.0),
+              //, vertical: 3.0),
               child: TextField(
-                style: TextStyle(color:Colors.white),
+                style: TextStyle(color: Colors.white),
                 controller: passwordController,
                 obscureText: _obscureText,
                 decoration: InputDecoration(
-                  border: UnderlineInputBorder(borderSide: BorderSide(color: Colors.red)),
-                  focusedBorder: UnderlineInputBorder(borderSide: BorderSide(color: Colors.white)),
-                  enabledBorder: UnderlineInputBorder(borderSide: BorderSide(color: Colors.white)),
-                 // fillColor: Colors.white,
+                  border: UnderlineInputBorder(
+                      borderSide: BorderSide(color: Colors.red)),
+                  focusedBorder: UnderlineInputBorder(
+                      borderSide: BorderSide(color: Colors.white)),
+                  enabledBorder: UnderlineInputBorder(
+                      borderSide: BorderSide(color: Colors.white)),
+                  // fillColor: Colors.white,
                   errorText: errorPasswordText,
-                  prefixIcon: Icon(Icons.lock,color: Colors.white,),
+                  prefixIcon: Icon(
+                    Icons.lock,
+                    color: Colors.white,
+                  ),
                   suffixIcon: IconButton(
-                      icon: Icon(_iconForPassword,color:Colors.white),
+                      icon: Icon(_iconForPassword, color: Colors.white),
                       onPressed: () {
                         setState(() {
                           _obscureText = !_obscureText;
@@ -150,8 +166,8 @@ class _LoginPage extends State<LoginPage> {
                         });
                       }),
                   //remove_red_eye)
-                  labelStyle: TextStyle(color:Colors.grey),
-                  helperStyle: TextStyle(color:Colors.grey),
+                  labelStyle: TextStyle(color: Colors.grey),
+                  helperStyle: TextStyle(color: Colors.grey),
                   labelText: "密碼",
                   helperText: "請輸入密碼，嘗試登入一次",
                   // hintText: "使用者密碼",
@@ -163,7 +179,8 @@ class _LoginPage extends State<LoginPage> {
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 ElevatedButton(
-                  style: ElevatedButton.styleFrom(primary: Colors.white,onPrimary: Colors.black),
+                  style: ElevatedButton.styleFrom(
+                      primary: Colors.white, onPrimary: Colors.black),
                   child: Text("註冊帳號"),
                   onPressed: () {
                     Navigator.of(context).push(PageRouteBuilder(
@@ -186,8 +203,10 @@ class _LoginPage extends State<LoginPage> {
                     ));
                   },
                 ),
-                VerticalDivider(), ElevatedButton(
-                  style: ElevatedButton.styleFrom(primary: Colors.white,onPrimary: Colors.black),
+                VerticalDivider(),
+                ElevatedButton(
+                  style: ElevatedButton.styleFrom(
+                      primary: Colors.white, onPrimary: Colors.black),
                   child: Text("登入"),
                   onPressed: () {
                     _loginButton(

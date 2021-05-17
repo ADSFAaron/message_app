@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../all_shared_imports.dart';
+
 // It is not necessary to review or understand the code in this file in order
 // to understand how to use the FlexColorScheme package demonstrated in
 // the examples.

@@ -45,6 +45,7 @@ dependencies:
   flex_color_scheme: ^2.1.1
   url_launcher: ^6.0.3
   flutter_svg: ^0.22.0
+  flutter_swiper: ^1.1.6
 
 dev_dependencies:
   flutter_test:

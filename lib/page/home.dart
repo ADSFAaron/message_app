@@ -171,7 +171,7 @@ class _MyHomePageState extends State<MyHomePage> {
                 ),
                 ListTile(
                   title: Text("Logout"),
-                  leading: Icon(Icons.logout_outlined),
+                  leading: Icon(Icons.login_outlined),
                   onTap: () {
                     showDialog(
                       context: context,

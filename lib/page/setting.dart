@@ -9,6 +9,7 @@ import 'package:flex_color_scheme/flex_color_scheme.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:flutter_svg/svg.dart';
+import 'package:flutter_swiper/flutter_swiper.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:message_app/page/person.dart';
@@ -147,7 +148,8 @@ class SettingPage extends StatelessWidget {
               onTap: () => Navigator.of(context).push(PageRouteBuilder(
                 pageBuilder: (context, animation, secondaryAnimation) =>
                     PersonSettingPage(
-                        backGroundURL: backGroundURL, userPhotoURL: userPhotoURL),
+                        backGroundURL: backGroundURL,
+                        userPhotoURL: userPhotoURL),
                 transitionsBuilder:
                     (context, animation, secondaryAnimation, child) {
                   var begin = Offset(0.0, 1.0);
@@ -521,6 +523,20 @@ class ThemePage extends StatelessWidget {
     final double width = MediaQuery.of(context).size.width;
     final double height = MediaQuery.of(context).size.height;
     final PageController previewController = PageController(initialPage: 0);
+    List<Widget> lis = <Widget>[
+      Padding(
+        padding: const EdgeInsets.fromLTRB(16.0, 0.0, 16.0, 0.0),
+        child: previewSVGChatRoom(theme),
+      ),
+      Padding(
+        padding: const EdgeInsets.fromLTRB(16.0, 0.0, 16.0, 0.0),
+        child: previewSVGChatPage(theme),
+      ),
+      Padding(
+        padding: const EdgeInsets.fromLTRB(16.0, 0.0, 16.0, 0.0),
+        child: previewSVGHomePage(theme),
+      ),
+    ];
 
     return Row(
       children: <Widget>[
@@ -594,26 +610,16 @@ class ThemePage extends StatelessWidget {
                   ),
                   Container(
                     height: height / 3 * 2,
-                    child: PageView(
-                        controller: previewController,
-                        scrollDirection: Axis.horizontal,
-                        children: [
-                          Padding(
-                            padding:
-                                const EdgeInsets.fromLTRB(16.0, 0.0, 16.0, 0.0),
-                            child: previewSVGChatRoom(theme),
-                          ),
-                          Padding(
-                            padding:
-                                const EdgeInsets.fromLTRB(16.0, 0.0, 16.0, 0.0),
-                            child: previewSVGChatPage(theme),
-                          ),
-                          Padding(
-                            padding:
-                                const EdgeInsets.fromLTRB(16.0, 0.0, 16.0, 0.0),
-                            child: previewSVGHomePage(theme),
-                          ),
-                        ]),
+                    alignment: Alignment.center,
+                    child: Swiper(
+                      // autoplay: true,
+                      itemCount: 3,
+                      itemBuilder: (BuildContext context, int index) {
+                        return lis.elementAt(index);
+                      },
+                      itemWidth: 300.0,
+                      layout: SwiperLayout.STACK,
+                    ),
                   ),
                 ],
               ),

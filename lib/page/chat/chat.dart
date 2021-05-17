@@ -265,8 +265,8 @@ class MessageBox extends StatelessWidget {
           decoration: BoxDecoration(
             borderRadius: BorderRadius.circular(10),
             color: other
-                ? theme.secondaryHeaderColor
-                : theme.colorScheme.secondary,
+                ?
+                 theme.colorScheme.secondary : theme.secondaryHeaderColor,
           ),
           padding: EdgeInsets.all(10.0),
           child: Text(text,

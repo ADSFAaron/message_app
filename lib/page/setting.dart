@@ -1,4 +1,5 @@
 import 'dart:io';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
@@ -12,6 +13,7 @@ import 'package:flutter_swiper/flutter_swiper.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:message_app/page/person.dart';
+
 import '../all_shared_imports.dart';
 
 // Create a custom flex scheme color for a light theme.
@@ -632,226 +634,32 @@ class ThemePage extends StatelessWidget {
   // Theme Page Theme Preview SVG (不直接使用 SVG 因為 flutter 無法對 svg element 修改)
   // <defs> 對 SVG 檔案定義變數
   Widget previewSVGChatPage(ThemeData theme) {
-    return SvgPicture.string(''' 
-        <svg height="667" viewBox="0 0 375 667" width="375" xmlns="http://www.w3.org/2000/svg">
+    return SvgPicture.string('''
+      <svg height="667" viewBox="0 0 375 667" width="375" xmlns="http://www.w3.org/2000/svg">
   <defs>
-    <filter filterUnits="userSpaceOnUse" height="71" id="Rectangle" width="390" x="-7.5" y="608.5">
-      <feOffset dy="5" input="SourceAlpha" />
-      <feGaussianBlur result="blur" stdDeviation="2.5" />
-      <feFlood flood-opacity="0.2" />
-      <feComposite in2="blur" operator="in" />
-      <feComposite in="SourceGraphic" />
-    </filter>
-    <filter filterUnits="userSpaceOnUse" height="98" id="Rectangle-2" width="417" x="-21" y="593">
-      <feOffset dy="3" input="SourceAlpha" />
-      <feGaussianBlur result="blur-2" stdDeviation="7" />
-      <feFlood flood-opacity="0.122" />
-      <feComposite in2="blur-2" operator="in" />
-      <feComposite in="SourceGraphic" />
-    </filter>
-    <filter filterUnits="userSpaceOnUse" height="86" id="Rectangle-3" width="405" x="-15" y="604">
-      <feOffset dy="8" input="SourceAlpha" />
-      <feGaussianBlur result="blur-3" stdDeviation="5" />
-      <feFlood flood-opacity="0.141" />
-      <feComposite in2="blur-3" operator="in" />
-      <feComposite in="SourceGraphic" />
-    </filter>
-    <filter filterUnits="userSpaceOnUse" height="65" id="Rectangle_8" width="65" x="288.5" y="20.5">
-      <feOffset dy="1" input="SourceAlpha" />
-      <feGaussianBlur result="blur-4" stdDeviation="1.5" />
-      <feFlood flood-opacity="0.161" />
-      <feComposite in2="blur-4" operator="in" />
-      <feComposite in="SourceGraphic" />
-    </filter>
-    <filter filterUnits="userSpaceOnUse" height="65" id="Rectangle_8-2" width="65" x="218.5"
-        y="20.5">
-      <feOffset dy="1" input="SourceAlpha" />
-      <feGaussianBlur result="blur-5" stdDeviation="1.5" />
-      <feFlood flood-opacity="0.161" />
-      <feComposite in2="blur-5" operator="in" />
-      <feComposite in="SourceGraphic" />
-    </filter>
-    <filter filterUnits="userSpaceOnUse" height="74" id="Ellipse_1" width="74" x="11" y="18">
-      <feOffset dy="3" input="SourceAlpha" />
-      <feGaussianBlur result="blur-6" stdDeviation="3" />
-      <feFlood flood-color="#8f8f8f" flood-opacity="0.161" />
-      <feComposite in2="blur-6" operator="in" />
-      <feComposite in="SourceGraphic" />
-    </filter>
-    <clipPath id="clip-ChatPage">
+    <clipPath id="clip-ChatPage_1">
       <rect height="667" width="375" />
     </clipPath>
   </defs>
-  <g clip-path="url(#clip-ChatPage)" id="ChatPage">
+  <g clip-path="url(#clip-ChatPage_1)" data-name="ChatPage – 1" id="ChatPage_1">
     <rect fill="#''' +
-        theme.colorScheme.background.hexCode +
+        theme.backgroundColor.hexCode +
         '''" height="667" width="375" />
-    <g data-name="Light 🌕/ Bottom Nav/1. Three up (3 States)"
-        id="Light_Bottom_Nav_1._Three_up_3_States_" transform="translate(0 611)">
-      <g data-name="Light 🌕/ Bottom Nav/Container" id="Light_Bottom_Nav_Container">
-        <g data-name="Light 🌕/Elevation/00dp" id="Light_Elevation_00dp">
-          <g id="Shadow">
-            <g style="mix-blend-mode: multiply;isolation: isolate" filter="url(#Rectangle)"
-                transform="matrix(1, 0, 0, 1, 0, -611)">
-              <rect data-name="Rectangle" fill="#fff" height="56" id="Rectangle-4"
-                  transform="translate(0 611)" width="375" />
-            </g>
-            <g style="mix-blend-mode: multiply;isolation: isolate" filter="url(#Rectangle-2)"
-                transform="matrix(1, 0, 0, 1, 0, -611)">
-              <rect data-name="Rectangle" fill="#fff" height="56" id="Rectangle-5"
-                  transform="translate(0 611)" width="375" />
-            </g>
-            <g style="mix-blend-mode: multiply;isolation: isolate" filter="url(#Rectangle-3)"
-                transform="matrix(1, 0, 0, 1, 0, -611)">
-              <rect data-name="Rectangle" fill="#fff" height="56" id="Rectangle-6"
-                  transform="translate(0 611)" width="375" />
-            </g>
-          </g>
-        </g>
-        <rect fill="#''' +
-        theme.bottomAppBarColor.hexCode +
-        '''" height="56" id="Primary" width="375" />
-      </g>
-      <g data-name="Light 🌕/ Bottom Nav/Tab on Primary" id="Light_Bottom_Nav_Tab_on_Primary"
-          transform="translate(68)">
-        <g data-name="Light 🌕/Elevation/00dp" id="Light_Elevation_00dp-2">
-          <rect style="mix-blend-mode: multiply;isolation: isolate" data-name="Rectangle"
-              fill="#fff" height="56" id="Rectangle-7" width="120" />
-        </g>
-        <text data-name="✏️ Caption" fill="#b8b8b8" font-family="SegoeUI, Segoe UI" font-size="12"
-            id="_Caption" letter-spacing="0.033em" transform="translate(60 45)">
-          <tspan x="-20.281" y="0">Friends</tspan>
-        </text>
-      </g>
-      <g data-name="Light 🌕/ Bottom Nav/Tab on Primary" id="Light_Bottom_Nav_Tab_on_Primary-2"
-          transform="translate(188)">
-        <g data-name="Light 🌕/Elevation/00dp" id="Light_Elevation_00dp-3">
-          <rect style="mix-blend-mode: multiply;isolation: isolate" data-name="Rectangle"
-              fill="#fff" height="56" id="Rectangle-8" width="120" />
-        </g>
-        <text data-name="✏️ Caption" fill="#''' +
-        theme.primaryColor.hexCode +
-        '''" font-family="SegoeUI, Segoe UI"
-            font-size="12" id="_Caption-2" letter-spacing="0.033em" transform="translate(60 45)">
-          <tspan x="-12.796" y="0">Chat</tspan>
-        </text>
-        <g id="chat" transform="translate(45.694 8)">
-          <g data-name="Group 220" id="Group_220" transform="translate(3.366)">
-            <g data-name="Group 219" id="Group_219" transform="translate(0)">
-              <path
-                  d="M14.859,0c-.006.006-.019.006-.037.006A11.43,11.43,0,0,0,5.857,18.56L4.19,22.43a.621.621,0,0,0,.325.818.635.635,0,0,0,.356.044l6.112-1.074a11.014,11.014,0,0,0,3.808.662A11.44,11.44,0,0,0,14.859,0ZM14.8,21.637a10.021,10.021,0,0,1-3.527-.643.6.6,0,0,0-.331-.031l-5.144.9L7.155,18.7a.628.628,0,0,0-.1-.655A9.98,9.98,0,0,1,5.32,15.157,10.193,10.193,0,1,1,25,11.387v.037A10.22,10.22,0,0,1,14.8,21.637Z"
-                  data-name="Path 2863" fill="#''' +
-        theme.primaryColor.hexCode +
-        '''" id="Path_2863"
-                  transform="translate(-3.366)" />
-            </g>
-          </g>
-          <g data-name="Group 222" id="Group_222" transform="translate(10.314 9.158)">
-            <g data-name="Group 221" id="Group_221">
-              <path d="M118.661,146.7H115.29a.624.624,0,1,0,0,1.249h3.371a.624.624,0,1,0,0-1.249Z"
-                  data-name="Path 2864" fill="#''' +
-        theme.primaryColor.hexCode +
-        '''" id="Path_2864"
-                  transform="translate(-114.666 -146.7)" />
-            </g>
-          </g>
-          <g data-name="Group 224" id="Group_224" transform="translate(10.314 12.28)">
-            <g data-name="Group 223" id="Group_223">
-              <path d="M123.031,196.7H115.29a.624.624,0,1,0,0,1.249h7.741a.624.624,0,1,0,0-1.249Z"
-                  data-name="Path 2865" fill="#''' +
-        theme.primaryColor.hexCode +
-        '''" id="Path_2865"
-                  transform="translate(-114.666 -196.7)" />
-            </g>
-          </g>
-        </g>
-      </g>
-    </g>
-    <g data-name="Add Friend Button" id="Add_Friend_Button" transform="translate(273)">
-      <g filter="url(#Rectangle_8)" transform="matrix(1, 0, 0, 1, -273, 0)">
-        <rect data-name="Rectangle 8" fill="#''' +
-        theme.scaffoldBackgroundColor.hexCode +
-        '''" height="56" id="Rectangle_8-3" rx="28"
-            transform="translate(293 24)" width="56" />
-      </g>
-      <g id="outline-person_add-24px" transform="translate(36 40)">
-        <g id="Bounding_Boxes">
-          <path d="M0,0H24V24H0Z" data-name="Path 3495" fill="none" id="Path_3495" />
-        </g>
-        <g id="Outline">
-          <g data-name="Group 390" id="Group_390">
-            <path
-                d="M15,12a4,4,0,1,0-4-4A4,4,0,0,0,15,12Zm0-6a2,2,0,1,1-2,2A2.006,2.006,0,0,1,15,6Z"
-                data-name="Path 3496" fill="#b8b8b8" id="Path_3496" />
-            <path
-                d="M15,14c-2.67,0-8,1.34-8,4v2H23V18C23,15.34,17.67,14,15,14ZM9,18c.22-.72,3.31-2,6-2s5.8,1.29,6,2Z"
-                data-name="Path 3497" fill="#b8b8b8" id="Path_3497" />
-            <path d="M6,15V12H9V10H6V7H4v3H1v2H4v3Z" data-name="Path 3498" fill="#b8b8b8"
-                id="Path_3498" />
-          </g>
-        </g>
-      </g>
-    </g>
-    <g data-name="Delete Button" id="Delete_Button" transform="translate(203)">
-      <g filter="url(#Rectangle_8-2)" transform="matrix(1, 0, 0, 1, -203, 0)">
-        <rect data-name="Rectangle 8" fill="#''' +
-        theme.scaffoldBackgroundColor.hexCode +
-        '''" height="56" id="Rectangle_8-4" rx="28"
-            transform="translate(223 24)" width="56" />
-      </g>
-      <g id="outline-delete_sweep-24px" transform="translate(36 40)">
-        <g data-name="Bounding_Boxes" id="Bounding_Boxes-2">
-          <path d="M0,0H24V24H0Z" data-name="Path 2784" fill="none" id="Path_2784" />
-        </g>
-        <g data-name="Outline" id="Outline-2">
-          <g data-name="Group 198" id="Group_198">
-            <rect data-name="Rectangle 125" fill="#''' +
-        theme.primaryColor.hexCode +
-        '''" height="2" id="Rectangle_125"
-                transform="translate(15 16)" width="4" />
-            <rect data-name="Rectangle 126" fill="#b8b8b8" height="2" id="Rectangle_126"
-                transform="translate(15 8)" width="7" />
-            <rect data-name="Rectangle 127" fill="#b8b8b8" height="2" id="Rectangle_127"
-                transform="translate(15 12)" width="6" />
-            <path d="M3,18a2.006,2.006,0,0,0,2,2h6a2.006,2.006,0,0,0,2-2V8H3Zm2-8h6v8H5Z"
-                data-name="Path 2785" fill="#b8b8b8" id="Path_2785" />
-            <path d="M10,4H6L5,5H2V7H14V5H11Z" data-name="Path 2786" fill="#b8b8b8"
-                id="Path_2786" />
-          </g>
-        </g>
-      </g>
-    </g>
-    <g data-name="Menu Button" id="Menu_Button">
-      <g filter="url(#Ellipse_1)" transform="matrix(1, 0, 0, 1, 0, 0)">
-        <circle cx="28" cy="28" data-name="Ellipse 1" fill="#''' +
-        theme.scaffoldBackgroundColor.hexCode +
-        '''" id="Ellipse_1-2" r="28"
-            transform="translate(20 24)" />
-      </g>
-      <g id="baseline-menu-24px" transform="translate(34.402 38.402)">
-        <path d="M0,0H28V28H0Z" data-name="Path 2012" fill="none" id="Path_2012" />
-        <path d="M3,21.6H23.2V19H3Zm0-6.5H23.2V12.5H3ZM3,6V8.6H23.2V6Z" data-name="Path 2013"
-            fill="#898888" id="Path_2013" transform="translate(0.899 0.201)" />
-      </g>
-    </g>
-    <path
-        d="M26.362,14.4a7.331,7.331,0,0,0-4.212-5.513,4.581,4.581,0,0,0,1.562-3.471,4.4,4.4,0,0,0-4.278-4.5,4.4,4.4,0,0,0-4.278,4.5,4.581,4.581,0,0,0,1.563,3.473,6.909,6.909,0,0,0-1.03.562A7.246,7.246,0,0,0,13.6,11.569a8.693,8.693,0,0,0-1.784-.942,5.664,5.664,0,0,0,2.24-4.55A5.45,5.45,0,0,0,8.758.5a5.45,5.45,0,0,0-5.3,5.576,5.664,5.664,0,0,0,2.24,4.55,9.212,9.212,0,0,0-5.667,7.1,2.157,2.157,0,0,0,.446,1.725,1.986,1.986,0,0,0,1.544.748H15.5a1.986,1.986,0,0,0,1.544-.748,2.157,2.157,0,0,0,.446-1.725,9.8,9.8,0,0,0-.285-1.2H24.65a1.71,1.71,0,0,0,1.329-.643,1.854,1.854,0,0,0,.383-1.483ZM16.7,5.413a2.737,2.737,0,1,1,5.464,0,2.737,2.737,0,1,1-5.464,0ZM5,6.077A3.876,3.876,0,0,1,8.758,2.1a3.877,3.877,0,0,1,3.755,3.979,3.877,3.877,0,0,1-3.755,3.979A3.876,3.876,0,0,1,5,6.077ZM15.855,18.423a.46.46,0,0,1-.358.176H2.02a.46.46,0,0,1-.358-.176A.52.52,0,0,1,1.553,18a7.44,7.44,0,0,1,7.205-6.35A7.44,7.44,0,0,1,15.963,18a.519.519,0,0,1-.109.42Zm8.939-3.569a.186.186,0,0,1-.144.072h-8.1a9.27,9.27,0,0,0-1.734-2.357,5.4,5.4,0,0,1,4.617-2.66,5.583,5.583,0,0,1,5.406,4.767.219.219,0,0,1-.046.178Zm0,0"
-        fill="#b8b8b8" id="friends" transform="translate(114.002 620.512)" />
-    <g data-name="Friend Chat-1" id="Friend_Chat-1" transform="translate(2 5)">
-      <g data-name="Rectangle 10" fill="#''' +
+        <path id="connectdevelop-brands" d="M268.126,122.639l-23.74-41.133a7.627,7.627,0,0,0,.889-3.428,7.242,7.242,0,0,0-6.982-7.11L212.013,25.52a7.408,7.408,0,0,0,.508-2.285,7.22,7.22,0,0,0-12.822-4.57H149.172a6.922,6.922,0,0,0-10.918,0H87.981a7.22,7.22,0,0,0-12.822,4.57,6.676,6.676,0,0,0,.508,2.285L49.133,71.6a7.1,7.1,0,0,0-4.316,6.475c0,.254.127.508.127.762L19.68,122.513a7.222,7.222,0,0,0-5.967,7.109,7.33,7.33,0,0,0,5.713,7.109l26.152,45.2a6.635,6.635,0,0,0-.381,2.285,7.086,7.086,0,0,0,5.713,6.982l24.5,42.529a8.2,8.2,0,0,0-.508,2.539,7.233,7.233,0,0,0,7.236,7.236,7.01,7.01,0,0,0,5.459-2.539h50.654a7.138,7.138,0,0,0,10.918,0h50.781a7.091,7.091,0,0,0,5.2,2.285,7.233,7.233,0,0,0,7.236-7.236,5.258,5.258,0,0,0-.381-2.031l24.5-42.783a7.086,7.086,0,0,0,5.713-6.982,7.184,7.184,0,0,0-.381-2.285l26.025-45.2a7.232,7.232,0,0,0,5.84-7.109A7.1,7.1,0,0,0,268.126,122.639Zm-188.144,99.4L59.289,186.116H79.982Zm0-39.736H59.289a7.8,7.8,0,0,0-.635-1.523l21.328-22.47Zm0-29.58L56.115,177.991a11.863,11.863,0,0,0-1.9-.762l-26.405-45.7a4.941,4.941,0,0,0,.254-1.9,6.7,6.7,0,0,0-.127-1.65L52.561,85.315a8,8,0,0,0,3.682-1.27l23.74,24.629v44.052Zm0-48.5L58.274,81.761a6.941,6.941,0,0,0,1.016-3.681c0-.127-.127-.381-.127-.508l20.82-7.49Zm0-38.213-20.693,7.49,20.693-35.8ZM234.738,84.554l.381.635-16.758,79.218-30.215-31.865,46.465-48.115ZM145.49,176.721l5.459,5.586H140.158Zm-.127-5.332-39.482-40.5,37.7-39.99,39.355,41.513Zm2.539,2.793,37.578-38.974,31.992,33.769-2.793,13.33H155.9ZM201.73,29.456a6.367,6.367,0,0,0,1.65.635L230.8,77.826v.254a6.937,6.937,0,0,0,1.016,3.681l-46.211,47.988L146.252,88.235Zm-4.316-1.016-53.828,57L116.545,56.878l78.837-28.437h2.032Zm-58.525,0a6.746,6.746,0,0,0,9.649,0h35.547l-70.332,25.39L89.631,28.441Zm-55.1,2.666.508-1.015q.642-.164,1.27-.381l24.248,25.518L83.792,64.623Zm0,37.578,28.818-10.41,28.31,29.961-37.7,39.863L83.792,108.167Zm0,43.925,17.265,17.9L83.792,148.665V112.61Zm0,41.641,19.931-21.074,39.228,40.752-8.125,8.379H83.792Zm3.3,76.806a6.818,6.818,0,0,0-2.793-1.65l-.508-.762V186.116h47.353L87.727,231.057Zm61.572,0a7.051,7.051,0,0,0-9.9,0h-45.7l43.418-44.941H154.63l43.418,44.941H148.664Zm56.875-5.586-2.031,3.555a6.381,6.381,0,0,0-1.65.635l-42.275-43.545h54.209l-8.253,39.355Zm6.093-10.537,6.094-28.818h10.41Zm16.5-32.627h-9.648l2.158-10.029,8.125,8.633a4.7,4.7,0,0,0-.635,1.4ZM259.493,131.4l-26.279,45.83a12.8,12.8,0,0,0-1.9.888l-9.775-10.41,16.377-77.695,21.709,37.578a9.646,9.646,0,0,0-.381,2.031A8.57,8.57,0,0,0,259.493,131.4Z" transform="translate(44.287 204.001)" fill="#''' +
+        theme.primaryColorDark.hexCode +
+        '''"/>
+    <g data-name="Friend Chat-1" id="Friend_Chat-1" transform="translate(-17 -31)">
+      <rect data-name="Rectangle 10" fill="#''' +
         theme.cardColor.hexCode +
-        '''" id="Rectangle_10" stroke="#e6e6e6" stroke-width="2"
-          transform="translate(17 99)">
-        <rect height="79" rx="10" stroke="none" width="338" />
-        <rect fill="none" height="77" rx="9" width="336" x="1" y="1" />
-      </g>
-      <text fill="#''' +
+        '''" height="79" id="Rectangle_10"
+          transform="translate(17 99)" width="375" />
+      <text data-name="Jeff / 打球群" font-family="SegoeUI, Segoe UI" font-size="21" id="Jeff_打球群"
+          letter-spacing="0.033em" transform="translate(177 148)" fill="#''' +
         theme.colorScheme.onBackground.hexCode +
-        '''" font-family="SegoeUI, Segoe UI" font-size="21" id="Jeff"
-          letter-spacing="0.033em" transform="translate(148 148)">
-        <tspan x="-16.862" y="0">Jeff / 打球</tspan>
+        '''">
+        <tspan x="-60.305" y="0">Jeff / 打球群</tspan>
       </text>
-      <g data-name="jeff" id="jeff-2" transform="translate(42 114)">
+      <g id="jeff" transform="translate(42 114)">
         <circle cx="25" cy="25" data-name="Ellipse 3" fill="#0d8abc" id="Ellipse_3" r="25" />
         <text fill="#fff" font-family="SegoeUI, Segoe UI" font-size="22" id="JE"
             transform="translate(25 34)">
@@ -859,21 +667,18 @@ class ThemePage extends StatelessWidget {
         </text>
       </g>
     </g>
-    <g data-name="Friend Chat-2" id="Friend_Chat-2" transform="translate(2 92)">
-      <g data-name="Rectangle 10" fill="#''' +
+    <g data-name="Friend Chat-2" id="Friend_Chat-2" transform="translate(-17 48)">
+      <rect data-name="Rectangle 10" fill="#''' +
         theme.cardColor.hexCode +
-        '''" id="Rectangle_10-2" stroke="#e6e6e6" stroke-width="2"
-          transform="translate(17 99)">
-        <rect height="79" rx="10" stroke="none" width="338" />
-        <rect fill="none" height="77" rx="9" width="336" x="1" y="1" />
-      </g>
-      <text data-name="Jeff" fill="#''' +
+        '''" height="79" id="Rectangle_10-2"
+          transform="translate(17 99)" width="375" />
+      <text data-name="Jeff / 古蹟文化交流" font-family="SegoeUI, Segoe UI" font-size="21" id="Jeff_古蹟文化交流"
+          letter-spacing="0.033em" transform="translate(210 148)" fill="#''' +
         theme.colorScheme.onBackground.hexCode +
-        '''" font-family="SegoeUI, Segoe UI" font-size="21"
-          id="Jeff-3" letter-spacing="0.033em" transform="translate(148 148)">
-        <tspan x="-16.862" y="0">Jeff / 古蹟文化交流</tspan>
+        '''">
+        <tspan x="-92.855" y="0">Jeff / 古蹟文化交流</tspan>
       </text>
-      <g data-name="jeff" id="jeff-4" transform="translate(42 114)">
+      <g data-name="jeff" id="jeff-2" transform="translate(42 114)">
         <circle cx="25" cy="25" data-name="Ellipse 3" fill="#0d8abc" id="Ellipse_3-2" r="25" />
         <text data-name="JE" fill="#fff" font-family="SegoeUI, Segoe UI" font-size="22" id="JE-2"
             transform="translate(25 34)">
@@ -881,21 +686,18 @@ class ThemePage extends StatelessWidget {
         </text>
       </g>
     </g>
-    <g data-name="Friend Chat-3" id="Friend_Chat-3" transform="translate(2 179)">
-      <g data-name="Rectangle 10" fill="#''' +
+    <g data-name="Friend Chat-3" id="Friend_Chat-3" transform="translate(-17 127)">
+      <rect data-name="Rectangle 10" fill="#''' +
         theme.cardColor.hexCode +
-        '''" id="Rectangle_10-3" stroke="#e6e6e6" stroke-width="2"
-          transform="translate(17 99)">
-        <rect height="79" rx="10" stroke="none" width="338" />
-        <rect fill="none" height="77" rx="9" width="336" x="1" y="1" />
-      </g>
-      <text fill="#''' +
+        '''" height="79" id="Rectangle_10-3"
+          transform="translate(17 99)" width="375" />
+      <text data-name="Zhon / o敏捷o" font-family="SegoeUI, Segoe UI" font-size="21" id="Zhon_o敏捷o"
+          letter-spacing="0.033em" transform="translate(188 148)" fill="#''' +
         theme.colorScheme.onBackground.hexCode +
-        '''" font-family="SegoeUI, Segoe UI" font-size="21" id="Zhon"
-          letter-spacing="0.033em" transform="translate(148 148)">
-        <tspan x="-25.075" y="0">Zhon / o敏捷o</tspan>
+        '''">
+        <tspan x="-70.673" y="0">Zhon / o 敏捷 o</tspan>
       </text>
-      <g data-name="zhon" id="zhon-2" transform="translate(42 114)">
+      <g id="zhon" transform="translate(42 114)">
         <circle cx="25" cy="25" data-name="Ellipse 2" fill="#b4f8c8" id="Ellipse_2" r="25" />
         <text font-family="SegoeUI, Segoe UI" font-size="22" id="ZH"
             transform="translate(25 33.741)">
@@ -903,425 +705,384 @@ class ThemePage extends StatelessWidget {
         </text>
       </g>
     </g>
+    <g id="AppBar">
+      <rect data-name="Rectangle 1" fill="#''' +
+        theme.primaryColor.hexCode +
+        '''" height="68" id="Rectangle_1" width="375" />
+      <text fill="#f2f2f7" font-family="SegoeUI, Segoe UI" font-size="26" id="Message"
+          transform="translate(68 43)">
+        <tspan x="0" y="0">Message</tspan>
+      </text>
+      <g id="baseline-menu-24px" transform="translate(22 20)">
+        <path d="M0,0H28V28H0Z" data-name="Path 2012" fill="none" id="Path_2012" />
+        <path d="M3,21.6H23.2V19H3Zm0-6.5H23.2V12.5H3ZM3,6V8.6H23.2V6Z" data-name="Path 2013"
+            fill="#f2f2f7"
+            id="Path_2013" transform="translate(0.899 0.201)" />
+      </g>
+      <g id="baseline-more_vert-24px" transform="translate(333 22)">
+        <path d="M0,0H24V24H0Z" data-name="Path 2016" fill="none" id="Path_2016" />
+        <path d="M12,8a2,2,0,1,0-2-2A2.006,2.006,0,0,0,12,8Zm0,2a2,2,0,1,0,2,2A2.006,2.006,0,0,0,12,10Zm0,6a2,2,0,1,0,2,2A2.006,2.006,0,0,0,12,16Z" data-name="Path 2017"
+            fill="#f2f2f7"
+            id="Path_2017" />
+      </g>
+    </g>
+    <g id="BottomNavBar">
+      <rect data-name="Rectangle 128" fill="#''' +
+        theme.primaryColorDark.hexCode +
+        '''" height="68" id="Rectangle_128"
+          transform="translate(0 599)" width="375" />
+      <circle cx="54" cy="54" data-name="Ellipse 5" fill="#''' +
+        theme.primaryColorDark.hexCode +
+        '''" id="Ellipse_5"
+          r="54" transform="translate(215 579)" />
+      <circle cx="39" cy="39" data-name="Ellipse 4" fill="#''' +
+        theme.backgroundColor.hexCode +
+        '''" id="Ellipse_4"
+          r="39" transform="translate(230 585)" />
+      <g id="baseline-message-24px" transform="translate(255 611)">
+        <path d="M4.4,2H23.6a2.4,2.4,0,0,1,2.388,2.4L26,26l-4.8-4.8H4.4A2.407,2.407,0,0,1,2,18.8V4.4A2.407,2.407,0,0,1,4.4,2ZM6.8,16.4H21.2V14H6.8Zm0-3.6H21.2V10.4H6.8Zm0-3.6H21.2V6.8H6.8Z" data-name="Path 853"
+            id="Path_853" fill="#''' +
+        theme.colorScheme.onBackground.hexCode +
+        '''"/>
+        <path d="M28,0H0V28H28Z" data-name="Path 854" fill="none" id="Path_854" />
+      </g>
+      <g id="baseline-home-24px" transform="translate(99 610)">
+        <path d="M11.6,24V16.588h4.8V24h6V14.118H26L14,3,2,14.118H5.6V24Z" data-name="Path 304"
+            id="Path_304" fill="#''' +
+        theme.colorScheme.onBackground.hexCode +
+        '''"/>
+        <path d="M0,0H28V28H0Z" data-name="Path 305" fill="none" id="Path_305" />
+      </g>
+      <text font-family="SegoeUI, Segoe UI" font-size="15" id="Home" letter-spacing="0.033em"
+          transform="translate(113 660)" fill="#''' +
+        theme.colorScheme.onBackground.hexCode +
+        '''">
+        <tspan x="-20.851" y="0">Home</tspan>
+      </text>
+    </g>
   </g>
 </svg>
 
-        ''');
+      
+      ''');
   }
 
   Widget previewSVGHomePage(ThemeData theme) {
-    return SvgPicture.string(''' 
-        <svg height="667" viewBox="0 0 375 667" width="375" xmlns="http://www.w3.org/2000/svg">
-    <defs>
-        <filter filterUnits="userSpaceOnUse" height="71" id="Rectangle" width="390" x="-7.5"
-            y="608.5">
-            <feOffset dy="5" input="SourceAlpha" />
-            <feGaussianBlur result="blur" stdDeviation="2.5" />
-            <feFlood flood-opacity="0.2" />
-            <feComposite in2="blur" operator="in" />
-            <feComposite in="SourceGraphic" />
-        </filter>
-        <filter filterUnits="userSpaceOnUse" height="98" id="Rectangle-2" width="417" x="-21"
-            y="593">
-            <feOffset dy="3" input="SourceAlpha" />
-            <feGaussianBlur result="blur-2" stdDeviation="7" />
-            <feFlood flood-opacity="0.122" />
-            <feComposite in2="blur-2" operator="in" />
-            <feComposite in="SourceGraphic" />
-        </filter>
-        <filter filterUnits="userSpaceOnUse" height="86" id="Rectangle-3" width="405" x="-15"
-            y="604">
-            <feOffset dy="8" input="SourceAlpha" />
-            <feGaussianBlur result="blur-3" stdDeviation="5" />
-            <feFlood flood-opacity="0.141" />
-            <feComposite in2="blur-3" operator="in" />
-            <feComposite in="SourceGraphic" />
-        </filter>
-        <filter filterUnits="userSpaceOnUse" height="65" id="Rectangle_8" width="148" x="205.5"
-            y="20.5">
-            <feOffset dy="1" input="SourceAlpha" />
-            <feGaussianBlur result="blur-4" stdDeviation="1.5" />
-            <feFlood flood-opacity="0.161" />
-            <feComposite in2="blur-4" operator="in" />
-            <feComposite in="SourceGraphic" />
-        </filter>
-        <filter filterUnits="userSpaceOnUse" height="74" id="Ellipse_1" width="74" x="11" y="18">
-            <feOffset dy="3" input="SourceAlpha" />
-            <feGaussianBlur result="blur-5" stdDeviation="3" />
-            <feFlood flood-color="#8f8f8f" flood-opacity="0.161" />
-            <feComposite in2="blur-5" operator="in" />
-            <feComposite in="SourceGraphic" />
-        </filter>
-        <clipPath id="clip-HomePage">
-            <rect height="667" width="375" />
-        </clipPath>
-    </defs>
-    <g clip-path="url(#clip-HomePage)" id="HomePage">
-        <rect fill="#''' +
+    return SvgPicture.string('''
+    
+    <svg xmlns="http://www.w3.org/2000/svg" width="375" height="667" viewBox="0 0 375 667">
+  <defs>
+    <clipPath id="clip-HomePage_1">
+      <rect width="375" height="667" />
+    </clipPath>
+  </defs>
+  <g id="HomePage_1" data-name="HomePage – 1" clip-path="url(#clip-HomePage_1)">
+    <rect width="375" height="667" fill="#''' +
         theme.backgroundColor.hexCode +
-        '''" height="667" width="375" />
-        <rect data-name="Rectangle 9" fill="#''' +
-        theme.cardColor.hexCode +
-        '''" height="568" id="Rectangle_9" rx="10"
-            transform="translate(17 99)" width="342" />
-        <g data-name="Light 🌕/ Bottom Nav/1. Three up (3 States)"
-            id="Light_Bottom_Nav_1._Three_up_3_States_" transform="translate(0 611)">
-            <g data-name="Light 🌕/ Bottom Nav/Container" id="Light_Bottom_Nav_Container">
-                <g data-name="Light 🌕/Elevation/00dp" id="Light_Elevation_00dp">
-                    <g id="Shadow">
-                        <g style="mix-blend-mode: multiply;isolation: isolate" filter="url(#Rectangle)"
-                            transform="matrix(1, 0, 0, 1, 0, -611)">
-                            <rect data-name="Rectangle" fill="#fff" height="56" id="Rectangle-4"
-                                transform="translate(0 611)" width="375" />
-                        </g>
-                        <g style="mix-blend-mode: multiply;isolation: isolate" filter="url(#Rectangle-2)"
-                            transform="matrix(1, 0, 0, 1, 0, -611)">
-                            <rect data-name="Rectangle" fill="#fff" height="56" id="Rectangle-5"
-                                transform="translate(0 611)" width="375" />
-                        </g>
-                        <g style="mix-blend-mode: multiply;isolation: isolate" filter="url(#Rectangle-3)"
-                            transform="matrix(1, 0, 0, 1, 0, -611)">
-                            <rect data-name="Rectangle" fill="#fff" height="56" id="Rectangle-6"
-                                transform="translate(0 611)" width="375" />
-                        </g>
-                    </g>
-                </g>
-                <rect fill="#''' +
-        theme.bottomAppBarColor.hexCode +
-        '''" height="56" id="Primary" width="375" />
-            </g>
-            <g data-name="Light 🌕/ Bottom Nav/Tab on Primary" id="Light_Bottom_Nav_Tab_on_Primary"
-                transform="translate(68)">
-                <g data-name="Light 🌕/Elevation/00dp" id="Light_Elevation_00dp-2">
-                    <rect style="mix-blend-mode: multiply;isolation: isolate" data-name="Rectangle" fill="#fff" height="56" id="Rectangle-7"
-                        width="120" />
-                </g>
-                <text data-name="✏️ Caption" fill="#''' +
-        theme.primaryColor.hexCode +
-        '''" font-family="SegoeUI, Segoe UI"
-                    font-size="12" id="_Caption" letter-spacing="0.033em"
-                    transform="translate(60 45)">
-                    <tspan x="-20.281" y="0">Friends</tspan>
-                </text>
-            </g>
-            <g data-name="Light 🌕/ Bottom Nav/Tab on Primary"
-                id="Light_Bottom_Nav_Tab_on_Primary-2" transform="translate(188)">
-                <g data-name="Light 🌕/Elevation/00dp" id="Light_Elevation_00dp-3">
-                    <rect style="mix-blend-mode: multiply;isolation: isolate" data-name="Rectangle" fill="#fff" height="56" id="Rectangle-8"
-                        width="120" />
-                </g>
-                <text data-name="✏️ Caption" fill="#b8b8b8" font-family="SegoeUI, Segoe UI"
-                    font-size="12" id="_Caption-2" letter-spacing="0.033em"
-                    transform="translate(60 45)">
-                    <tspan x="-12.796" y="0">Chat</tspan>
-                </text>
-                <g id="chat" transform="translate(45.694 8)">
-                    <g data-name="Group 220" id="Group_220" transform="translate(3.366)">
-                        <g data-name="Group 219" id="Group_219" transform="translate(0)">
-                            <path d="M14.859,0c-.006.006-.019.006-.037.006A11.43,11.43,0,0,0,5.857,18.56L4.19,22.43a.621.621,0,0,0,.325.818.635.635,0,0,0,.356.044l6.112-1.074a11.014,11.014,0,0,0,3.808.662A11.44,11.44,0,0,0,14.859,0ZM14.8,21.637a10.021,10.021,0,0,1-3.527-.643.6.6,0,0,0-.331-.031l-5.144.9L7.155,18.7a.628.628,0,0,0-.1-.655A9.98,9.98,0,0,1,5.32,15.157,10.193,10.193,0,1,1,25,11.387v.037A10.22,10.22,0,0,1,14.8,21.637Z" data-name="Path 2863"
-                                fill="#b8b8b8"
-                                id="Path_2863" transform="translate(-3.366)" />
-                        </g>
-                    </g>
-                    <g data-name="Group 222" id="Group_222" transform="translate(10.314 9.158)">
-                        <g data-name="Group 221" id="Group_221">
-                            <path d="M118.661,146.7H115.29a.624.624,0,1,0,0,1.249h3.371a.624.624,0,1,0,0-1.249Z" data-name="Path 2864"
-                                fill="#b8b8b8"
-                                id="Path_2864" transform="translate(-114.666 -146.7)" />
-                        </g>
-                    </g>
-                    <g data-name="Group 224" id="Group_224" transform="translate(10.314 12.28)">
-                        <g data-name="Group 223" id="Group_223">
-                            <path d="M123.031,196.7H115.29a.624.624,0,1,0,0,1.249h7.741a.624.624,0,1,0,0-1.249Z" data-name="Path 2865"
-                                fill="#b8b8b8"
-                                id="Path_2865" transform="translate(-114.666 -196.7)" />
-                        </g>
-                    </g>
-                </g>
-            </g>
-        </g>
-        <g data-name="Add Friend Button" id="Add_Friend_Button" transform="translate(273)">
-            <g filter="url(#Rectangle_8)" transform="matrix(1, 0, 0, 1, -273, 0)">
-                <rect data-name="Rectangle 8" fill="#''' +
-        theme.scaffoldBackgroundColor.hexCode +
-        '''" height="56" id="Rectangle_8-2" rx="28"
-                    transform="translate(210 24)" width="139" />
-            </g>
-            <g id="outline-person_add-24px" transform="translate(36 40)">
-                <g id="Bounding_Boxes">
-                    <path d="M0,0H24V24H0Z" data-name="Path 3495" fill="none" id="Path_3495" />
-                </g>
-                <g id="Outline">
-                    <g data-name="Group 390" id="Group_390">
-                        <path d="M15,12a4,4,0,1,0-4-4A4,4,0,0,0,15,12Zm0-6a2,2,0,1,1-2,2A2.006,2.006,0,0,1,15,6Z" data-name="Path 3496"
-                            fill="#b8b8b8"
-                            id="Path_3496" />
-                        <path d="M15,14c-2.67,0-8,1.34-8,4v2H23V18C23,15.34,17.67,14,15,14ZM9,18c.22-.72,3.31-2,6-2s5.8,1.29,6,2Z" data-name="Path 3497"
-                            fill="#b8b8b8"
-                            id="Path_3497" />
-                        <path d="M6,15V12H9V10H6V7H4v3H1v2H4v3Z" data-name="Path 3498"
-                            fill="#b8b8b8" id="Path_3498" />
-                    </g>
-                </g>
-            </g>
-            <text data-name="Add Friend" fill="#b8b8b8" font-family="SegoeUI, Segoe UI"
-                font-size="12" id="Add_Friend" letter-spacing="0.033em"
-                transform="translate(-11 57)">
-                <tspan x="-30.915" y="0">Add Friend</tspan>
-            </text>
-        </g>
-        <g data-name="Menu Button" id="Menu_Button">
-            <g filter="url(#Ellipse_1)" transform="matrix(1, 0, 0, 1, 0, 0)">
-                <circle cx="28" cy="28" data-name="Ellipse 1" fill="#''' +
-        theme.scaffoldBackgroundColor.hexCode +
-        '''" id="Ellipse_1-2"
-                    r="28" transform="translate(20 24)" />
-            </g>
-            <g id="baseline-menu-24px" transform="translate(34.402 38.402)">
-                <path d="M0,0H28V28H0Z" data-name="Path 2012" fill="none" id="Path_2012" />
-                <path d="M3,21.6H23.2V19H3Zm0-6.5H23.2V12.5H3ZM3,6V8.6H23.2V6Z" data-name="Path 2013"
-                    fill="#898888"
-                    id="Path_2013" transform="translate(0.899 0.201)" />
-            </g>
-        </g>
-        <path d="M26.362,14.4a7.331,7.331,0,0,0-4.212-5.513,4.581,4.581,0,0,0,1.562-3.471,4.4,4.4,0,0,0-4.278-4.5,4.4,4.4,0,0,0-4.278,4.5,4.581,4.581,0,0,0,1.563,3.473,6.909,6.909,0,0,0-1.03.562A7.246,7.246,0,0,0,13.6,11.569a8.693,8.693,0,0,0-1.784-.942,5.664,5.664,0,0,0,2.24-4.55A5.45,5.45,0,0,0,8.758.5a5.45,5.45,0,0,0-5.3,5.576,5.664,5.664,0,0,0,2.24,4.55,9.212,9.212,0,0,0-5.667,7.1,2.157,2.157,0,0,0,.446,1.725,1.986,1.986,0,0,0,1.544.748H15.5a1.986,1.986,0,0,0,1.544-.748,2.157,2.157,0,0,0,.446-1.725,9.8,9.8,0,0,0-.285-1.2H24.65a1.71,1.71,0,0,0,1.329-.643,1.854,1.854,0,0,0,.383-1.483ZM16.7,5.413a2.737,2.737,0,1,1,5.464,0,2.737,2.737,0,1,1-5.464,0ZM5,6.077A3.876,3.876,0,0,1,8.758,2.1a3.877,3.877,0,0,1,3.755,3.979,3.877,3.877,0,0,1-3.755,3.979A3.876,3.876,0,0,1,5,6.077ZM15.855,18.423a.46.46,0,0,1-.358.176H2.02a.46.46,0,0,1-.358-.176A.52.52,0,0,1,1.553,18a7.44,7.44,0,0,1,7.205-6.35A7.44,7.44,0,0,1,15.963,18a.519.519,0,0,1-.109.42Zm8.939-3.569a.186.186,0,0,1-.144.072h-8.1a9.27,9.27,0,0,0-1.734-2.357,5.4,5.4,0,0,1,4.617-2.66,5.583,5.583,0,0,1,5.406,4.767.219.219,0,0,1-.046.178Zm0,0"
-            fill="#''' +
-        theme.primaryColor.hexCode +
+        '''" />
+        <path id="connectdevelop-brands" d="M268.126,122.639l-23.74-41.133a7.627,7.627,0,0,0,.889-3.428,7.242,7.242,0,0,0-6.982-7.11L212.013,25.52a7.408,7.408,0,0,0,.508-2.285,7.22,7.22,0,0,0-12.822-4.57H149.172a6.922,6.922,0,0,0-10.918,0H87.981a7.22,7.22,0,0,0-12.822,4.57,6.676,6.676,0,0,0,.508,2.285L49.133,71.6a7.1,7.1,0,0,0-4.316,6.475c0,.254.127.508.127.762L19.68,122.513a7.222,7.222,0,0,0-5.967,7.109,7.33,7.33,0,0,0,5.713,7.109l26.152,45.2a6.635,6.635,0,0,0-.381,2.285,7.086,7.086,0,0,0,5.713,6.982l24.5,42.529a8.2,8.2,0,0,0-.508,2.539,7.233,7.233,0,0,0,7.236,7.236,7.01,7.01,0,0,0,5.459-2.539h50.654a7.138,7.138,0,0,0,10.918,0h50.781a7.091,7.091,0,0,0,5.2,2.285,7.233,7.233,0,0,0,7.236-7.236,5.258,5.258,0,0,0-.381-2.031l24.5-42.783a7.086,7.086,0,0,0,5.713-6.982,7.184,7.184,0,0,0-.381-2.285l26.025-45.2a7.232,7.232,0,0,0,5.84-7.109A7.1,7.1,0,0,0,268.126,122.639Zm-188.144,99.4L59.289,186.116H79.982Zm0-39.736H59.289a7.8,7.8,0,0,0-.635-1.523l21.328-22.47Zm0-29.58L56.115,177.991a11.863,11.863,0,0,0-1.9-.762l-26.405-45.7a4.941,4.941,0,0,0,.254-1.9,6.7,6.7,0,0,0-.127-1.65L52.561,85.315a8,8,0,0,0,3.682-1.27l23.74,24.629v44.052Zm0-48.5L58.274,81.761a6.941,6.941,0,0,0,1.016-3.681c0-.127-.127-.381-.127-.508l20.82-7.49Zm0-38.213-20.693,7.49,20.693-35.8ZM234.738,84.554l.381.635-16.758,79.218-30.215-31.865,46.465-48.115ZM145.49,176.721l5.459,5.586H140.158Zm-.127-5.332-39.482-40.5,37.7-39.99,39.355,41.513Zm2.539,2.793,37.578-38.974,31.992,33.769-2.793,13.33H155.9ZM201.73,29.456a6.367,6.367,0,0,0,1.65.635L230.8,77.826v.254a6.937,6.937,0,0,0,1.016,3.681l-46.211,47.988L146.252,88.235Zm-4.316-1.016-53.828,57L116.545,56.878l78.837-28.437h2.032Zm-58.525,0a6.746,6.746,0,0,0,9.649,0h35.547l-70.332,25.39L89.631,28.441Zm-55.1,2.666.508-1.015q.642-.164,1.27-.381l24.248,25.518L83.792,64.623Zm0,37.578,28.818-10.41,28.31,29.961-37.7,39.863L83.792,108.167Zm0,43.925,17.265,17.9L83.792,148.665V112.61Zm0,41.641,19.931-21.074,39.228,40.752-8.125,8.379H83.792Zm3.3,76.806a6.818,6.818,0,0,0-2.793-1.65l-.508-.762V186.116h47.353L87.727,231.057Zm61.572,0a7.051,7.051,0,0,0-9.9,0h-45.7l43.418-44.941H154.63l43.418,44.941H148.664Zm56.875-5.586-2.031,3.555a6.381,6.381,0,0,0-1.65.635l-42.275-43.545h54.209l-8.253,39.355Zm6.093-10.537,6.094-28.818h10.41Zm16.5-32.627h-9.648l2.158-10.029,8.125,8.633a4.7,4.7,0,0,0-.635,1.4ZM259.493,131.4l-26.279,45.83a12.8,12.8,0,0,0-1.9.888l-9.775-10.41,16.377-77.695,21.709,37.578a9.646,9.646,0,0,0-.381,2.031A8.57,8.57,0,0,0,259.493,131.4Z" transform="translate(44.287 204.001)" fill="#''' +
+        theme.primaryColorDark.hexCode +
+        '''"/>
+    <g id="Friend_TItle-1" data-name="Friend TItle-1" transform="translate(-7 -23)">
+      <g id="Rectangle_10" data-name="Rectangle 10" transform="translate(17 99)" fill="#''' +
+        theme.backgroundColor.hexCode +
         '''"
-            id="friends" transform="translate(114.002 620.512)" />
-        <g data-name="Friend TItle-1" id="Friend_TItle-1">
-            <g data-name="Rectangle 10" fill="#''' +
-        theme.backgroundColor.hexCode +
-        '''" id="Rectangle_10" stroke="#898888"
-                stroke-width="1" transform="translate(17 99)">
-                <path
-                    d="M10,0H114a0,0,0,0,1,0,0V114a0,0,0,0,1,0,0H0a0,0,0,0,1,0,0V10A10,10,0,0,1,10,0Z"
-                    stroke="none" />
-                <path
-                    d="M10,.5H113a.5.5,0,0,1,.5.5V113a.5.5,0,0,1-.5.5H1a.5.5,0,0,1-.5-.5V10A9.5,9.5,0,0,1,10,.5Z"
-                    fill="none" />
-            </g>
-            <g id="jeff" transform="translate(51 123)">
-                <circle cx="25" cy="25" data-name="Ellipse 3" fill="#0d8abc" id="Ellipse_3"
-                    r="25" />
-                <text fill="#fff" font-family="SegoeUI, Segoe UI" font-size="22" id="JE"
-                    transform="translate(25 34)">
-                    <tspan x="-12.491" y="0">JE</tspan>
-                </text>
-            </g>
-            <text data-name="Jeff" fill="#0d8abc" font-family="SegoeUI, Segoe UI" font-size="15"
-                id="Jeff-2" letter-spacing="0.033em" transform="translate(74 203)">
-                <tspan x="-12.044" y="0">Jeff</tspan>
-            </text>
-        </g>
-        <g data-name="Friend Title-2" id="Friend_Title-2">
-            <g data-name="Rectangle 11" fill="#''' +
-        theme.backgroundColor.hexCode +
-        '''" id="Rectangle_11" stroke="#898888"
-                stroke-width="1" transform="translate(131 99)">
-                <rect height="114" stroke="none" width="114" />
-                <rect fill="none" height="113" width="113" x="0.5" y="0.5" />
-            </g>
-            <text font-family="SegoeUI, Segoe UI" font-size="15" id="Zhon"
-                letter-spacing="0.033em" transform="translate(188 202)">
-                <tspan x="-17.911" y="0" fill="#''' +
+          stroke="#e6e6e6" stroke-width="1">
+        <rect width="120" height="120" rx="10" stroke="none" />
+        <rect x="0.5" y="0.5" width="119" height="119" rx="9.5" fill="none" />
+      </g>
+      <g id="jeff" transform="translate(54.188 125.25)">
+        <circle id="Ellipse_3" data-name="Ellipse 3" cx="25" cy="25" r="25" fill="#0d8abc" />
+        <text id="JE" transform="translate(25 34)" fill="#fff" font-size="22"
+            font-family="SegoeUI, Segoe UI">
+          <tspan x="-9.491" y="0">JE</tspan>
+        </text>
+      </g>
+      <text id="Jeff-2" data-name="Jeff" transform="translate(77 209)" font-size="15"
+          font-family="SegoeUI, Segoe UI" letter-spacing="0.033em" fill="#''' +
         theme.colorScheme.onBackground.hexCode +
-        '''">Zhon</tspan>
-            </text>
-            <g data-name="zhon" id="zhon-2" transform="translate(162 123)">
-                <circle cx="25" cy="25" data-name="Ellipse 2" fill="#b4f8c8" id="Ellipse_2"
-                    r="25" />
-                <text font-family="SegoeUI, Segoe UI" font-size="22" id="ZH"
-                    transform="translate(25 33.741)">
-                    <tspan x="-14.083" y="0">ZH</tspan>
-                </text>
-            </g>
-        </g>
+        '''">
+        <tspan x="-12.044" y="0">Jeff</tspan>
+      </text>
     </g>
+    <g id="Friend_Title-2" data-name="Friend Title-2" transform="translate(4 -23)">
+      <g id="Rectangle_11" data-name="Rectangle 11" transform="translate(131 99)" fill="#''' +
+        theme.backgroundColor.hexCode +
+        '''"
+          stroke="#eaeaea" stroke-width="1">
+        <rect width="120" height="120" rx="10" stroke="none" />
+        <rect x="0.5" y="0.5" width="119" height="119" rx="9.5" fill="none" />
+      </g>
+      <text id="Zhon" transform="translate(191 208)" font-size="15" font-family="SegoeUI, Segoe UI"
+          letter-spacing="0.033em" fill="#''' +
+        theme.colorScheme.onBackground.hexCode +
+        '''">
+        <tspan x="-17.911" y="0">Zhon</tspan>
+      </text>
+      <g id="zhon-2" data-name="zhon" transform="translate(164.906 125.25)">
+        <circle id="Ellipse_2" data-name="Ellipse 2" cx="25" cy="25" r="25" fill="#b4f8c8" />
+        <text id="ZH" transform="translate(25 33.741)" font-size="22"
+            font-family="SegoeUI, Segoe UI">
+          <tspan x="-14.083" y="0">ZH</tspan>
+        </text>
+      </g>
+    </g>
+    <g id="AppBar">
+      <rect id="Rectangle_1" data-name="Rectangle 1" width="375" height="68" fill="#''' +
+        theme.primaryColor.hexCode +
+        '''" />
+      <text id="Friends" transform="translate(68 43)" fill="#f2f2f7" font-size="26"
+          font-family="SegoeUI, Segoe UI">
+        <tspan x="0" y="0">Friends</tspan>
+      </text>
+      <g id="baseline-menu-24px" transform="translate(22 20)">
+        <path id="Path_2012" data-name="Path 2012" d="M0,0H28V28H0Z" fill="none" />
+        <path id="Path_2013" data-name="Path 2013"
+            d="M3,21.6H23.2V19H3Zm0-6.5H23.2V12.5H3ZM3,6V8.6H23.2V6Z"
+            transform="translate(0.899 0.201)" fill="#f2f2f7" />
+      </g>
+      <g id="outline-person_add-24px" transform="translate(333 22)">
+        <g id="Bounding_Boxes">
+          <path id="Path_3495" data-name="Path 3495" d="M0,0H24V24H0Z" fill="none" />
+        </g>
+        <g id="Outline">
+          <g id="Group_390" data-name="Group 390">
+            <path id="Path_3496" data-name="Path 3496"
+                d="M15,12a4,4,0,1,0-4-4A4,4,0,0,0,15,12Zm0-6a2,2,0,1,1-2,2A2.006,2.006,0,0,1,15,6Z"
+                fill="#f2f2f7" />
+            <path id="Path_3497" data-name="Path 3497"
+                d="M15,14c-2.67,0-8,1.34-8,4v2H23V18C23,15.34,17.67,14,15,14ZM9,18c.22-.72,3.31-2,6-2s5.8,1.29,6,2Z"
+                fill="#f2f2f7" />
+            <path id="Path_3498" data-name="Path 3498" d="M6,15V12H9V10H6V7H4v3H1v2H4v3Z"
+                fill="#f2f2f7" />
+          </g>
+        </g>
+      </g>
+    </g>
+    <g id="BottomNavBar">
+      <rect id="Rectangle_128" data-name="Rectangle 128" width="375" height="68"
+          transform="translate(0 599)" fill="#''' +
+        theme.primaryColorDark.hexCode +
+        '''" />
+      <circle id="Ellipse_5" data-name="Ellipse 5" cx="54" cy="54" r="54"
+          transform="translate(59 579)" fill="#''' +
+        theme.primaryColorDark.hexCode +
+        '''" />
+      <circle id="Ellipse_4" data-name="Ellipse 4" cx="39" cy="39" r="39"
+          transform="translate(74 585)" fill="#''' +
+        theme.backgroundColor.hexCode +
+        '''" />
+      <g id="baseline-message-24px" transform="translate(255 611)">
+        <path id="Path_853" data-name="Path 853"  fill="#''' +
+        theme.colorScheme.onBackground.hexCode +
+        '''"
+            d="M4.4,2H23.6a2.4,2.4,0,0,1,2.388,2.4L26,26l-4.8-4.8H4.4A2.407,2.407,0,0,1,2,18.8V4.4A2.407,2.407,0,0,1,4.4,2ZM6.8,16.4H21.2V14H6.8Zm0-3.6H21.2V10.4H6.8Zm0-3.6H21.2V6.8H6.8Z" />
+        <path id="Path_854" data-name="Path 854" d="M28,0H0V28H28Z" fill="none" />
+      </g>
+      <g id="baseline-home-24px" transform="translate(99 610)">
+        <path id="Path_304" data-name="Path 304"
+            d="M11.6,24V16.588h4.8V24h6V14.118H26L14,3,2,14.118H5.6V24Z"  fill="#''' +
+        theme.colorScheme.onBackground.hexCode +
+        '''"/>
+        <path id="Path_305" data-name="Path 305" d="M0,0H28V28H0Z" fill="none" />
+      </g>
+      <text id="Comment" transform="translate(271 660)" font-size="15"
+          font-family="SegoeUI, Segoe UI" letter-spacing="0.033em"  fill="#''' +
+        theme.colorScheme.onBackground.hexCode +
+        '''">
+        <tspan x="-34.166" y="0">Comment</tspan>
+      </text>
+    </g>
+  </g>
 </svg>
 
-        ''');
+    
+    ''');
   }
 
   Widget previewSVGChatRoom(ThemeData theme) {
-    return SvgPicture.string(''' 
-        <svg height="667" viewBox="0 0 375 667" width="375" xmlns="http://www.w3.org/2000/svg" fill="#''' +
-        theme.cardColor.hexCode +
-        '''">
+    return SvgPicture.string('''
+    <svg xmlns="http://www.w3.org/2000/svg" width="375" height="667" viewBox="0 0 375 667">
   <defs>
-    <clipPath id="clip-ChatRoom">
-      <rect height="667" width="375" />
+    <clipPath id="clip-ChatRoom_1">
+      <rect width="375" height="667" />
     </clipPath>
   </defs>
-  <g clip-path="url(#clip-ChatRoom)" id="ChatRoom">
-    <rect fill="#''' +
+  <g id="ChatRoom_1" data-name="ChatRoom – 1" clip-path="url(#clip-ChatRoom_1)">
+    <rect width="375" height="667" fill="#''' +
         theme.backgroundColor.hexCode +
-        '''" height="667" width="375" />
-    <rect data-name="Rectangle 1" fill="#''' +
-        theme.primaryColor.hexCode +
-        '''" height="68" id="Rectangle_1"
-        width="375" />
-    <g data-name="Rectangle 2" fill="#''' +
-        theme.bottomAppBarColor.hexCode +
-        '''" id="Rectangle_2" stroke="#B0B0B0"
-        stroke-width="1" transform="translate(60 602)">
-      <rect height="47" rx="10" stroke="none" width="256" />
-      <rect fill="none" height="46" rx="9.5" width="255" x="0.5" y="0.5" />
-    </g>
-    <g id="outline-send-24px" transform="translate(334 612)">
-      <g id="Bounding_Boxes">
-        <path d="M0,0H28V28H0Z" data-name="Path 2825" fill="none" id="Path_2825" />
+        '''" />
+    <g id="Bottom">
+      <g id="Rectangle_2" data-name="Rectangle 2" transform="translate(60 602)" fill="#'''+ theme.backgroundColor.hexCode +'''"
+          stroke="#b0b0b0" stroke-width="1">
+        <rect width="256" height="47" rx="10" stroke="none" />
+        <rect x="0.5" y="0.5" width="255" height="46" rx="9.5" fill="none" />
       </g>
-      <g id="Outline" transform="translate(2 3)">
-        <path
-            d="M4.393,6.7l8.94,3.936L4.381,9.417,4.393,6.7m8.929,10.658L4.381,21.3V18.583l8.94-1.222M2.012,3,2,11.556,19.857,14,2,16.444,2.012,25,27,14,2.012,3Z"
-            fill="#''' +
-        theme.primaryColorLight.hexCode +
-        '''" id="XMLID_1127_" transform="translate(-2 -3)" />
-      </g>
-    </g>
-    <g id="baseline-expand_less-24px" transform="translate(17 612)">
-      <path d="M12,8,6,14l1.41,1.41L12,10.83l4.59,4.58L18,14Z" data-name="Path 2000" id="Path_2000"
-          transform="translate(2 1.929)"  fill="#''' +
-        theme.primaryColorDark.hexCode +
-        '''"/>
-      <path d="M0,0H28V28H0Z" data-name="Path 2001" fill="none" id="Path_2001" />
-    </g>
-    <g id="baseline-arrow_back-24px" transform="translate(22 21)">
-      <path d="M0,0H26V26H0Z" data-name="Path 1968" fill="none" id="Path_1968" />
-      <path d="M22,11.875H8.309L14.6,5.586,13,4,4,13l9,9,1.586-1.586L8.309,14.125H22Z"
-          data-name="Path 1969" id="Path_1969" />
-    </g>
-    <g id="outline-border_color-24px" transform="translate(337 24.002)">
-      <g data-name="Bounding_Boxes" id="Bounding_Boxes-2">
-        <path d="M0,0H20V20H0Z" data-name="Path 2859" fill="none" id="Path_2859" />
-      </g>
-      <g data-name="Outline" id="Outline-2" transform="translate(0 -0.002)">
-        <g data-name="Group 218" id="Group_218">
-          <path d="M14,3.25l-10,10V17H7.75l10-10ZM6.92,15H6v-.92l8-8,.92.92Z" data-name="Path 2860"
-               id="Path_2860" transform="translate(-1.561 0.002)" />
-          <path d="M20.71,4.04a1,1,0,0,0,0-1.41L18.37.29a1,1,0,0,0-1.41,0L15,2.25,18.75,6Z"
-              data-name="Path 2861" id="Path_2861" transform="translate(-2 0.002)" />
-          <path d="M0,20H20v4H0Z" data-name="Path 2862" fill="rgba(0,0,0,0.2)" id="Path_2862"
-              transform="translate(0 -3.998)" />
+      <g id="outline-send-24px" transform="translate(334 612)">
+        <g id="Bounding_Boxes">
+          <path id="Path_2825" data-name="Path 2825" d="M0,0H28V28H0Z" fill="none" />
+        </g>
+        <g id="Outline" transform="translate(2 3)">
+          <path id="XMLID_1127_"
+              d="M4.393,6.7l8.94,3.936L4.381,9.417,4.393,6.7m8.929,10.658L4.381,21.3V18.583l8.94-1.222M2.012,3,2,11.556,19.857,14,2,16.444,2.012,25,27,14,2.012,3Z"
+              transform="translate(-2 -3)" fill="#''' +
+        theme.colorScheme.onBackground.hexCode +
+        '''" />
         </g>
       </g>
-    </g>
-    <text data-name="Chat Room"  font-family="SegoeUI, Segoe UI" font-size="26"
-        id="Chat_Room" transform="translate(68 43)" >
-      <tspan x="0" y="0">Chat Room</tspan>
-    </text>
-    <path d="M10,0H80A10,10,0,0,1,90,10V38A10,10,0,0,1,80,48H0a0,0,0,0,1,0,0V10A10,10,0,0,1,10,0Z"
-        data-name="Rectangle 4" fill="rgba(180,248,200,0.5)" id="Rectangle_4"
-        transform="translate(77 102)" />
-    <path d="M10,0H214a10,10,0,0,1,10,10V70a10,10,0,0,1-10,10H0a0,0,0,0,1,0,0V10A10,10,0,0,1,10,0Z"
-        data-name="Rectangle 12" fill="rgba(180,248,200,0.5)" id="Rectangle_12"
-        transform="translate(77 292)" />
-    <path d="M0,0H188a10,10,0,0,1,10,10V38a10,10,0,0,1-10,10H10A10,10,0,0,1,0,38V0A0,0,0,0,1,0,0Z"
-        data-name="Rectangle 5" fill="rgba(180,248,200,0.5)" id="Rectangle_5"
-        transform="translate(77 159)" />
-    <text data-name="Type Some Text" fill="#e3e3e3" font-family="SegoeUI, Segoe UI" font-size="18"
-        id="Type_Some_Text" transform="translate(75 631)">
-      <tspan x="0" y="0">Type Some Text</tspan>
-    </text>
-    <text font-family="SegoeUI, Segoe UI" font-size="15" id="Hey_Jeff" letter-spacing="0.033em"
-        transform="translate(122 132)" fill="#000">
-      <tspan x="-29.85" y="0">Hey, Jeff</tspan>
-    </text>
-    <text data-name="What do u call a shoe made
-out of a banana?" font-family="SegoeUI, Segoe UI" font-size="15"
-        id="What_do_u_call_a_shoe_made_out_of_a_banana_" letter-spacing="0.033em"
-        transform="translate(91 323)" fill="#000">
-      <tspan x="0" y="0">What do u call a shoe made</tspan>
-      <tspan x="0" y="32">out of a banana?</tspan>
-    </text>
-    <text data-name="I wanna ask u a question" font-family="SegoeUI, Segoe UI" font-size="15"
-        id="I_wanna_ask_u_a_question" letter-spacing="0.033em" fill="#000"
-        transform="translate(179 189)">
-      <tspan x="-87.107" y="0">I wanna ask u a question</tspan>
-    </text>
-    <g id="Chat">
-      <path d="M10,0H52A10,10,0,0,1,62,10V48a0,0,0,0,1,0,0H10A10,10,0,0,1,0,38V10A10,10,0,0,1,10,0Z"
-          data-name="Rectangle 3" fill="rgba(13,138,188,0.5)" id="Rectangle_3"
-          transform="translate(236 228)" />
-      <text fill="#fff" font-family="SegoeUI, Segoe UI" font-size="15" id="Sure"
-          letter-spacing="0.033em" transform="translate(267 258)">
-        <tspan x="-15.508" y="0">Sure</tspan>
+      <g id="baseline-expand_less-24px" transform="translate(17 612)">
+        <path id="Path_2000" data-name="Path 2000" fill="#''' +
+        theme.colorScheme.onBackground.hexCode +
+        '''"
+            d="M12,8,6,14l1.41,1.41L12,10.83l4.59,4.58L18,14Z" transform="translate(2 1.929)" />
+        <path id="Path_2001" data-name="Path 2001" d="M0,0H28V28H0Z" fill="none" />
+      </g>
+      <text id="Type_Some_Text" data-name="Type Some Text" transform="translate(75 631)"
+          fill="#e3e3e3" font-size="18" font-family="SegoeUI, Segoe UI">
+        <tspan x="0" y="0">Type Some Text</tspan>
       </text>
     </g>
-    <g data-name="Chat" id="Chat-2" transform="translate(0 168)">
-      <path d="M10,0H76A10,10,0,0,1,86,10V48a0,0,0,0,1,0,0H10A10,10,0,0,1,0,38V10A10,10,0,0,1,10,0Z"
-          data-name="Rectangle 3" fill="rgba(13,138,188,0.5)" id="Rectangle_3-2"
-          transform="translate(212 228)" />
-      <text data-name="Slipper?" fill="#fff" font-family="SegoeUI, Segoe UI" font-size="15"
-          id="Slipper_" letter-spacing="0.033em" transform="translate(255 258)">
-        <tspan x="-28.077" y="0">Slipper?</tspan>
+    <g id="Message_4" data-name="Message 4">
+      <g id="Chat" transform="translate(0 168)">
+        <rect id="Rectangle_3" data-name="Rectangle 3" width="86" height="48" rx="10"
+            transform="translate(212 228)" fill="#''' +
+        theme.primaryColor.blend(theme.backgroundColor, 70).hexCode +
+        '''" />
+        <text id="Slipper_" data-name="Slipper?" transform="translate(255 258)" fill="#fff"
+            font-size="15" font-family="SegoeUI, Segoe UI" letter-spacing="0.033em">
+          <tspan x="-28.077" y="0">Slipper?</tspan>
+        </text>
+      </g>
+      <text id="PM_5:49" data-name="PM 5:49" transform="translate(188 436)" fill="#666"
+          font-size="10" font-family="SegoeUI, Segoe UI" letter-spacing="0.033em">
+        <tspan x="-18.83" y="0">PM 5:49</tspan>
       </text>
+      <g id="jeff" transform="translate(307 394)">
+        <circle id="Ellipse_3" data-name="Ellipse 3" cx="25" cy="25" r="25" fill="#0d8abc" />
+        <text id="JE" transform="translate(25 34)" fill="#fff" font-size="22"
+            font-family="SegoeUI, Segoe UI">
+          <tspan x="-12.491" y="0">JE</tspan>
+        </text>
+      </g>
     </g>
-    <g id="Message_stamp">
-      <text data-name="PM 5:47" fill="#666" font-family="SegoeUI, Segoe UI" font-size="10"
-          id="PM_5:47" letter-spacing="0.033em" transform="translate(195 139)">
-        <tspan x="-18.83" y="0">PM 5:47</tspan>
+    <g id="Message_3" data-name="Message 3">
+      <rect id="Rectangle_12" data-name="Rectangle 12" width="224" height="80" rx="10"
+          transform="translate(77 292)" fill="#''' +
+        theme.colorScheme.secondary.hexCode +
+        '''" />
+      <text id="What_do_u_call_a_shoe_made_out_of_a_banana_" data-name="What do u call a shoe made
+out of a banana?" transform="translate(91 323)" font-size="15" font-family="SegoeUI, Segoe UI"
+          letter-spacing="0.033em">
+        <tspan x="0" y="0">What do u call a shoe made</tspan>
+        <tspan x="0" y="32">out of a banana?</tspan>
       </text>
-      <text fill="#666" font-family="SegoeUI, Segoe UI" font-size="11" id="Read"
-          letter-spacing="0.033em" transform="translate(176 125)">
-        <tspan x="0" y="0">Read</tspan>
-      </text>
+      <g id="Message_stamp" transform="translate(133 228)">
+        <text id="PM_5:51" data-name="PM 5:51" transform="translate(195 139)" fill="#666"
+            font-size="10" font-family="SegoeUI, Segoe UI" letter-spacing="0.033em">
+          <tspan x="-18.83" y="0">PM 5:51</tspan>
+        </text>
+        <text id="Read" transform="translate(176 125)" fill="#666" font-size="11"
+            font-family="SegoeUI, Segoe UI" letter-spacing="0.033em">
+          <tspan x="0" y="0">Read</tspan>
+        </text>
+      </g>
+      <g id="zhon" transform="translate(15 322)">
+        <circle id="Ellipse_2" data-name="Ellipse 2" cx="25" cy="25" r="25" fill="#b4f8c8" />
+        <text id="ZH" transform="translate(25 33.741)" font-size="22"
+            font-family="SegoeUI, Segoe UI">
+          <tspan x="-14.083" y="0">ZH</tspan>
+        </text>
+      </g>
     </g>
-    <g data-name="Message_stamp" id="Message_stamp-2" transform="translate(106 61)">
-      <text data-name="PM 5:48" fill="#666" font-family="SegoeUI, Segoe UI" font-size="10"
-          id="PM_5:48" letter-spacing="0.033em" transform="translate(195 139)">
-        <tspan x="-18.83" y="0">PM 5:48</tspan>
+    <g id="Message_2" data-name="Message 2">
+      <g id="Chat-2" data-name="Chat">
+        <rect id="Rectangle_3-2" data-name="Rectangle 3" width="62" height="48" rx="10"
+            transform="translate(236 228)" fill="#''' +
+        theme.primaryColor.blend(theme.backgroundColor, 70).hexCode +
+        '''" />
+        <text id="Sure" transform="translate(267 258)" fill="#fff" font-size="15"
+            font-family="SegoeUI, Segoe UI" letter-spacing="0.033em">
+          <tspan x="-15.508" y="0">Sure</tspan>
+        </text>
+      </g>
+      <text id="PM_5:49-2" data-name="PM 5:49" transform="translate(209 268)" fill="#666"
+          font-size="10" font-family="SegoeUI, Segoe UI" letter-spacing="0.033em">
+        <tspan x="-18.83" y="0">PM 5:49</tspan>
       </text>
-      <text data-name="Read" fill="#666" font-family="SegoeUI, Segoe UI" font-size="11" id="Read-2"
-          letter-spacing="0.033em" transform="translate(176 125)">
-        <tspan x="0" y="0">Read</tspan>
-      </text>
+      <g id="jeff-2" data-name="jeff" transform="translate(307 226)">
+        <circle id="Ellipse_3-2" data-name="Ellipse 3" cx="25" cy="25" r="25" fill="#0d8abc" />
+        <text id="JE-2" data-name="JE" transform="translate(25 34)" fill="#fff" font-size="22"
+            font-family="SegoeUI, Segoe UI">
+          <tspan x="-12.491" y="0">JE</tspan>
+        </text>
+      </g>
     </g>
-    <g data-name="Message_stamp" id="Message_stamp-3" transform="translate(133 228)">
-      <text data-name="PM 5:51" fill="#666" font-family="SegoeUI, Segoe UI" font-size="10"
-          id="PM_5:51" letter-spacing="0.033em" transform="translate(195 139)">
-        <tspan x="-18.83" y="0">PM 5:51</tspan>
+    <g id="Message_1" data-name="Message 1">
+      <rect id="Rectangle_4" data-name="Rectangle 4" width="90" height="48" rx="10"
+          transform="translate(77 102)" fill="#''' +
+        theme.colorScheme.secondary.hexCode +
+        '''" />
+      <rect id="Rectangle_5" data-name="Rectangle 5" width="198" height="48" rx="10"
+          transform="translate(77 159)" fill="#''' +
+        theme.colorScheme.secondary.hexCode +
+        '''" />
+      <text id="Hey_Jeff" data-name="Hey, Jeff" transform="translate(122 132)" font-size="15"
+          font-family="SegoeUI, Segoe UI" letter-spacing="0.033em">
+        <tspan x="-29.85" y="0">Hey, Jeff</tspan>
       </text>
-      <text data-name="Read" fill="#666" font-family="SegoeUI, Segoe UI" font-size="11" id="Read-3"
-          letter-spacing="0.033em" transform="translate(176 125)">
-        <tspan x="0" y="0">Read</tspan>
+      <text id="I_wanna_ask_u_a_question" data-name="I wanna ask u a question"
+          transform="translate(179 189)" font-size="15" font-family="SegoeUI, Segoe UI"
+          letter-spacing="0.033em">
+        <tspan x="-87.107" y="0">I wanna ask u a question</tspan>
       </text>
+      <g id="Message_stamp-2" data-name="Message_stamp">
+        <text id="PM_5:47" data-name="PM 5:47" transform="translate(195 139)" fill="#666"
+            font-size="10" font-family="SegoeUI, Segoe UI" letter-spacing="0.033em">
+          <tspan x="-18.83" y="0">PM 5:47</tspan>
+        </text>
+        <text id="Read-2" data-name="Read" transform="translate(176 125)" fill="#666" font-size="11"
+            font-family="SegoeUI, Segoe UI" letter-spacing="0.033em">
+          <tspan x="0" y="0">Read</tspan>
+        </text>
+      </g>
+      <g id="Message_stamp-3" data-name="Message_stamp" transform="translate(106 61)">
+        <text id="PM_5:48" data-name="PM 5:48" transform="translate(195 139)" fill="#666"
+            font-size="10" font-family="SegoeUI, Segoe UI" letter-spacing="0.033em">
+          <tspan x="-18.83" y="0">PM 5:48</tspan>
+        </text>
+        <text id="Read-3" data-name="Read" transform="translate(176 125)" fill="#666" font-size="11"
+            font-family="SegoeUI, Segoe UI" letter-spacing="0.033em">
+          <tspan x="0" y="0">Read</tspan>
+        </text>
+      </g>
+      <g id="zhon-2" data-name="zhon" transform="translate(15 157)">
+        <circle id="Ellipse_2-2" data-name="Ellipse 2" cx="25" cy="25" r="25" fill="#b4f8c8" />
+        <text id="ZH-2" data-name="ZH" transform="translate(25 33.741)" font-size="22"
+            font-family="SegoeUI, Segoe UI">
+          <tspan x="-14.083" y="0">ZH</tspan>
+        </text>
+      </g>
     </g>
-    <text data-name="PM 5:49" fill="#666" font-family="SegoeUI, Segoe UI" font-size="10"
-        id="PM_5:49" letter-spacing="0.033em" transform="translate(209 268)">
-      <tspan x="-18.83" y="0">PM 5:49</tspan>
-    </text>
-    <text data-name="PM 5:49" fill="#666" font-family="SegoeUI, Segoe UI" font-size="10"
-        id="PM_5:49-2" letter-spacing="0.033em" transform="translate(188 436)">
-      <tspan x="-18.83" y="0">PM 5:49</tspan>
-    </text>
-    <g id="zhon" transform="translate(15 157)">
-      <circle cx="25" cy="25" data-name="Ellipse 2" fill="#b4f8c8" id="Ellipse_2" r="25" />
-      <text font-family="SegoeUI, Segoe UI" font-size="22" id="ZH" transform="translate(25 33.741)">
-        <tspan x="-14.083" y="0">ZH</tspan>
+    <g id="AppBar">
+      <rect id="Rectangle_1" data-name="Rectangle 1" width="375" height="68" fill="#''' +
+        theme.primaryColor.hexCode +
+        '''" />
+      <g id="baseline-arrow_back-24px" transform="translate(22 21)">
+        <path id="Path_1968" data-name="Path 1968" d="M0,0H26V26H0Z" fill="none" />
+        <path id="Path_1969" data-name="Path 1969" fill="#f2f2f7"
+            d="M22,11.875H8.309L14.6,5.586,13,4,4,13l9,9,1.586-1.586L8.309,14.125H22Z" />
+      </g>
+      <text id="Zhon-3" data-name="Zhon" transform="translate(68 43)" font-size="26"
+          font-family="SegoeUI, Segoe UI" fill="#f2f2f7">
+        <tspan x="0" y="0">Zhon</tspan>
       </text>
-    </g>
-    <g data-name="zhon" id="zhon-2" transform="translate(15 322)">
-      <circle cx="25" cy="25" data-name="Ellipse 2" fill="#b4f8c8" id="Ellipse_2-2" r="25" />
-      <text data-name="ZH" font-family="SegoeUI, Segoe UI" font-size="22" id="ZH-2"
-          transform="translate(25 33.741)">
-        <tspan x="-14.083" y="0">ZH</tspan>
-      </text>
-    </g>
-    <g id="jeff" transform="translate(307 394)">
-      <circle cx="25" cy="25" data-name="Ellipse 3" fill="#0d8abc" id="Ellipse_3" r="25" />
-      <text fill="#fff" font-family="SegoeUI, Segoe UI" font-size="22" id="JE"
-          transform="translate(25 34)">
-        <tspan x="-12.491" y="0">JE</tspan>
-      </text>
-    </g>
-    <g data-name="jeff" id="jeff-2" transform="translate(307 226)">
-      <circle cx="25" cy="25" data-name="Ellipse 3" fill="#0d8abc" id="Ellipse_3-2" r="25" />
-      <text data-name="JE" fill="#fff" font-family="SegoeUI, Segoe UI" font-size="22" id="JE-2"
-          transform="translate(25 34)">
-        <tspan x="-12.491" y="0">JE</tspan>
-      </text>
+      <g id="Setting_Icon" data-name="Setting Icon" transform="translate(-5 -652)">
+        <path id="Path_439" data-name="Path 439" d="M0,0H28V28H0Z" transform="translate(336 672)"
+            fill="none" />
+        <path id="Path_440" data-name="Path 440"
+            d="M19.48,12.975A8.113,8.113,0,0,0,19.543,12a6.131,6.131,0,0,0-.075-.975l2.125-1.65a.515.515,0,0,0,.126-.637L19.706,5.275a.513.513,0,0,0-.616-.225l-2.5,1a7.376,7.376,0,0,0-1.7-.975l-.377-2.65a.5.5,0,0,0-.5-.425H9.989a.488.488,0,0,0-.49.425l-.377,2.65a7.573,7.573,0,0,0-1.7.975l-2.5-1a.5.5,0,0,0-.616.225L2.295,8.737a.483.483,0,0,0,.126.638l2.125,1.65a5.858,5.858,0,0,0-.013,1.95l-2.125,1.65a.515.515,0,0,0-.126.638l2.011,3.463a.513.513,0,0,0,.616.225l2.5-1a7.376,7.376,0,0,0,1.7.975l.377,2.65a.511.511,0,0,0,.5.425h4.023a.479.479,0,0,0,.49-.425l.377-2.65a7.573,7.573,0,0,0,1.7-.975l2.5,1a.5.5,0,0,0,.616-.225l2.011-3.462a.483.483,0,0,0-.126-.638l-2.1-1.65ZM12,15.75A3.75,3.75,0,1,1,15.771,12,3.772,3.772,0,0,1,12,15.75Z"
+            transform="translate(337.778 674)" fill="#f2f2f7" />
+      </g>
     </g>
   </g>
 </svg>

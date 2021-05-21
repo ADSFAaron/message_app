@@ -42,6 +42,8 @@ class _ChatSetting extends State<ChatSetting> {
   @override
   Widget build(BuildContext context) {
     controller.text = roomName;
+    // print('chatSetting');
+    // print(photoURL);
     return Scaffold(
         appBar: AppBar(
           title: Text("Chat Setting"),
@@ -75,7 +77,8 @@ class _ChatSetting extends State<ChatSetting> {
                           color: Theme.of(context).backgroundColor),
                     ),
                   ),
-                ),Align(
+                ),
+                Align(
                   alignment: Alignment.bottomRight,
                   child: GestureDetector(
                     onTap: () => myBottomSheet(context),

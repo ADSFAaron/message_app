@@ -156,6 +156,7 @@ class _ChatPage extends State<ChatPage> {
                 onPressed: () async {
                   await Navigator.of(context)
                       .push(MaterialPageRoute(builder: (context) {
+                        print(photoURL);
                     return ChatSetting(
                       roomName: roomName,
                       docId: roomID,

@@ -434,7 +434,7 @@ class _MyHomePageState extends State<MyHomePage> {
             },
             openBuilder: (BuildContext context, VoidCallback openContainer) {
               return ChatPage(
-                  photoURL: snapshot[i]['photoURL'],
+                  photoURL: snapshot[i]['photoUrl'],
                   roomId: snapshot[i]['roomID'],
                   roomName: snapshot[i]['roomName'],
                   user: userData);

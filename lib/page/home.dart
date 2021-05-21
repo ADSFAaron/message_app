@@ -385,7 +385,7 @@ class _MyHomePageState extends State<MyHomePage> {
             IconSlideAction(
                 caption: 'delete',
                 color: Colors.white,
-                icon: Icons.delete,
+                icon: Icons.delete_outline,
                 onTap: () => Fluttertoast.showToast(msg: "尚未開發")
                 // _deleteMessage(i),
                 )
@@ -469,7 +469,7 @@ class _MyHomePageState extends State<MyHomePage> {
                   child: IconButton(
                     alignment: Alignment.centerRight,
                     icon:
-                        const Icon(Icons.add_circle_outline_outlined, size: 24),
+                        const Icon(Icons.person_add_alt, size: 24),
                     tooltip: 'Add Friend',
                     onPressed: () async {
                       // print("-------add---------");
@@ -572,7 +572,7 @@ class _MyHomePageState extends State<MyHomePage> {
                 actions: <Widget>[
                   IconButton(
                     alignment: Alignment.centerRight,
-                    icon: const Icon(Icons.add_circle, size: 30),
+                    icon: const Icon(Icons.person_add_alt, size: 30),
                     tooltip: 'Add Friend',
                     onPressed: () async {
                       // print("-------add---------");
@@ -788,7 +788,7 @@ class _MyHomePageState extends State<MyHomePage> {
             ),
             actions: [
               IconButton(
-                  icon: Icon(Icons.menu),
+                  icon: Icon(Icons.more_vert),
                   onPressed: () {
                     showPopupWindow(
                       context,

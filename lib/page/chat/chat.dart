@@ -211,7 +211,7 @@ class _ChatPage extends State<ChatPage> {
                   SafeArea(
                       child: Row(children: [
                     IconButton(
-                        icon: Icon(Icons.menu),
+                        icon: Icon(Icons.expand_less),
                         onPressed: () => myBottomSheet(context)),
                     Flexible(
                         child: TextField(

@@ -396,7 +396,7 @@ class _MyHomePageState extends State<MyHomePage> {
               ThemeData theme = Theme.of(context);
               return ListTile(
                 tileColor: theme.colorScheme.secondary,
-                leading: Container(
+                leading:snapshot[i]['photoUrl']==null?Container(
                     height: 90,
                     width: 90,
                     child: CircleAvatar(
@@ -407,7 +407,13 @@ class _MyHomePageState extends State<MyHomePage> {
                           Icons.person,
                           size: 45,
                           color: theme.secondaryHeaderColor,
-                        ))),
+                        ))):Container(
+                  height: 90,
+                  width: 90,
+                  decoration: BoxDecoration(
+                      shape: BoxShape.circle,
+                      image: DecorationImage(image:NetworkImage(snapshot[i]['photoUrl']),)),
+                ),
                 title: Text(
                   snapshot[i]['roomName'],
                   style: TextStyle(fontSize: 30, color: theme.backgroundColor),

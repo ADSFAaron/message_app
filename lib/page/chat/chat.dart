@@ -340,7 +340,7 @@ class _InviteFriend extends State<InviteFriend> {
       count++;
     }
     return new Scaffold(
-      appBar: new AppBar(title: Text('Demo')),
+      appBar: new AppBar(title: Text('添加好友')),
       body: InkWell(
         onTap: (){
         },

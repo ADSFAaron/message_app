@@ -230,7 +230,6 @@ class _PersonSettingPage extends State<PersonSettingPage> {
     final picker = ImagePicker();
     final pickedFile = await picker.getImage(source: _source);
 
-    if(pickedFile==null) return ;
     EasyLoading.show(status: 'loading...');
     String subTitle = pickedFile.path.toString().split('.').last;
     File file = File(pickedFile.path);

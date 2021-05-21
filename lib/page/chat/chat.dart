@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'dart:async';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -10,6 +11,7 @@ import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:message_app/page/chat/chatSetting.dart';
 import 'package:timeago/timeago.dart' as timeago;
+import 'package:firebase_core/firebase_core.dart';
 
 //TODO
 //TODO 建 subDocument
@@ -52,6 +54,7 @@ class _ChatPage extends State<ChatPage> {
   void initState() {
     super.initState();
     auth = FirebaseAuth.instance;
+
   }
 
   final TextEditingController _chatController = TextEditingController();
@@ -78,7 +81,6 @@ class _ChatPage extends State<ChatPage> {
 
     Navigator.of(context).pop();
   }
-
   void myBottomSheet(BuildContext context) {
     File _image;
     final picker = ImagePicker();
@@ -89,7 +91,7 @@ class _ChatPage extends State<ChatPage> {
           return Container(
               height: 200,
               child: GridView.count(
-                crossAxisCount: 2,
+                crossAxisCount: 3,
                 childAspectRatio: 1.0,
                 children: <Widget>[
                   InkWell(
@@ -104,15 +106,24 @@ class _ChatPage extends State<ChatPage> {
                         children: [Icon(Icons.photo), Text("相片")]),
                     onTap: () => getImage(picker, ImageSource.gallery),
                   ),
+                  InkWell(
+                    child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [Icon(Icons.person), Text("gif")]),
+                    onTap: () => getImage(picker, ImageSource.gallery),
+                  ),
                   Icon(Icons.airport_shuttle),
                   Icon(Icons.all_inclusive),
                   Icon(Icons.beach_access),
                   Icon(Icons.cake),
                   Icon(Icons.free_breakfast),
                 ],
-              ));
+
+              )
+          );
         });
   }
+
 
   void _submitContent(String content, String type) async {
     if (content == '') return;
@@ -160,7 +171,24 @@ class _ChatPage extends State<ChatPage> {
                     roomName = data.data()['roomName'];
                     photoURL = data.data()['phototURL'];
                   });
-                })
+                }),
+            IconButton(
+              icon: Icon(Icons.menu, size: 28),
+              onPressed: () async {
+                await Navigator.of(context).push(
+                    MaterialPageRoute(builder: (context)
+                        {
+                          return InviteFriend(
+                              roomId: roomID,
+                              roomName:roomName,
+                              photoURL:photoURL,
+                              user:user,
+                          );
+                        }
+                    ));
+              },
+
+            ),
           ],
         ),
         body: InkWell(
@@ -233,6 +261,191 @@ class _ChatPage extends State<ChatPage> {
         ));
   }
 }
+
+
+class InviteFriend extends StatefulWidget{
+  final String roomId;
+  final String roomName;
+  final String photoURL;
+  final String friendEmail;
+  final DocumentSnapshot user;
+
+  InviteFriend(
+      {Key key,
+        @required this.user,
+        @required this.roomId,
+        @required this.roomName,
+        @required this.photoURL,
+        @required this.friendEmail})
+       : super(key: key);
+  @override
+  _InviteFriend createState() => _InviteFriend(roomId, roomName, photoURL, user,friendEmail);
+}
+class _InviteFriend extends State<InviteFriend> {
+  String photoURL;
+  String roomID;
+  String roomName;
+  String friendEmail;
+  FirebaseAuth auth;
+  bool _newValue = false;
+  bool _newValue1;
+  bool _newValue2 = true;
+  DocumentSnapshot user;
+  List friend;
+  Map<String, bool> friend_number= {};
+  int count = 0; // 只需要做一次就好
+  CollectionReference users;
+
+  void initFirebase() async {
+    await Firebase.initializeApp().whenComplete(() {
+      print("initial completed");
+    });
+    users = FirebaseFirestore.instance.collection('users');
+  }
+  void initState() {
+    initFirebase();
+    super.initState();
+  }
+
+
+
+  _InviteFriend(String _roomId, String _roomName, String _url,
+      DocumentSnapshot _data, String _friendEmail) {
+    roomID = _roomId;
+    roomName = _roomName;
+    photoURL = _url;
+    user = _data;
+    friendEmail = _friendEmail;
+  }
+
+
+  @override
+  Widget build(BuildContext context) {
+    //print(user.data()['friend'][0]['email']);
+    //print(user.data());
+    //print(roomID);
+    //print(roomName);
+   // print(photoURL);
+
+    //print(friend.length);
+    if(count == 0) {
+
+      friend = user.data()['friend'];
+      for (int i = 0; i < friend.length; i++) {
+        friend_number.addAll({
+          "${friend[i]['username']}": false
+        });
+        //print(friend_number);
+      }
+      count++;
+    }
+    return new Scaffold(
+      appBar: new AppBar(title: Text('Demo')),
+      body: InkWell(
+        onTap: (){
+        },
+        child: Column(
+          children: [
+            Expanded(
+            child: ListView(
+              children: friend_number.keys.map((String key) {
+                return new CheckboxListTile(
+                  title: Text(key),
+                  value: friend_number[key],
+                  onChanged: (bool value) {
+                    setState(() {
+                      friend_number[key] = value;
+                      //print(friend_number[key]);
+                    });
+                  },
+                  isThreeLine: false,
+                  dense: true,
+                  secondary: Icon(Icons.person),
+                  selected: true,
+                  controlAffinity: ListTileControlAffinity.platform,
+                );
+              }).toList(),
+
+            ),
+            ),
+            ElevatedButton(
+              child: Text("確認"),
+              onPressed: () {
+             addfirend();
+             //print(users);
+             Navigator.of(context).pop();
+              },
+            ),
+          ],
+        ),
+      ),
+
+    );
+  }
+  void addChatRoom(String _email, String _id, String _roomName) async {
+
+    DocumentSnapshot document1 = await users.doc(_email).get();
+    print(document1);
+    List<Map<String, dynamic>> list = List.from(document1.data()['chatRoom']);
+    var addThing = {
+      "roomName": _roomName,
+      "roomID": _id,
+      "photoUrl": null,
+    };
+    list.add(addThing);
+    try {
+      users.doc(_email).update({"chatRoom": list});
+    }
+    catch(e){
+     print('1');
+    }
+    print('3');
+  }
+
+  void createChat(String friendemail) async {
+    //print('4');
+    CollectionReference chatRoom =
+    FirebaseFirestore.instance.collection("chatRoom");
+    DocumentSnapshot document = await chatRoom.doc(roomID).get();
+
+    bool notInTheRoom = true;
+    for(int i = 0;i<document.data()['member'].length;i++){
+      //print(document.data()['member']);
+      //print(roomName);
+      if(friendemail == document.data()['member'][i]){
+        notInTheRoom = false;
+      }
+
+      print(document.data()['member'][i]);
+
+    }
+
+    if(notInTheRoom){
+      List list =  List.from(document.data()['member']);
+      list.add(friendemail);
+      chatRoom.doc(roomID).update({'member':list});
+      addChatRoom(friendemail, roomID, roomName);
+    }
+    //TODO 把雙方的聊天室增加這個剛健的聊天室
+    //用function才會跑得比較快 同時跑兩個
+    //addChatRoom(user.data()['email'], roomID, roomName);
+
+    //TODO 跳轉道 辣個 chatRoom
+    //TODO 現有作法 創建後須等待幾秒才會出現
+    print('4');
+  }
+
+  void addfirend() {
+    for (int j = 0; j < friend.length; j++) {
+      if (friend_number[friend[j]['username']] == true) {
+        //print('1');
+        createChat(friend[j]['email']);
+      }
+    }
+  }
+}
+
+
 
 class MessageBox extends StatelessWidget {
   final String text;

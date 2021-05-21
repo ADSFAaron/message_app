@@ -17,6 +17,13 @@ import 'package:message_app/page/chat/chat.dart';
 import 'chat/chat.dart';
 import 'person.dart';
 import 'setting.dart';
+import 'package:flutter_local_notifications/flutter_local_notifications.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
+import 'package:firebase_analytics/firebase_analytics.dart';
+import 'dart:io';
+import 'dart:async';
+import 'dart:convert';
+
 
 class MyHomePage extends StatefulWidget {
   MyHomePage({
@@ -38,6 +45,7 @@ class MyHomePage extends StatefulWidget {
   final DocumentSnapshot userData;
   final User user;
 
+
   @override
   _MyHomePageState createState() => _MyHomePageState(
       user: user,
@@ -47,6 +55,8 @@ class MyHomePage extends StatefulWidget {
       flexSchemeData: flexSchemeData,
       schemeIndex: schemeIndex,
       onSchemeChanged: onSchemeChanged);
+
+
 }
 
 class _MyHomePageState extends State<MyHomePage> {
@@ -59,18 +69,20 @@ class _MyHomePageState extends State<MyHomePage> {
     @required this.onSchemeChanged,
     @required this.flexSchemeData,
   });
-
   final ThemeMode themeMode;
   final ValueChanged<ThemeMode> onThemeModeChanged;
   final int schemeIndex;
   final ValueChanged<int> onSchemeChanged;
   final FlexSchemeData flexSchemeData;
 
+  final FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin = FlutterLocalNotificationsPlugin();
+
   int _selectedIndex = 1;
   int allMessageindex = 21;
   int beenTaped = 999;
   List<Widget> friendList = [];
   List<Widget> chatList = [];
+  List<Widget> chatGroupList = [];
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
 
   List<Widget> _widgetOptions(BuildContext context, ThemeData theme) =>
@@ -91,11 +103,13 @@ class _MyHomePageState extends State<MyHomePage> {
     users = FirebaseFirestore.instance.collection('users');
   }
 
+  @override
   @protected
   @mustCallSuper
   void initState() {
     initFirebase();
     super.initState();
+
 
     EasyLoading.addStatusCallback((status) {
       print('EasyLoading Status $status');
@@ -105,7 +119,54 @@ class _MyHomePageState extends State<MyHomePage> {
 //    messageDetail.add(MessageDetail(friend: none, message: "12"));
 //    messageDetail.add(MessageDetail(friend: none, message: "12"));
     //TODO 處理login前的資訊
+    FirebaseMessaging messaging = FirebaseMessaging.instance;
+    var then = messaging.getToken().then((value) {
+      print(value);
+    });
+    FirebaseMessaging.onMessage.listen((RemoteMessage event) {
+      print("message recieved");
+      print(event.notification.body);
+      showDialog(
+          context: context,
+          builder: (BuildContext context) {
+            return AlertDialog(
+              title: Text("Notification"),
+              content: Text(event.notification.body),
+              actions: [
+                TextButton(
+                  child: Text("Ok"),
+                  onPressed: () {
+                    Navigator.of(context).pop();
+                  },
+                )
+              ],
+            );
+          });
+    });
+    FirebaseMessaging.onMessageOpenedApp.listen((message) {
+      print('Message clicked!');
+    });
+
   }
+
+  Future<void> _messageHandler(RemoteMessage message) async {
+    print('background message ${message.notification.body}');
+  }
+
+  void main() async {
+    WidgetsFlutterBinding.ensureInitialized();
+    await Firebase.initializeApp();
+    FirebaseMessaging.onBackgroundMessage(_messageHandler);
+    runApp(MyApp());
+  }
+
+
+
+
+
+
+
+
 
   @override
   Widget build(BuildContext context) {
@@ -303,6 +364,7 @@ class _MyHomePageState extends State<MyHomePage> {
           //TODO 開聊天房間
           // print(list);
           if (list != null) {
+            //print(list);
             if (list[0] == 'sendMessage') _createChat(list);
           }
         },
@@ -310,6 +372,9 @@ class _MyHomePageState extends State<MyHomePage> {
     }
     return list;
   }
+
+
+
 
   List<Widget> createChatContainer(BuildContext context, List snapshot) {
     List<Widget> list = [];
@@ -331,7 +396,7 @@ class _MyHomePageState extends State<MyHomePage> {
               ThemeData theme = Theme.of(context);
               return ListTile(
                 tileColor: theme.colorScheme.secondary,
-                leading: snapshot[i]['photoUrl']==null?Container(
+                leading: Container(
                     height: 90,
                     width: 90,
                     child: CircleAvatar(
@@ -342,13 +407,7 @@ class _MyHomePageState extends State<MyHomePage> {
                           Icons.person,
                           size: 45,
                           color: theme.secondaryHeaderColor,
-                        ))):Container(
-                    height: 90,
-                    width: 90,
-                  decoration: BoxDecoration(
-                      shape: BoxShape.circle,
-                      image: DecorationImage(image:NetworkImage(snapshot[i]['photoUrl']),)),
-                        ),
+                        ))),
                 title: Text(
                   snapshot[i]['roomName'],
                   style: TextStyle(fontSize: 30, color: theme.backgroundColor),
@@ -555,6 +614,7 @@ class _MyHomePageState extends State<MyHomePage> {
 
   Widget chatRoomPage(ThemeData theme) {
     try {
+      Map<String, dynamic> map = userData.data();
       return CustomScrollView(
         key: ValueKey<int>(3),
         shrinkWrap: true,
@@ -575,6 +635,7 @@ class _MyHomePageState extends State<MyHomePage> {
                 'Message',
               ),
             ),
+
             actions: [
               IconButton(
                   icon: Icon(Icons.more_vert_outlined),
@@ -608,30 +669,54 @@ class _MyHomePageState extends State<MyHomePage> {
                       },
                       childFun: (pop) {
                         return StatefulBuilder(
+
                             key: GlobalKey(),
                             builder: (popContext, popState) {
                               return Container(
                                 padding: EdgeInsets.all(10),
-                                height: 76,
+                                height: 160,
                                 width: 200,
                                 color: Colors.black,
                                 alignment: Alignment.center,
                                 child: Column(
-                                  children: [
+                                  children: <Widget>[
                                     ListTile(
                                         leading: Icon(
-                                          Icons.delete_outline,
+                                          Icons.add_circle,
                                           color: Colors.white,
                                         ),
                                         onTap: () {
-                                          Fluttertoast.showToast(msg: "尚未實作");
+                                          //Fluttertoast.showToast(msg: "尚未實作");
                                           // _cleanMessage();
-                                          Navigator.of(context).pop();
+                                          /*Navigator.of(context).pop([
+                                            "sendMessage",
+                                            user.email,
+                                            map['username']
+                                          ]);*/
+                                          List group = ["sendMessage",user.email,map['username']];
+                                          createGroupChat(group);
                                         },
                                         title: Text(
-                                          "全部刪除",
+                                          "創建群組",
                                           style: TextStyle(color: Colors.white),
-                                        ))
+                                        ),
+                                    ),
+                                    ListTile(
+
+                                      leading: Icon(
+                                        Icons.delete,
+                                        color: Colors.white,
+                                      ),
+                                      onTap: () {
+                                        Fluttertoast.showToast(msg: "尚未實作");
+                                        // _cleanMessage();
+                                        Navigator.of(context).pop();
+                                      },
+                                      title: Text(
+                                        "全部刪除",
+                                        style: TextStyle(color: Colors.white),
+                                      ),
+                                    ),
                                   ],
                                 ),
                               );
@@ -662,6 +747,7 @@ class _MyHomePageState extends State<MyHomePage> {
                   Map<String, dynamic> map = snapshot.data.data();
                   List _chatList = map['chatRoom'];
                   chatList = createChatContainer(context, _chatList);
+
                 }
 
                 // print(snapshot.data);
@@ -677,7 +763,6 @@ class _MyHomePageState extends State<MyHomePage> {
     } catch (e) {
       Map<String, dynamic> map = userData.data();
       List _chatList = map['chatRoom'];
-      print(_chatList);
       chatList = createChatContainer(context, _chatList);
       return CustomScrollView(
         key: ValueKey<int>(3),
@@ -743,7 +828,29 @@ class _MyHomePageState extends State<MyHomePage> {
                                 color: Colors.black,
                                 alignment: Alignment.center,
                                 child: Column(
-                                  children: [
+                                  children: <Widget>[
+                                    ListTile(
+                                      leading: Icon(
+                                        Icons.add_circle,
+                                        color: Colors.white,
+                                      ),
+                                      onTap: () {
+                                        //Fluttertoast.showToast(msg: "尚未實作");
+                                        // _cleanMessage();
+                                        /*Navigator.of(context).pop([
+                                          "sendMessage",
+                                          user.email,
+                                          map['username'],
+                                          //print( map['username']),
+                                        ]);*/
+                                        List group = ["sendMessage",user.email,map['username']];
+                                        createGroupChat(group);
+                                      },
+                                      title: Text(
+                                        "創建群組",
+                                        style: TextStyle(color: Colors.white),
+                                      ),
+                                    ),
                                     ListTile(
                                         leading: Icon(
                                           Icons.delete,
@@ -810,6 +917,7 @@ class _MyHomePageState extends State<MyHomePage> {
     CollectionReference chatRoom =
         FirebaseFirestore.instance.collection("chatRoom");
     String _roomName = "${userData['username']},${list[2]} Chat";
+
     DocumentReference reference = await chatRoom.add({
       'member': [list[1], user.email], // John Doe
       'roomName': _roomName, // Stokes and Sons
@@ -845,6 +953,47 @@ class _MyHomePageState extends State<MyHomePage> {
     ));
 
     addChatRoom(list[1], reference.id, _roomName);
+  }
+
+  void createGroupChat(List list) async {
+    CollectionReference chatRoom =
+    FirebaseFirestore.instance.collection("chatRoom");
+    String _roomName = "${userData['username']} Chat";
+    DocumentReference reference = await chatRoom.add({
+      'member': [ user.email], // John Doe
+      'roomName': _roomName, // Stokes and Sons
+      'friendChat': true,
+      'photoURL': null,
+    });
+
+    //TODO 把雙方的聊天室增加這個剛健的聊天室
+    //用function才會跑得比較快 同時跑兩個
+    addChatRoom(user.email, reference.id, _roomName);
+
+    //TODO 跳轉道 辣個 chatRoom
+    //TODO 現有作法 創建後須等待幾秒才會出現
+    Navigator.of(context).push(PageRouteBuilder(
+      transitionDuration: Duration(milliseconds: 800),
+      pageBuilder: (context, animation, secondaryAnimation) => ChatPage(
+          roomName: _roomName,
+          roomId: reference.id,
+          photoURL: null,
+          user: userData),
+      transitionsBuilder: (context, animation, secondaryAnimation, child) {
+        var begin = Offset(0.0, 1.0);
+        var end = Offset.zero;
+        var curve = Curves.ease;
+
+        var tween =
+        Tween(begin: begin, end: end).chain(CurveTween(curve: curve));
+        return SlideTransition(
+          position: animation.drive(tween),
+          child: child,
+        );
+      },
+    ));
+
+    //addChatRoom(list[1], reference.id, _roomName);
   }
 
   void _cleanMessage() {}

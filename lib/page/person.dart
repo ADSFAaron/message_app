@@ -80,7 +80,7 @@ class PersonDetailPage extends StatelessWidget {
                             alignment: Alignment.center,
                             child: SizedBox(
                                 width: MediaQuery.of(context).size.width,
-                                child: Text(data['username'],
+                                child: Text(data['username'],//username裡放的是朋友的名子
                                     textAlign: TextAlign.center,
                                     style: TextStyle(
                                         fontSize: 40,
@@ -140,7 +140,7 @@ class PersonDetailPage extends StatelessWidget {
                                     Navigator.of(context).pop([
                                       "sendMessage",
                                       friendEmail,
-                                      data['username']
+                                      data['username'],
                                     ]);
                                   },
                                 ),

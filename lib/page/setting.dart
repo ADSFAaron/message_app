@@ -1,4 +1,5 @@
 import 'dart:io';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
@@ -12,6 +13,7 @@ import 'package:flutter_swiper/flutter_swiper.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:message_app/page/person.dart';
+
 import '../all_shared_imports.dart';
 
 // Create a custom flex scheme color for a light theme.
@@ -228,7 +230,6 @@ class _PersonSettingPage extends State<PersonSettingPage> {
     final picker = ImagePicker();
     final pickedFile = await picker.getImage(source: _source);
 
-    if(pickedFile==null) return ;
     EasyLoading.show(status: 'loading...');
     String subTitle = pickedFile.path.toString().split('.').last;
     File file = File(pickedFile.path);

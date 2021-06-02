@@ -1,8 +1,9 @@
-import 'dart:io';
 import 'dart:async';
+import 'dart:io';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:firebase_storage/firebase_storage.dart' as firebase_storage;
 import 'package:flex_color_scheme/flex_color_scheme.dart';
@@ -11,7 +12,6 @@ import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:message_app/page/chat/chatSetting.dart';
 import 'package:timeago/timeago.dart' as timeago;
-import 'package:firebase_core/firebase_core.dart';
 
 //TODO
 //TODO 建 subDocument
@@ -23,12 +23,11 @@ class ChatPage extends StatefulWidget {
 
   final DocumentSnapshot user;
 
-  ChatPage(
-      {Key key,
-      @required this.user,
-      @required this.roomId,
-      @required this.roomName,
-      @required this.photoURL})
+  ChatPage({Key key,
+    @required this.user,
+    @required this.roomId,
+    @required this.roomName,
+    @required this.photoURL})
       : super(key: key);
 
   @override
@@ -43,8 +42,7 @@ class _ChatPage extends State<ChatPage> {
 
   DocumentSnapshot user;
 
-  _ChatPage(
-      String _roomId, String _roomName, String _url, DocumentSnapshot _data) {
+  _ChatPage(String _roomId, String _roomName, String _url, DocumentSnapshot _data) {
     roomID = _roomId;
     roomName = _roomName;
     photoURL = _url;
@@ -54,7 +52,6 @@ class _ChatPage extends State<ChatPage> {
   void initState() {
     super.initState();
     auth = FirebaseAuth.instance;
-
   }
 
   final TextEditingController _chatController = TextEditingController();
@@ -81,6 +78,7 @@ class _ChatPage extends State<ChatPage> {
 
     Navigator.of(context).pop();
   }
+
   void myBottomSheet(BuildContext context) {
     File _image;
     final picker = ImagePicker();
@@ -156,7 +154,7 @@ class _ChatPage extends State<ChatPage> {
                 onPressed: () async {
                   await Navigator.of(context)
                       .push(MaterialPageRoute(builder: (context) {
-                        print(photoURL);
+                    print(photoURL);
                     return ChatSetting(
                       roomName: roomName,
                       docId: roomID,
@@ -174,18 +172,17 @@ class _ChatPage extends State<ChatPage> {
                   });
                 }),
             IconButton(
-              icon: Icon(Icons.menu, size: 28),
+              icon: Icon(Icons.people_alt, size: 28),
               onPressed: () async {
-                await Navigator.of(context).push(
-                    MaterialPageRoute(builder: (context)
-                        {
-                          return InviteFriend(
-                              roomId: roomID,
-                              roomName:roomName,
-                              photoURL:photoURL,
-                              user:user,
-                          );
-                        }
+                await Navigator.of(context)
+                    .push(MaterialPageRoute(builder: (context) {
+                  return InviteFriend(
+                    roomId: roomID,
+                    roomName: roomName,
+                    photoURL: photoURL,
+                    user: user,
+                  );
+                }
                     ));
               },
 
@@ -224,7 +221,7 @@ class _ChatPage extends State<ChatPage> {
                                 // 加入reverse，讓它反轉
                                 itemBuilder: (context, index) {
                                   final QueryDocumentSnapshot document =
-                                      snapshot.data.docs[index];
+                                  snapshot.data.docs[index];
                                   return HandleMessage(
                                     document: document,
                                     auth: auth,
@@ -239,24 +236,24 @@ class _ChatPage extends State<ChatPage> {
                           })),
                   SafeArea(
                       child: Row(children: [
-                    IconButton(
-                        icon: Icon(Icons.expand_less),
-                        onPressed: () => myBottomSheet(context)),
-                    Flexible(
-                        child: TextField(
-                      decoration: InputDecoration(
-                        contentPadding: EdgeInsets.all(16.0),
-                        border: OutlineInputBorder(),
-                        hintText: '輸入文字',
-                      ),
-                      controller: _chatController,
-                      // onSubmitted: _submitText, // 綁定事件給_submitText這個Function
-                    )),
-                    IconButton(
-                        icon: Icon(Icons.send),
-                        onPressed: () =>
-                            _submitContent(_chatController.text, 'text'))
-                  ])),
+                        IconButton(
+                            icon: Icon(Icons.expand_less),
+                            onPressed: () => myBottomSheet(context)),
+                        Flexible(
+                            child: TextField(
+                              decoration: InputDecoration(
+                                contentPadding: EdgeInsets.all(16.0),
+                                border: OutlineInputBorder(),
+                                hintText: '輸入文字',
+                              ),
+                              controller: _chatController,
+                              // onSubmitted: _submitText, // 綁定事件給_submitText這個Function
+                            )),
+                        IconButton(
+                            icon: Icon(Icons.send),
+                            onPressed: () =>
+                                _submitContent(_chatController.text, 'text'))
+                      ])),
                 ],
               )),
         ));
@@ -271,14 +268,14 @@ class InviteFriend extends StatefulWidget{
   final String friendEmail;
   final DocumentSnapshot user;
 
-  InviteFriend(
-      {Key key,
-        @required this.user,
-        @required this.roomId,
-        @required this.roomName,
-        @required this.photoURL,
-        @required this.friendEmail})
-       : super(key: key);
+  InviteFriend({Key key,
+    @required this.user,
+    @required this.roomId,
+    @required this.roomName,
+    @required this.photoURL,
+    @required this.friendEmail})
+      : super(key: key);
+
   @override
   _InviteFriend createState() => _InviteFriend(roomId, roomName, photoURL, user,friendEmail);
 }
@@ -303,11 +300,11 @@ class _InviteFriend extends State<InviteFriend> {
     });
     users = FirebaseFirestore.instance.collection('users');
   }
+
   void initState() {
     initFirebase();
     super.initState();
   }
-
 
 
   _InviteFriend(String _roomId, String _roomName, String _url,
@@ -326,11 +323,10 @@ class _InviteFriend extends State<InviteFriend> {
     //print(user.data());
     //print(roomID);
     //print(roomName);
-   // print(photoURL);
+    // print(photoURL);
 
     //print(friend.length);
     if(count == 0) {
-
       friend = user.data()['friend'];
       for (int i = 0; i < friend.length; i++) {
         friend_number.addAll({
@@ -343,38 +339,37 @@ class _InviteFriend extends State<InviteFriend> {
     return new Scaffold(
       appBar: new AppBar(title: Text('添加好友')),
       body: InkWell(
-        onTap: (){
-        },
+        onTap: (){},
         child: Column(
           children: [
             Expanded(
-            child: ListView(
-              children: friend_number.keys.map((String key) {
-                return new CheckboxListTile(
-                  title: Text(key),
-                  value: friend_number[key],
-                  onChanged: (bool value) {
-                    setState(() {
-                      friend_number[key] = value;
-                      //print(friend_number[key]);
-                    });
-                  },
-                  isThreeLine: false,
-                  dense: true,
-                  secondary: Icon(Icons.person),
-                  selected: true,
-                  controlAffinity: ListTileControlAffinity.platform,
-                );
-              }).toList(),
+              child: ListView(
+                children: friend_number.keys.map((String key) {
+                  return new CheckboxListTile(
+                    title: Text(key),
+                    value: friend_number[key],
+                    onChanged: (bool value) {
+                      setState(() {
+                        friend_number[key] = value;
+                        //print(friend_number[key]);
+                      });
+                    },
+                    isThreeLine: false,
+                    dense: true,
+                    secondary: Icon(Icons.person),
+                    selected: true,
+                    controlAffinity: ListTileControlAffinity.platform,
+                  );
+                }).toList(),
 
-            ),
+              ),
             ),
             ElevatedButton(
               child: Text("確認"),
               onPressed: () {
-             addfirend();
-             //print(users);
-             Navigator.of(context).pop();
+                addfirend();
+                //print(users);
+                Navigator.of(context).pop();
               },
             ),
           ],
@@ -383,8 +378,8 @@ class _InviteFriend extends State<InviteFriend> {
 
     );
   }
-  void addChatRoom(String _email, String _id, String _roomName) async {
 
+  void addChatRoom(String _email, String _id, String _roomName) async {
     DocumentSnapshot document1 = await users.doc(_email).get();
     print(document1);
     List<Map<String, dynamic>> list = List.from(document1.data()['chatRoom']);
@@ -398,7 +393,7 @@ class _InviteFriend extends State<InviteFriend> {
       users.doc(_email).update({"chatRoom": list});
     }
     catch(e){
-     print('1');
+      print('1');
     }
     print('3');
   }
@@ -418,7 +413,6 @@ class _InviteFriend extends State<InviteFriend> {
       }
 
       print(document.data()['member'][i]);
-
     }
 
     if(notInTheRoom){
@@ -447,7 +441,6 @@ class _InviteFriend extends State<InviteFriend> {
 }
 
 
-
 class MessageBox extends StatelessWidget {
   final String text;
   final bool other;
@@ -455,8 +448,7 @@ class MessageBox extends StatelessWidget {
   final String username;
   final DateTime time;
 
-  MessageBox(
-      {Key key, this.text, this.other, this.photoURL, this.username, this.time})
+  MessageBox({Key key, this.text, this.other, this.photoURL, this.username, this.time})
       : super(key: key);
 
   @override
@@ -480,7 +472,7 @@ class MessageBox extends StatelessWidget {
             borderRadius: BorderRadius.circular(10),
             color: other
                 ?
-                 theme.colorScheme.secondary : theme.secondaryHeaderColor,
+            theme.colorScheme.secondary : theme.secondaryHeaderColor,
           ),
           padding: EdgeInsets.all(10.0),
           child: Text(text,
@@ -492,22 +484,22 @@ class MessageBox extends StatelessWidget {
       VerticalDivider(),
       photoURL != null
           ? Container(
-              width: clipSize,
-              height: clipSize,
-              alignment: Alignment.center,
-              decoration: BoxDecoration(
-                  shape: BoxShape.circle,
-                  image: DecorationImage(image: NetworkImage(photoURL))))
+          width: clipSize,
+          height: clipSize,
+          alignment: Alignment.center,
+          decoration: BoxDecoration(
+              shape: BoxShape.circle,
+              image: DecorationImage(image: NetworkImage(photoURL))))
           : Container(
-              width: clipSize,
-              height: clipSize,
-              alignment: Alignment.bottomCenter,
-              child: CircleAvatar(
-                  backgroundColor:
-                      other ? theme.colorScheme.secondary : theme.primaryColor,
-                  radius: 35,
-                  child: Icon(Icons.person,
-                      size: 30, color: theme.backgroundColor))),
+          width: clipSize,
+          height: clipSize,
+          alignment: Alignment.bottomCenter,
+          child: CircleAvatar(
+              backgroundColor:
+              other ? theme.colorScheme.secondary : theme.primaryColor,
+              radius: 35,
+              child: Icon(Icons.person,
+                  size: 30, color: theme.backgroundColor))),
     ];
 
     // print(timeago.format(time));
@@ -516,7 +508,7 @@ class MessageBox extends StatelessWidget {
         child: Row(
             verticalDirection: VerticalDirection.up,
             mainAxisAlignment:
-                other ? MainAxisAlignment.start : MainAxisAlignment.end,
+            other ? MainAxisAlignment.start : MainAxisAlignment.end,
             children: other ? list.reversed.toList() : list));
   }
 }
@@ -592,7 +584,7 @@ class HandleMessage extends StatelessWidget {
         time: document.data()['time'].toDate(),
         photoURL: document.data()['photoURL'],
         other:
-            document.data()['email'] == auth.currentUser.email ? false : true,
+        document.data()['email'] == auth.currentUser.email ? false : true,
         imageURL: document.data()['content'],
       );
     }
@@ -613,13 +605,12 @@ class ImageBox extends StatelessWidget {
   final String username;
   final DateTime time;
 
-  ImageBox(
-      {Key key,
-      @required this.imageURL,
-      @required this.other,
-      @required this.photoURL,
-      @required this.username,
-      @required this.time})
+  ImageBox({Key key,
+    @required this.imageURL,
+    @required this.other,
+    @required this.photoURL,
+    @required this.username,
+    @required this.time})
       : super(key: key);
 
   @override
@@ -645,22 +636,22 @@ class ImageBox extends StatelessWidget {
       VerticalDivider(),
       photoURL != null
           ? Container(
-              width: clipSize,
-              height: clipSize,
-              alignment: Alignment.bottomCenter,
-              decoration: BoxDecoration(
-                  shape: BoxShape.circle,
-                  image: DecorationImage(image: NetworkImage(photoURL))))
+          width: clipSize,
+          height: clipSize,
+          alignment: Alignment.bottomCenter,
+          decoration: BoxDecoration(
+              shape: BoxShape.circle,
+              image: DecorationImage(image: NetworkImage(photoURL))))
           : Container(
-              width: clipSize,
-              height: clipSize,
-              alignment: Alignment.bottomCenter,
-              child: CircleAvatar(
-                  backgroundColor:
-                      other ? theme.colorScheme.secondary : theme.primaryColor,
-                  radius: 35,
-                  child: Icon(Icons.person,
-                      size: 30, color: theme.backgroundColor))),
+          width: clipSize,
+          height: clipSize,
+          alignment: Alignment.bottomCenter,
+          child: CircleAvatar(
+              backgroundColor:
+              other ? theme.colorScheme.secondary : theme.primaryColor,
+              radius: 35,
+              child: Icon(Icons.person,
+                  size: 30, color: theme.backgroundColor))),
     ];
 
     // print(timeago.format(time));
@@ -669,7 +660,7 @@ class ImageBox extends StatelessWidget {
         child: Row(
             verticalDirection: VerticalDirection.up,
             mainAxisAlignment:
-                other ? MainAxisAlignment.start : MainAxisAlignment.end,
+            other ? MainAxisAlignment.start : MainAxisAlignment.end,
             children: other ? list.reversed.toList() : list));
   }
 }

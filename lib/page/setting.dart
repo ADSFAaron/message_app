@@ -124,9 +124,7 @@ class SettingPage extends StatelessWidget {
     return Scaffold(
       appBar: AppBar(
         leading: IconButton(
-          icon: FaIcon(
-            FontAwesomeIcons.times,
-          ),
+          icon: Icon(Icons.close),
           onPressed: () => Navigator.of(context).pop(),
         ),
         title: Container(
@@ -303,19 +301,12 @@ class _PersonSettingPage extends State<PersonSettingPage> {
             return Scaffold(
               appBar: AppBar(
                 leading: IconButton(
-                  icon: FaIcon(
-                    FontAwesomeIcons.times,
-                    color: Colors.black,
-                  ),
+                  icon: Icon(Icons.close),
                   onPressed: () => Navigator.of(context).pop(),
                 ),
-                title: Center(
-                  child: Text(
-                    "個人資料",
-                    style: TextStyle(color: Colors.black),
-                  ),
+                title: Text(
+                  "個人資料",
                 ),
-                backgroundColor: Colors.white,
               ),
               body: ListView(
                 children: [
@@ -393,7 +384,8 @@ class _PersonSettingPage extends State<PersonSettingPage> {
                   Container(
                     height: MediaQuery.of(context).size.height / 2,
                     child: Center(
-                      child: TextField(),
+                      // username 可以換成從 firebase 上的名字
+                      child: TextFormField(initialValue: "username"),
                     ),
                   ),
                 ],
@@ -404,10 +396,7 @@ class _PersonSettingPage extends State<PersonSettingPage> {
           return Scaffold(
             appBar: AppBar(
               leading: IconButton(
-                icon: FaIcon(
-                  FontAwesomeIcons.times,
-                  color: Colors.black,
-                ),
+                icon: Icon(Icons.close),
                 onPressed: () => Navigator.of(context).pop(),
               ),
               title: Center(
@@ -416,7 +405,6 @@ class _PersonSettingPage extends State<PersonSettingPage> {
                   style: TextStyle(color: Colors.black),
                 ),
               ),
-              backgroundColor: Colors.white,
             ),
             body: ListView(
               children: [

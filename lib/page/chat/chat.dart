@@ -267,7 +267,6 @@ class InviteFriend extends StatefulWidget{
   final String roomId;
   final String roomName;
   final String photoURL;
-  final String friendEmail;
   final DocumentSnapshot user;
 
   InviteFriend(
@@ -275,17 +274,16 @@ class InviteFriend extends StatefulWidget{
         @required this.user,
         @required this.roomId,
         @required this.roomName,
-        @required this.photoURL,
-        @required this.friendEmail})
+        @required this.photoURL,})
        : super(key: key);
   @override
-  _InviteFriend createState() => _InviteFriend(roomId, roomName, photoURL, user,friendEmail);
+  _InviteFriend createState() => _InviteFriend(roomId, roomName, photoURL, user);
 }
 class _InviteFriend extends State<InviteFriend> {
   String photoURL;
   String roomID;
   String roomName;
-  String friendEmail;
+
   FirebaseAuth auth;
   bool _newValue = false;
   bool _newValue1;
@@ -310,80 +308,124 @@ class _InviteFriend extends State<InviteFriend> {
 
 
   _InviteFriend(String _roomId, String _roomName, String _url,
-      DocumentSnapshot _data, String _friendEmail) {
+      DocumentSnapshot _data, ) {
     roomID = _roomId;
     roomName = _roomName;
     photoURL = _url;
     user = _data;
-    friendEmail = _friendEmail;
   }
 
+  Future<void> getfriend() async{
+
+    DocumentSnapshot getdata= await FirebaseFirestore.instance
+        .collection('users')
+        .doc(user.data()['email'])
+        .get();
+    friend= getdata.data()['friend'];
+  }
 
   @override
-  Widget build(BuildContext context) {
+     build(BuildContext context) {
     //print(user.data()['friend'][0]['email']);
     //print(user.data());
     //print(roomID);
     //print(roomName);
-   // print(photoURL);
-    friend = user.data()['friend'];
+    // print(photoURL);
+    //friend = user.data()['friend'];
+    return FutureBuilder(
+      future: getfriend(),
+      builder: (context, AsyncSnapshot<void> snapshot) {
+        if (snapshot.hasError) {
+          print('error');
+        }
+        if (snapshot.connectionState == ConnectionState.done) {
+          /*Map<String, dynamic> data = snapshot.data.data();
+          friend = data['friend'];*/
+          //print(friend);
+          print('1');
+          if (count == 0) {
+            for (int i = 0; i < friend.length; i++) {
+              friend_number.addAll({
+                "${friend[i]['username']}": false
+              });
+              //print(friend_number);
+            }
+
+            print(friend_number);
+            count++;
+          }
+          return new Scaffold(
+            appBar: new AppBar(title: Text('Demo')),
+            body: InkWell(
+              onTap: (){
+              },
+              child: Column(
+                children: <Widget>[
+                  Expanded(
+                    child: ListView(
+                      children: friend_number.keys.map((String key) {
+                        return new CheckboxListTile(
+                          title: Text(key),
+                          value: friend_number[key],
+                          onChanged: (bool value) {
+                            setState(() {
+                              friend_number[key] = value;
+                              //print(friend_number[key]);
+                            });
+                          },
+                          isThreeLine: false,
+                          dense: true,
+                          secondary: Icon(Icons.person),
+                          selected: true,
+                          controlAffinity: ListTileControlAffinity.platform,
+                        );
+                      }).toList(),
+
+                    ),
+                  ),
+                  ElevatedButton(
+                    child: Text("確認"),
+                    onPressed: () {
+                      addfirend();
+                      //print(users);
+                      Navigator.of(context).pop();
+                    },
+                  ),
+                ],
+              ),
+            ),
+          );
+        }
+        print('friend');
+       return new Scaffold(
+          appBar: new AppBar(title: Text('Demo')),
+          body: InkWell(
+            onTap: (){
+            },
+            child: CircularProgressIndicator(),
+          ),
+        );
+      },
+    );
+    //print(friend);
     //print(friend.length);
-    if(count == 0) {
+   /* if(count == 0) {
       for (int i = 0; i < friend.length; i++) {
         friend_number.addAll({
           "${friend[i]['username']}": false
         });
         //print(friend_number);
       }
+      print(friend_number);
       count++;
-    }
-    return new Scaffold(
-      appBar: new AppBar(title: Text('Demo')),
-      body: InkWell(
-        onTap: (){
-        },
-        child: Column(
-          children: [
-            Expanded(
-            child: ListView(
-              children: friend_number.keys.map((String key) {
-                return new CheckboxListTile(
-                  title: Text(key),
-                  value: friend_number[key],
-                  onChanged: (bool value) {
-                    setState(() {
-                      friend_number[key] = value;
-                      //print(friend_number[key]);
-                    });
-                  },
-                  isThreeLine: false,
-                  dense: true,
-                  secondary: Icon(Icons.person),
-                  selected: true,
-                  controlAffinity: ListTileControlAffinity.platform,
-                );
-              }).toList(),
+    }*/
 
-            ),
-            ),
-            ElevatedButton(
-              child: Text("確認"),
-              onPressed: () {
-             addfirend();
-             //print(users);
-             Navigator.of(context).pop();
-              },
-            ),
-          ],
-        ),
-      ),
-
-    );
   }
   void addChatRoom(String _email, String _id, String _roomName) async {
 
     DocumentSnapshot document1 = await users.doc(_email).get();
     print(document1);
+    print(_roomName);
     List<Map<String, dynamic>> list = List.from(document1.data()['chatRoom']);
     var addThing = {
       "roomName": _roomName,
@@ -404,34 +446,27 @@ class _InviteFriend extends State<InviteFriend> {
     CollectionReference chatRoom =
     FirebaseFirestore.instance.collection("chatRoom");
     DocumentSnapshot document = await chatRoom.doc(roomID).get();
-
-    for(int i = 0;i<friend.length;i++){
+    bool check = true;
+    print(friendemail);
+    print(friend.length);
+    for(int i = 0;i<document.data()['member'].length;i++){
       //print(document.data()['member']);
       //print(roomName);
-      //print(document.data()[friendemail]);
-      if(document.data()[friendemail] == null)
-        {
-          print('6');
-          try {
-            addChatRoom(friend[i]['email'], roomID, roomName);
-          }
-          catch(e){
-            print(e);
-          }
-          try {
-            DocumentReference reference = await chatRoom.add({
-              'member': [friend[i]['username']], // John Doe
-              'roomName': roomName, // Stokes and Sons
-              'friendChat': true,
-              'photoURL': null,
-            });
-            print(reference);
-          }
-          catch(e){
-            print(e);
-          }
-          print('5');
+        if(friendemail == document.data()['member'][i]){
+            check = false;
         }
+
+      print(document.data()['member'][i]);
+
+    }
+    print(check);
+    if(check){
+      List list = List.from(document.data()['member']);
+
+      list.add(friendemail);
+      chatRoom.doc(roomID).update({"member": list});
+
+      addChatRoom(friendemail, roomID, roomName);
     }
     //TODO 把雙方的聊天室增加這個剛健的聊天室
     //用function才會跑得比較快 同時跑兩個
@@ -439,7 +474,7 @@ class _InviteFriend extends State<InviteFriend> {
 
     //TODO 跳轉道 辣個 chatRoom
     //TODO 現有作法 創建後須等待幾秒才會出現
-    print('4');
+
   }
 
   void addfirend() {

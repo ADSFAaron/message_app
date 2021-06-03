@@ -385,7 +385,7 @@ class _MyHomePageState extends State<MyHomePage> {
             IconSlideAction(
                 caption: 'delete',
                 color: Colors.white,
-                icon: Icons.delete,
+                icon: Icons.delete_outline,
                 onTap: () => Fluttertoast.showToast(msg: "尚未開發")
                 // _deleteMessage(i),
                 )
@@ -396,7 +396,7 @@ class _MyHomePageState extends State<MyHomePage> {
               ThemeData theme = Theme.of(context);
               return ListTile(
                 tileColor: theme.colorScheme.secondary,
-                leading: Container(
+                leading:snapshot[i]['photoUrl']==null?Container(
                     height: 90,
                     width: 90,
                     child: CircleAvatar(
@@ -407,7 +407,13 @@ class _MyHomePageState extends State<MyHomePage> {
                           Icons.person,
                           size: 45,
                           color: theme.secondaryHeaderColor,
-                        ))),
+                        ))):Container(
+                  height: 90,
+                  width: 90,
+                  decoration: BoxDecoration(
+                      shape: BoxShape.circle,
+                      image: DecorationImage(image:NetworkImage(snapshot[i]['photoUrl']),)),
+                ),
                 title: Text(
                   snapshot[i]['roomName'],
                   style: TextStyle(fontSize: 30, color: theme.backgroundColor),
@@ -428,7 +434,7 @@ class _MyHomePageState extends State<MyHomePage> {
             },
             openBuilder: (BuildContext context, VoidCallback openContainer) {
               return ChatPage(
-                  photoURL: snapshot[i]['photoURL'],
+                  photoURL: snapshot[i]['photoUrl'],
                   roomId: snapshot[i]['roomID'],
                   roomName: snapshot[i]['roomName'],
                   user: userData);
@@ -469,7 +475,7 @@ class _MyHomePageState extends State<MyHomePage> {
                   child: IconButton(
                     alignment: Alignment.centerRight,
                     icon:
-                        const Icon(Icons.add_circle_outline_outlined, size: 24),
+                        const Icon(Icons.person_add_alt, size: 24),
                     tooltip: 'Add Friend',
                     onPressed: () async {
                       // print("-------add---------");
@@ -572,7 +578,7 @@ class _MyHomePageState extends State<MyHomePage> {
                 actions: <Widget>[
                   IconButton(
                     alignment: Alignment.centerRight,
-                    icon: const Icon(Icons.add_circle, size: 30),
+                    icon: const Icon(Icons.person_add_alt, size: 30),
                     tooltip: 'Add Friend',
                     onPressed: () async {
                       // print("-------add---------");
@@ -747,7 +753,6 @@ class _MyHomePageState extends State<MyHomePage> {
                   Map<String, dynamic> map = snapshot.data.data();
                   List _chatList = map['chatRoom'];
                   chatList = createChatContainer(context, _chatList);
-
                 }
 
                 // print(snapshot.data);
@@ -788,7 +793,7 @@ class _MyHomePageState extends State<MyHomePage> {
             ),
             actions: [
               IconButton(
-                  icon: Icon(Icons.menu),
+                  icon: Icon(Icons.more_vert),
                   onPressed: () {
                     showPopupWindow(
                       context,
@@ -917,13 +922,14 @@ class _MyHomePageState extends State<MyHomePage> {
     CollectionReference chatRoom =
         FirebaseFirestore.instance.collection("chatRoom");
     String _roomName = "${userData['username']},${list[2]} Chat";
+
     DocumentReference reference = await chatRoom.add({
       'member': [list[1], user.email], // John Doe
       'roomName': _roomName, // Stokes and Sons
       'friendChat': true,
       'photoURL': null,
     });
-
+    //reference.get().then((value) => value.data()['username']);
     //TODO 把雙方的聊天室增加這個剛健的聊天室
     //用function才會跑得比較快 同時跑兩個
     addChatRoom(user.email, reference.id, _roomName);

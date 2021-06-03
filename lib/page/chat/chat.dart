@@ -43,6 +43,8 @@ class _ChatPage extends State<ChatPage> {
 
   DocumentSnapshot user;
 
+
+  List<int> checkseen ;//表示有幾個人看過
   _ChatPage(
       String _roomId, String _roomName, String _url, DocumentSnapshot _data) {
     roomID = _roomId;
@@ -129,6 +131,10 @@ class _ChatPage extends State<ChatPage> {
     if (content == '') return;
     _chatController.clear(); // 清空controller資料
     // print(roomID);
+    Map<String, bool> seen={};
+     for(int i =0;i<user.data()['friend'].length;i++){
+       seen[user.data()['friend'][i]['email']]=false;
+     }
     await FirebaseFirestore.instance
         .collection('chatRoom')
         .doc(roomID)
@@ -139,12 +145,15 @@ class _ChatPage extends State<ChatPage> {
       'userName': user.data()['username'],
       'content': content,
       'time': Timestamp.now(),
-      'type': type
+      'type': type,
+      'seen': seen,
     });
+
     setState(() {});
   }
 
   Widget build(BuildContext context) {
+    //print(checkseen);
     final ThemeData theme = Theme.of(context);
     return Scaffold(
         appBar: AppBar(
@@ -156,6 +165,7 @@ class _ChatPage extends State<ChatPage> {
                 onPressed: () async {
                   await Navigator.of(context)
                       .push(MaterialPageRoute(builder: (context) {
+                        print(photoURL);
                     return ChatSetting(
                       roomName: roomName,
                       docId: roomID,
@@ -216,6 +226,7 @@ class _ChatPage extends State<ChatPage> {
                             }
                             // print();
                             final int commentCount = snapshot.data.docs.length;
+                            checkseen = List(commentCount);//給List一個長度
                             if (commentCount > 0) {
                               return ListView.builder(
                                 padding: EdgeInsets.all(8.0),
@@ -224,10 +235,57 @@ class _ChatPage extends State<ChatPage> {
                                 itemBuilder: (context, index) {
                                   final QueryDocumentSnapshot document =
                                       snapshot.data.docs[index];
-                                  return HandleMessage(
+                                      //List temp;
+                                      //print(temp);
+                                      if(checkseen[index] == null) { // 初始化目前訊息已讀人數為0
+                                        checkseen[index] = 0;
+                                      }
+                                      //print(document.id);
+                                        if(user.data()['photoURL'] != "null") {
+                                          //print('2');
+                                          /*print(List.from(
+                                              document.data()['photoURL']));*/
+                                         /* print(document.data()['photoURL']);
+                                          print(user.data()['username']);
+                                          print(document.data()['userName']);*/
+                                          //String a = user.data()['photoURL'];
+                                          if(document.data()['userName'] == user.data()['username'] ) {
+                                              //print('3');
+                                              CollectionReference chatRoom =
+                                              FirebaseFirestore.instance
+                                                  .collection('chatRoom')
+                                                  .doc(roomID)
+                                                  .collection('messages');
+                                              //list.add(user.data()['photoURL']);
+                                              chatRoom.doc(document.id).update(
+                                                  {'photoURL': user.data()['photoURL']});
+                                          }
+                                          if(document.data()['seen']!=null){
+                                            print('a');
+                                            for(int i = 0;i<document.data()['seen'].length;i++) {
+                                              if (document.data()['seen'][i] != true) {
+                                                if (document.data()['seen'][i] == user.data()['email']) {
+                                                  document.data()['seen'][i] = true;
+                                                  checkseen[index]++;
+                                                }
+                                              }
+                                            }
+                                            //print( checkseen[index]);
+                                          }
+                                        }
+                                  if(document.data()['seen']!=null){
+                                    return HandleMessage(
                                     document: document,
                                     auth: auth,
-                                  );
+                                    seen: checkseen[index],
+                                    );
+                                  }
+                                  else {
+                                    return HandleMessage(
+                                      document: document,
+                                      auth: auth,
+                                    );
+                                  }
                                 },
                                 itemCount: commentCount,
                               );
@@ -239,7 +297,7 @@ class _ChatPage extends State<ChatPage> {
                   SafeArea(
                       child: Row(children: [
                     IconButton(
-                        icon: Icon(Icons.menu),
+                        icon: Icon(Icons.expand_less),
                         onPressed: () => myBottomSheet(context)),
                     Flexible(
                         child: TextField(
@@ -267,6 +325,7 @@ class InviteFriend extends StatefulWidget{
   final String roomId;
   final String roomName;
   final String photoURL;
+  final String friendEmail;
   final DocumentSnapshot user;
 
   InviteFriend(
@@ -274,16 +333,17 @@ class InviteFriend extends StatefulWidget{
         @required this.user,
         @required this.roomId,
         @required this.roomName,
-        @required this.photoURL,})
+        @required this.photoURL,
+        @required this.friendEmail})
        : super(key: key);
   @override
-  _InviteFriend createState() => _InviteFriend(roomId, roomName, photoURL, user);
+  _InviteFriend createState() => _InviteFriend(roomId, roomName, photoURL, user,friendEmail);
 }
 class _InviteFriend extends State<InviteFriend> {
   String photoURL;
   String roomID;
   String roomName;
-
+  String friendEmail;
   FirebaseAuth auth;
   bool _newValue = false;
   bool _newValue1;
@@ -308,124 +368,82 @@ class _InviteFriend extends State<InviteFriend> {
 
 
   _InviteFriend(String _roomId, String _roomName, String _url,
-      DocumentSnapshot _data, ) {
+      DocumentSnapshot _data, String _friendEmail) {
     roomID = _roomId;
     roomName = _roomName;
     photoURL = _url;
     user = _data;
+    friendEmail = _friendEmail;
   }
 
-  Future<void> getfriend() async{
-
-    DocumentSnapshot getdata= await FirebaseFirestore.instance
-        .collection('users')
-        .doc(user.data()['email'])
-        .get();
-    friend= getdata.data()['friend'];
-  }
 
   @override
-     build(BuildContext context) {
+  Widget build(BuildContext context) {
     //print(user.data()['friend'][0]['email']);
     //print(user.data());
     //print(roomID);
     //print(roomName);
-    // print(photoURL);
-    //friend = user.data()['friend'];
-    return FutureBuilder(
-      future: getfriend(),
-      builder: (context, AsyncSnapshot<void> snapshot) {
-        if (snapshot.hasError) {
-          print('error');
-        }
-        if (snapshot.connectionState == ConnectionState.done) {
-          /*Map<String, dynamic> data = snapshot.data.data();
-          friend = data['friend'];*/
-          //print(friend);
-          print('1');
-          if (count == 0) {
-            for (int i = 0; i < friend.length; i++) {
-              friend_number.addAll({
-                "${friend[i]['username']}": false
-              });
-              //print(friend_number);
-            }
+   // print(photoURL);
 
-            print(friend_number);
-            count++;
-          }
-          return new Scaffold(
-            appBar: new AppBar(title: Text('Demo')),
-            body: InkWell(
-              onTap: (){
-              },
-              child: Column(
-                children: <Widget>[
-                  Expanded(
-                    child: ListView(
-                      children: friend_number.keys.map((String key) {
-                        return new CheckboxListTile(
-                          title: Text(key),
-                          value: friend_number[key],
-                          onChanged: (bool value) {
-                            setState(() {
-                              friend_number[key] = value;
-                              //print(friend_number[key]);
-                            });
-                          },
-                          isThreeLine: false,
-                          dense: true,
-                          secondary: Icon(Icons.person),
-                          selected: true,
-                          controlAffinity: ListTileControlAffinity.platform,
-                        );
-                      }).toList(),
-
-                    ),
-                  ),
-                  ElevatedButton(
-                    child: Text("確認"),
-                    onPressed: () {
-                      addfirend();
-                      //print(users);
-                      Navigator.of(context).pop();
-                    },
-                  ),
-                ],
-              ),
-            ),
-          );
-        }
-        print('friend');
-       return new Scaffold(
-          appBar: new AppBar(title: Text('Demo')),
-          body: InkWell(
-            onTap: (){
-            },
-            child: CircularProgressIndicator(),
-          ),
-        );
-      },
-    );
-    //print(friend);
     //print(friend.length);
-   /* if(count == 0) {
+    if(count == 0) {
+
+      friend = user.data()['friend'];
       for (int i = 0; i < friend.length; i++) {
         friend_number.addAll({
           "${friend[i]['username']}": false
         });
         //print(friend_number);
       }
-      print(friend_number);
       count++;
-    }*/
+    }
+    return new Scaffold(
+      appBar: new AppBar(title: Text('添加好友')),
+      body: InkWell(
+        onTap: (){
+        },
+        child: Column(
+          children: [
+            Expanded(
+            child: ListView(
+              children: friend_number.keys.map((String key) {
+                return new CheckboxListTile(
+                  title: Text(key),
+                  value: friend_number[key],
+                  onChanged: (bool value) {
+                    setState(() {
+                      friend_number[key] = value;
+                      //print(friend_number[key]);
+                    });
+                  },
+                  isThreeLine: false,
+                  dense: true,
+                  secondary: Icon(Icons.person),
+                  selected: true,
+                  controlAffinity: ListTileControlAffinity.platform,
+                );
+              }).toList(),
 
+            ),
+            ),
+            ElevatedButton(
+              child: Text("確認"),
+              onPressed: () {
+             addfirend();
+             //print(users);
+             Navigator.of(context).pop();
+              },
+            ),
+          ],
+        ),
+      ),
+
+    );
   }
   void addChatRoom(String _email, String _id, String _roomName) async {
 
     DocumentSnapshot document1 = await users.doc(_email).get();
     print(document1);
-    print(_roomName);
     List<Map<String, dynamic>> list = List.from(document1.data()['chatRoom']);
     var addThing = {
       "roomName": _roomName,
@@ -441,31 +459,29 @@ class _InviteFriend extends State<InviteFriend> {
     }
     print('3');
   }
+
   void createChat(String friendemail) async {
     //print('4');
     CollectionReference chatRoom =
     FirebaseFirestore.instance.collection("chatRoom");
     DocumentSnapshot document = await chatRoom.doc(roomID).get();
-    bool check = true;
-    print(friendemail);
-    print(friend.length);
+
+    bool notInTheRoom = true;
     for(int i = 0;i<document.data()['member'].length;i++){
       //print(document.data()['member']);
       //print(roomName);
-        if(friendemail == document.data()['member'][i]){
-            check = false;
-        }
+      if(friendemail == document.data()['member'][i]){
+        notInTheRoom = false;
+      }
 
       print(document.data()['member'][i]);
 
     }
-    print(check);
-    if(check){
-      List list = List.from(document.data()['member']);
 
+    if(notInTheRoom){
+      List list =  List.from(document.data()['member']);
       list.add(friendemail);
-      chatRoom.doc(roomID).update({"member": list});
-
+      chatRoom.doc(roomID).update({'member':list});
       addChatRoom(friendemail, roomID, roomName);
     }
     //TODO 把雙方的聊天室增加這個剛健的聊天室
@@ -474,7 +490,7 @@ class _InviteFriend extends State<InviteFriend> {
 
     //TODO 跳轉道 辣個 chatRoom
     //TODO 現有作法 創建後須等待幾秒才會出現
-
+    print('4');
   }
 
   void addfirend() {
@@ -495,20 +511,29 @@ class MessageBox extends StatelessWidget {
   final String photoURL;
   final String username;
   final DateTime time;
+  final int seen;
 
   MessageBox(
-      {Key key, this.text, this.other, this.photoURL, this.username, this.time})
+      {Key key, this.text, this.other, this.photoURL, this.username, this.time, this.seen})
       : super(key: key);
 
   @override
   Widget build(BuildContext context) {
     final ThemeData theme = Theme.of(context);
     double clipSize = 60;
+    String outputread ;
+
+    if(other == false){
+      outputread = time.year.toString() +'-'+ time.month.toString() +'-'+ time.day.toString()+ ' '+ time.hour.toString()+':'+time.minute.toString() +' 已讀' + '$seen';
+    }
+    else{
+      outputread = time.year.toString() +'-'+ time.month.toString() +'-'+ time.day.toString()+ ' '+ time.hour.toString()+':'+time.minute.toString();
+    }
     List list = <Widget>[
       Container(
         height: 35,
         alignment: Alignment.bottomCenter,
-        child: Text(timeago.format(time),
+        child: Text(outputread ,
             // overflow: TextOverflow.ellipsis,
             maxLines: 5,
             style: TextStyle(
@@ -620,10 +645,10 @@ class _ShortCutChatRoom extends State<ShortCutChatRoom> {
 
 class HandleMessage extends StatelessWidget {
   final QueryDocumentSnapshot document;
-
+  final int seen;
   final FirebaseAuth auth;
 
-  HandleMessage({this.document, this.auth});
+  HandleMessage({this.document, this.auth,this.seen});
 
   @override
   Widget build(BuildContext context) {
@@ -635,6 +660,7 @@ class HandleMessage extends StatelessWidget {
         other:
             document.data()['email'] == auth.currentUser.email ? false : true,
         imageURL: document.data()['content'],
+          seen: seen
       );
     }
     return MessageBox(
@@ -643,6 +669,7 @@ class HandleMessage extends StatelessWidget {
       photoURL: document.data()['photoURL'],
       other: document.data()['email'] == auth.currentUser.email ? false : true,
       text: document.data()['content'],
+      seen: seen
     );
   }
 }
@@ -653,6 +680,7 @@ class ImageBox extends StatelessWidget {
   final String photoURL;
   final String username;
   final DateTime time;
+  final int seen;
 
   ImageBox(
       {Key key,
@@ -660,7 +688,8 @@ class ImageBox extends StatelessWidget {
       @required this.other,
       @required this.photoURL,
       @required this.username,
-      @required this.time})
+      @required this.time,
+        @required this.seen})
       : super(key: key);
 
   @override
@@ -668,10 +697,17 @@ class ImageBox extends StatelessWidget {
     final ThemeData theme = Theme.of(context);
     Image image = Image.network(imageURL, fit: BoxFit.fill);
     double clipSize = 60;
+    String outputread ;
+    if(other == false){
+      outputread = time.year.toString() +'-'+ time.month.toString() +'-'+ time.day.toString()+ ' '+ time.hour.toString()+':'+time.minute.toString() +' 已讀' + '$seen';
+    }
+    else{
+      outputread = time.year.toString() +'-'+ time.month.toString() +'-'+ time.day.toString()+ ' '+ time.hour.toString()+':'+time.minute.toString();
+    }
     List list = <Widget>[
       Container(
         alignment: Alignment.bottomCenter,
-        child: Text(timeago.format(time),
+        child: Text( outputread,
             // overflow: TextOverflow.ellipsis,
             maxLines: 5,
             style: TextStyle(

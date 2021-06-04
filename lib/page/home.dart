@@ -1,12 +1,16 @@
+import 'dart:async';
+
 import 'package:animations/animations.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:convex_bottom_bar/convex_bottom_bar.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flex_color_scheme/flex_color_scheme.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_easyloading/flutter_easyloading.dart';
+import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
@@ -23,6 +27,7 @@ import 'package:firebase_analytics/firebase_analytics.dart';
 import 'dart:io';
 import 'dart:async';
 import 'dart:convert';
+
 
 
 class MyHomePage extends StatefulWidget {
@@ -146,11 +151,11 @@ class _MyHomePageState extends State<MyHomePage> {
     FirebaseMessaging.onMessageOpenedApp.listen((message) {
       print('Message clicked!');
     });
-
   }
 
   Future<void> _messageHandler(RemoteMessage message) async {
     print('background message ${message.notification.body}');
+
   }
 
   void main() async {
@@ -159,11 +164,6 @@ class _MyHomePageState extends State<MyHomePage> {
     FirebaseMessaging.onBackgroundMessage(_messageHandler);
     runApp(MyApp());
   }
-
-
-
-
-
 
 
 
@@ -374,8 +374,6 @@ class _MyHomePageState extends State<MyHomePage> {
   }
 
 
-
-
   List<Widget> createChatContainer(BuildContext context, List snapshot) {
     List<Widget> list = [];
     for (int i = 0; i < snapshot.length; i++) {
@@ -387,8 +385,8 @@ class _MyHomePageState extends State<MyHomePage> {
                 color: Colors.white,
                 icon: Icons.delete_outline,
                 onTap: () => Fluttertoast.showToast(msg: "尚未開發")
-                // _deleteMessage(i),
-                )
+              // _deleteMessage(i),
+            )
           ],
           actionExtentRatio: 1 / 4,
           child: OpenContainer(
@@ -419,7 +417,7 @@ class _MyHomePageState extends State<MyHomePage> {
                   style: TextStyle(fontSize: 30, color: theme.backgroundColor),
                 ),
                 contentPadding:
-                    EdgeInsets.symmetric(vertical: 15.0, horizontal: 0.0),
+                EdgeInsets.symmetric(vertical: 15.0, horizontal: 0.0),
                 subtitle: Text(
                   "壓著往左滑看看",
                   style: TextStyle(color: theme.backgroundColor),
@@ -475,7 +473,7 @@ class _MyHomePageState extends State<MyHomePage> {
                   child: IconButton(
                     alignment: Alignment.centerRight,
                     icon:
-                        const Icon(Icons.person_add_alt, size: 24),
+                    const Icon(Icons.person_add_alt, size: 24),
                     tooltip: 'Add Friend',
                     onPressed: () async {
                       // print("-------add---------");
@@ -687,6 +685,7 @@ class _MyHomePageState extends State<MyHomePage> {
                                 child: Column(
                                   children: <Widget>[
                                     ListTile(
+
                                         leading: Icon(
                                           Icons.add_circle,
                                           color: Colors.white,
@@ -695,10 +694,12 @@ class _MyHomePageState extends State<MyHomePage> {
                                           //Fluttertoast.showToast(msg: "尚未實作");
                                           // _cleanMessage();
                                           /*Navigator.of(context).pop([
+
                                             "sendMessage",
                                             user.email,
                                             map['username']
                                           ]);*/
+
                                           List group = ["sendMessage",user.email,map['username']];
                                           createGroupChat(group);
                                         },
@@ -706,6 +707,7 @@ class _MyHomePageState extends State<MyHomePage> {
                                           "創建群組",
                                           style: TextStyle(color: Colors.white),
                                         ),
+
                                     ),
                                     ListTile(
 
@@ -739,11 +741,11 @@ class _MyHomePageState extends State<MyHomePage> {
                   print("error snapshot");
                   return SliverList(
                       delegate: SliverChildListDelegate([
-                    Container(
-                      height: 100,
-                      child: Text('Something went wrong'),
-                    )
-                  ]));
+                        Container(
+                          height: 100,
+                          child: Text('Something went wrong'),
+                        )
+                      ]));
                 }
 
                 if (snapshot.connectionState == ConnectionState.waiting) {
@@ -828,7 +830,7 @@ class _MyHomePageState extends State<MyHomePage> {
                             builder: (popContext, popState) {
                               return Container(
                                 padding: EdgeInsets.all(10),
-                                height: 76,
+                                height: 160,
                                 width: 200,
                                 color: Colors.black,
                                 alignment: Alignment.center,
@@ -920,7 +922,7 @@ class _MyHomePageState extends State<MyHomePage> {
 
   void _createChat(List list) async {
     CollectionReference chatRoom =
-        FirebaseFirestore.instance.collection("chatRoom");
+    FirebaseFirestore.instance.collection("chatRoom");
     String _roomName = "${userData['username']},${list[2]} Chat";
 
     DocumentReference reference = await chatRoom.add({
@@ -949,7 +951,7 @@ class _MyHomePageState extends State<MyHomePage> {
         var curve = Curves.ease;
 
         var tween =
-            Tween(begin: begin, end: end).chain(CurveTween(curve: curve));
+        Tween(begin: begin, end: end).chain(CurveTween(curve: curve));
         return SlideTransition(
           position: animation.drive(tween),
           child: child,
@@ -1030,41 +1032,41 @@ class MyDrawerHeader extends StatelessWidget {
   Widget build(BuildContext context) {
     return userData['backGroundURL'] != null
         ? DrawerHeader(
-            decoration: BoxDecoration(
-                color: Theme.of(context).colorScheme.secondary,
-                image: DecorationImage(
-                    image: NetworkImage(userData['backGroundURL']),
-                    fit: BoxFit.cover)),
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: <Widget>[
-                FaceImage(
-                  faceURL: userData['photoURL'],
-                ),
-                Divider(),
-                NameText(
-                  userName: userData['username'],
-                  siz: 30,
-                )
-              ],
-            ),
+      decoration: BoxDecoration(
+          color: Theme.of(context).colorScheme.secondary,
+          image: DecorationImage(
+              image: NetworkImage(userData['backGroundURL']),
+              fit: BoxFit.cover)),
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: <Widget>[
+          FaceImage(
+            faceURL: userData['photoURL'],
+          ),
+          Divider(),
+          NameText(
+            userName: userData['username'],
+            siz: 30,
           )
+        ],
+      ),
+    )
         : DrawerHeader(
-            decoration: BoxDecoration(
-                image: DecorationImage(
-                    image: AssetImage("images/2.jpg"), fit: BoxFit.cover)),
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: <Widget>[
-                FaceImage(
-                  faceURL: userData['photoURL'],
-                ),
-                Divider(),
-                NameText(
-                  userName: userData['username'],
-                  siz: 30,
-                )
-              ],
-            ));
+        decoration: BoxDecoration(
+            image: DecorationImage(
+                image: AssetImage("images/2.jpg"), fit: BoxFit.cover)),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: <Widget>[
+            FaceImage(
+              faceURL: userData['photoURL'],
+            ),
+            Divider(),
+            NameText(
+              userName: userData['username'],
+              siz: 30,
+            )
+          ],
+        ));
   }
 }

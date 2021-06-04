@@ -42,7 +42,7 @@ class _MyApp extends State<MyApp> {
     print(usedFlexScheme);
     return MaterialApp(
       builder: EasyLoading.init(),
-      title: 'Flutter Demo',
+      title: 'Message App',
       theme: FlexColorScheme.light(
         colors: myFlexSchemes[themeIndex].light,
         surfaceStyle: FlexSurface.medium,

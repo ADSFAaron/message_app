@@ -1,8 +1,10 @@
+import 'dart:async';
 import 'dart:io';
 import 'dart:async';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:firebase_storage/firebase_storage.dart' as firebase_storage;
 import 'package:flex_color_scheme/flex_color_scheme.dart';
@@ -23,12 +25,11 @@ class ChatPage extends StatefulWidget {
 
   final DocumentSnapshot user;
 
-  ChatPage(
-      {Key key,
-      @required this.user,
-      @required this.roomId,
-      @required this.roomName,
-      @required this.photoURL})
+  ChatPage({Key key,
+    @required this.user,
+    @required this.roomId,
+    @required this.roomName,
+    @required this.photoURL})
       : super(key: key);
 
   @override
@@ -46,8 +47,7 @@ class _ChatPage extends State<ChatPage> {
   List<String> nameRead;
   List<int> checkseen ;//表示有幾個人看過
 
-  _ChatPage(
-      String _roomId, String _roomName, String _url, DocumentSnapshot _data) {
+  _ChatPage(String _roomId, String _roomName, String _url, DocumentSnapshot _data) {
     roomID = _roomId;
     roomName = _roomName;
     photoURL = _url;
@@ -174,7 +174,7 @@ class _ChatPage extends State<ChatPage> {
                 onPressed: () async {
                   await Navigator.of(context)
                       .push(MaterialPageRoute(builder: (context) {
-                        print(photoURL);
+
                     return ChatSetting(
                       roomName: roomName,
                       docId: roomID,
@@ -204,6 +204,7 @@ class _ChatPage extends State<ChatPage> {
                               user:user,
                           );
                         }
+
                     ));
               },
 
@@ -253,6 +254,7 @@ class _ChatPage extends State<ChatPage> {
                                       .collection('messages');
                                   print(index);
                                   final QueryDocumentSnapshot document =
+
                                       snapshot.data.docs[index];
                                       //List temp;
                                       //print(temp);
@@ -303,6 +305,7 @@ class _ChatPage extends State<ChatPage> {
                                         }
                                   if(document.data()['seen']!=null){
                                     return HandleMessage(
+
                                     document: document,
                                     auth: auth,
                                     seen: checkseen[index],
@@ -344,6 +347,7 @@ class _ChatPage extends State<ChatPage> {
                         onPressed: () =>
                             _submitContent(_chatController.text, 'text'))
                   ])),
+
                 ],
               )),
         ));
@@ -358,8 +362,7 @@ class InviteFriend extends StatefulWidget{
   final String friendEmail;
   final DocumentSnapshot user;
 
-  InviteFriend(
-      {Key key,
+  InviteFriend({Key key,
         @required this.user,
         @required this.roomId,
         @required this.roomName,
@@ -396,7 +399,6 @@ class _InviteFriend extends State<InviteFriend> {
   }
 
 
-
   _InviteFriend(String _roomId, String _roomName, String _url,
       DocumentSnapshot _data, String _friendEmail) {
     roomID = _roomId;
@@ -430,38 +432,38 @@ class _InviteFriend extends State<InviteFriend> {
     return new Scaffold(
       appBar: new AppBar(title: Text('添加好友')),
       body: InkWell(
-        onTap: (){
-        },
+        onTap: (){},
         child: Column(
           children: [
             Expanded(
-            child: ListView(
-              children: friend_number.keys.map((String key) {
-                return new CheckboxListTile(
-                  title: Text(key),
-                  value: friend_number[key],
-                  onChanged: (bool value) {
-                    setState(() {
-                      friend_number[key] = value;
-                      //print(friend_number[key]);
-                    });
-                  },
-                  isThreeLine: false,
-                  dense: true,
-                  secondary: Icon(Icons.person),
-                  selected: true,
-                  controlAffinity: ListTileControlAffinity.platform,
-                );
-              }).toList(),
+              child: ListView(
+                children: friend_number.keys.map((String key) {
+                  return new CheckboxListTile(
+                    title: Text(key),
+                    value: friend_number[key],
+                    onChanged: (bool value) {
+                      setState(() {
+                        friend_number[key] = value;
+                        //print(friend_number[key]);
+                      });
+                    },
+                    isThreeLine: false,
+                    dense: true,
+                    secondary: Icon(Icons.person),
+                    selected: true,
+                    controlAffinity: ListTileControlAffinity.platform,
+                  );
+                }).toList(),
 
-            ),
+              ),
             ),
             ElevatedButton(
               child: Text("確認"),
               onPressed: () {
-             addfirend();
-             //print(users);
-             Navigator.of(context).pop();
+
+                addfirend();
+                //print(users);
+                Navigator.of(context).pop();
               },
             ),
           ],
@@ -471,6 +473,7 @@ class _InviteFriend extends State<InviteFriend> {
     );
   }
   void addChatRoom(String _email, String _id, String _roomName) async {
+
 
     DocumentSnapshot document1 = await users.doc(_email).get();
     print(document1);
@@ -534,7 +537,6 @@ class _InviteFriend extends State<InviteFriend> {
 }
 
 
-
 class MessageBox extends StatelessWidget {
   final String text;
   final bool other;
@@ -546,6 +548,7 @@ class MessageBox extends StatelessWidget {
 
   MessageBox(
       {Key key, this.text, this.other, this.photoURL, this.username, this.time, this.seen, this.alreadyRead})
+
       : super(key: key);
 
   @override
@@ -603,7 +606,7 @@ class MessageBox extends StatelessWidget {
             borderRadius: BorderRadius.circular(10),
             color: other
                 ?
-                 theme.colorScheme.secondary : theme.secondaryHeaderColor,
+            theme.colorScheme.secondary : theme.secondaryHeaderColor,
           ),
           padding: EdgeInsets.all(10.0),
           child: Text(text,
@@ -615,22 +618,22 @@ class MessageBox extends StatelessWidget {
       VerticalDivider(),
       photoURL != null
           ? Container(
-              width: clipSize,
-              height: clipSize,
-              alignment: Alignment.center,
-              decoration: BoxDecoration(
-                  shape: BoxShape.circle,
-                  image: DecorationImage(image: NetworkImage(photoURL))))
+          width: clipSize,
+          height: clipSize,
+          alignment: Alignment.center,
+          decoration: BoxDecoration(
+              shape: BoxShape.circle,
+              image: DecorationImage(image: NetworkImage(photoURL))))
           : Container(
-              width: clipSize,
-              height: clipSize,
-              alignment: Alignment.bottomCenter,
-              child: CircleAvatar(
-                  backgroundColor:
-                      other ? theme.colorScheme.secondary : theme.primaryColor,
-                  radius: 35,
-                  child: Icon(Icons.person,
-                      size: 30, color: theme.backgroundColor))),
+          width: clipSize,
+          height: clipSize,
+          alignment: Alignment.bottomCenter,
+          child: CircleAvatar(
+              backgroundColor:
+              other ? theme.colorScheme.secondary : theme.primaryColor,
+              radius: 35,
+              child: Icon(Icons.person,
+                  size: 30, color: theme.backgroundColor))),
     ];
 
     if(insertRead)
@@ -641,7 +644,7 @@ class MessageBox extends StatelessWidget {
         child: Row(
             verticalDirection: VerticalDirection.up,
             mainAxisAlignment:
-                other ? MainAxisAlignment.start : MainAxisAlignment.end,
+            other ? MainAxisAlignment.start : MainAxisAlignment.end,
             children: other ? list.reversed.toList() : list));
   }
 }
@@ -718,7 +721,7 @@ class HandleMessage extends StatelessWidget {
         time: document.data()['time'].toDate(),
         photoURL: document.data()['photoURL'],
         other:
-            document.data()['email'] == auth.currentUser.email ? false : true,
+        document.data()['email'] == auth.currentUser.email ? false : true,
         imageURL: document.data()['content'],
           seen: seen
       );
@@ -751,6 +754,7 @@ class ImageBox extends StatelessWidget {
       @required this.username,
       @required this.time,
         @required this.seen})
+
       : super(key: key);
 
   @override
@@ -783,22 +787,22 @@ class ImageBox extends StatelessWidget {
       VerticalDivider(),
       photoURL != null
           ? Container(
-              width: clipSize,
-              height: clipSize,
-              alignment: Alignment.bottomCenter,
-              decoration: BoxDecoration(
-                  shape: BoxShape.circle,
-                  image: DecorationImage(image: NetworkImage(photoURL))))
+          width: clipSize,
+          height: clipSize,
+          alignment: Alignment.bottomCenter,
+          decoration: BoxDecoration(
+              shape: BoxShape.circle,
+              image: DecorationImage(image: NetworkImage(photoURL))))
           : Container(
-              width: clipSize,
-              height: clipSize,
-              alignment: Alignment.bottomCenter,
-              child: CircleAvatar(
-                  backgroundColor:
-                      other ? theme.colorScheme.secondary : theme.primaryColor,
-                  radius: 35,
-                  child: Icon(Icons.person,
-                      size: 30, color: theme.backgroundColor))),
+          width: clipSize,
+          height: clipSize,
+          alignment: Alignment.bottomCenter,
+          child: CircleAvatar(
+              backgroundColor:
+              other ? theme.colorScheme.secondary : theme.primaryColor,
+              radius: 35,
+              child: Icon(Icons.person,
+                  size: 30, color: theme.backgroundColor))),
     ];
 
     // print(timeago.format(time));
@@ -807,7 +811,7 @@ class ImageBox extends StatelessWidget {
         child: Row(
             verticalDirection: VerticalDirection.up,
             mainAxisAlignment:
-                other ? MainAxisAlignment.start : MainAxisAlignment.end,
+            other ? MainAxisAlignment.start : MainAxisAlignment.end,
             children: other ? list.reversed.toList() : list));
   }
 }

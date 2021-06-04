@@ -21,6 +21,13 @@ import 'package:message_app/page/chat/chat.dart';
 import 'chat/chat.dart';
 import 'person.dart';
 import 'setting.dart';
+import 'package:flutter_local_notifications/flutter_local_notifications.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
+import 'package:firebase_analytics/firebase_analytics.dart';
+import 'dart:io';
+import 'dart:async';
+import 'dart:convert';
+
 
 
 class MyHomePage extends StatefulWidget {
@@ -67,7 +74,6 @@ class _MyHomePageState extends State<MyHomePage> {
     @required this.onSchemeChanged,
     @required this.flexSchemeData,
   });
-
   final ThemeMode themeMode;
   final ValueChanged<ThemeMode> onThemeModeChanged;
   final int schemeIndex;
@@ -149,6 +155,7 @@ class _MyHomePageState extends State<MyHomePage> {
 
   Future<void> _messageHandler(RemoteMessage message) async {
     print('background message ${message.notification.body}');
+
   }
 
   void main() async {
@@ -157,6 +164,8 @@ class _MyHomePageState extends State<MyHomePage> {
     FirebaseMessaging.onBackgroundMessage(_messageHandler);
     runApp(MyApp());
   }
+
+
 
 
   @override
@@ -676,25 +685,29 @@ class _MyHomePageState extends State<MyHomePage> {
                                 child: Column(
                                   children: <Widget>[
                                     ListTile(
-                                      leading: Icon(
-                                        Icons.add_circle,
-                                        color: Colors.white,
-                                      ),
-                                      onTap: () {
-                                        //Fluttertoast.showToast(msg: "尚未實作");
-                                        // _cleanMessage();
-                                        /*Navigator.of(context).pop([
+
+                                        leading: Icon(
+                                          Icons.add_circle,
+                                          color: Colors.white,
+                                        ),
+                                        onTap: () {
+                                          //Fluttertoast.showToast(msg: "尚未實作");
+                                          // _cleanMessage();
+                                          /*Navigator.of(context).pop([
+
                                             "sendMessage",
                                             user.email,
                                             map['username']
                                           ]);*/
-                                        List group = ["sendMessage",user.email,map['username']];
-                                        createGroupChat(group);
-                                      },
-                                      title: Text(
-                                        "創建群組",
-                                        style: TextStyle(color: Colors.white),
-                                      ),
+
+                                          List group = ["sendMessage",user.email,map['username']];
+                                          createGroupChat(group);
+                                        },
+                                        title: Text(
+                                          "創建群組",
+                                          style: TextStyle(color: Colors.white),
+                                        ),
+
                                     ),
                                     ListTile(
 
@@ -918,7 +931,7 @@ class _MyHomePageState extends State<MyHomePage> {
       'friendChat': true,
       'photoURL': null,
     });
-
+    //reference.get().then((value) => value.data()['username']);
     //TODO 把雙方的聊天室增加這個剛健的聊天室
     //用function才會跑得比較快 同時跑兩個
     addChatRoom(user.email, reference.id, _roomName);

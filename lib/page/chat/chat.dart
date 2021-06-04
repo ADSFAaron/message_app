@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'dart:io';
+import 'dart:async';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -12,6 +13,7 @@ import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:message_app/page/chat/chatSetting.dart';
 import 'package:timeago/timeago.dart' as timeago;
+import 'package:firebase_core/firebase_core.dart';
 
 //TODO
 //TODO 建 subDocument
@@ -42,6 +44,9 @@ class _ChatPage extends State<ChatPage> {
 
   DocumentSnapshot user;
 
+  List<String> nameRead;
+  List<int> checkseen ;//表示有幾個人看過
+
   _ChatPage(String _roomId, String _roomName, String _url, DocumentSnapshot _data) {
     roomID = _roomId;
     roomName = _roomName;
@@ -52,6 +57,7 @@ class _ChatPage extends State<ChatPage> {
   void initState() {
     super.initState();
     auth = FirebaseAuth.instance;
+
   }
 
   final TextEditingController _chatController = TextEditingController();
@@ -78,7 +84,6 @@ class _ChatPage extends State<ChatPage> {
 
     Navigator.of(context).pop();
   }
-
   void myBottomSheet(BuildContext context) {
     File _image;
     final picker = ImagePicker();
@@ -127,6 +132,18 @@ class _ChatPage extends State<ChatPage> {
     if (content == '') return;
     _chatController.clear(); // 清空controller資料
     // print(roomID);
+    Map<String, bool> seen={};
+    CollectionReference chatRoom =
+    FirebaseFirestore.instance.collection("chatRoom");
+    DocumentSnapshot document = await chatRoom.doc(roomID).get();
+    for(int i = 0;i<document.data()['member'].length;i++){
+
+      if(document.data()['member'][i] != user.data()['email']) {
+        seen.addAll({
+          "${document.data()['member'][i]}": false
+        });
+      }
+    }
     await FirebaseFirestore.instance
         .collection('chatRoom')
         .doc(roomID)
@@ -137,12 +154,15 @@ class _ChatPage extends State<ChatPage> {
       'userName': user.data()['username'],
       'content': content,
       'time': Timestamp.now(),
-      'type': type
+      'type': type,
+      'seen': seen,
     });
+
     setState(() {});
   }
 
   Widget build(BuildContext context) {
+    //print(checkseen);
     final ThemeData theme = Theme.of(context);
     return Scaffold(
         appBar: AppBar(
@@ -154,7 +174,7 @@ class _ChatPage extends State<ChatPage> {
                 onPressed: () async {
                   await Navigator.of(context)
                       .push(MaterialPageRoute(builder: (context) {
-                    print(photoURL);
+
                     return ChatSetting(
                       roomName: roomName,
                       docId: roomID,
@@ -172,17 +192,19 @@ class _ChatPage extends State<ChatPage> {
                   });
                 }),
             IconButton(
-              icon: Icon(Icons.people_alt, size: 28),
+              icon: Icon(Icons.menu, size: 28),
               onPressed: () async {
-                await Navigator.of(context)
-                    .push(MaterialPageRoute(builder: (context) {
-                  return InviteFriend(
-                    roomId: roomID,
-                    roomName: roomName,
-                    photoURL: photoURL,
-                    user: user,
-                  );
-                }
+                await Navigator.of(context).push(
+                    MaterialPageRoute(builder: (context)
+                        {
+                          return InviteFriend(
+                              roomId: roomID,
+                              roomName:roomName,
+                              photoURL:photoURL,
+                              user:user,
+                          );
+                        }
+
                     ));
               },
 
@@ -214,18 +236,89 @@ class _ChatPage extends State<ChatPage> {
                             }
                             // print();
                             final int commentCount = snapshot.data.docs.length;
+                            print('輸出型別');
+                            print(nameRead.runtimeType);
+                            print(checkseen.runtimeType);
+                            nameRead = List<String>(commentCount);
+                            checkseen = List(commentCount);//給List一個長度
                             if (commentCount > 0) {
                               return ListView.builder(
                                 padding: EdgeInsets.all(8.0),
                                 reverse: true,
                                 // 加入reverse，讓它反轉
                                 itemBuilder: (context, index) {
+                                  CollectionReference chatRoom =
+                                  FirebaseFirestore.instance
+                                      .collection('chatRoom')
+                                      .doc(roomID)
+                                      .collection('messages');
+                                  print(index);
                                   final QueryDocumentSnapshot document =
-                                  snapshot.data.docs[index];
-                                  return HandleMessage(
+
+                                      snapshot.data.docs[index];
+                                      //List temp;
+                                      //print(temp);
+                                      if(checkseen[index] == null) { // 初始化目前訊息已讀人數為0
+                                        checkseen[index] = 0;
+                                        nameRead[index] = "";
+                                      }
+                                      //print(document.id);
+                                        if(user.data()['photoURL'] != "null") {
+                                          //print('2');
+                                          /*print(List.from(
+                                              document.data()['photoURL']));*/
+                                         /* print(document.data()['photoURL']);
+                                          print(user.data()['username']);
+                                          print(document.data()['userName']);*/
+                                          //String a = user.data()['photoURL'];
+
+                                          if(document.data()['userName'] == user.data()['username'] ) {
+                                              chatRoom.doc(document.id).update(
+                                                  {'photoURL': user.data()['photoURL']});
+                                          }
+                                          int k = 0;
+                                          if(document.data()['seen']!=null){
+                                            var cloneMapSeen = document.data()['seen'];
+                                            for (var kk in document.data()['seen'].keys) {
+                                                //int k = 0;
+                                                if(kk == user.data()['email']) {
+                                                  cloneMapSeen[kk] = true;
+                                                }
+                                                if(cloneMapSeen[kk]) {
+                                                  checkseen[index] += 1;
+                                                  //print(checkseen.runtimeType);
+                                                  //print(kk.runtimeType);
+                                                  for (var i = 0; i< user.data()['friend'].length;i++) {
+                                                    if(kk == user.data()['friend'][i]['email'] ) {
+                                                      nameRead[k] = user.data()['friend'][i]['username'];
+                                                      k+=1;
+                                                      print("this is k");
+                                                      print(k);
+                                                    }
+                                                  }
+                                                }
+
+                                            }
+                                            chatRoom.doc(document.id).update(
+                                                {'seen': cloneMapSeen});
+                                          }
+                                        }
+                                  if(document.data()['seen']!=null){
+                                    return HandleMessage(
+
                                     document: document,
                                     auth: auth,
-                                  );
+                                    seen: checkseen[index],
+                                    alreadyRead: nameRead,
+                                    );
+                                  }
+                                  else {
+                                    return HandleMessage(
+                                      document: document,
+                                      auth: auth,
+
+                                    );
+                                  }
                                 },
                                 itemCount: commentCount,
                               );
@@ -236,24 +329,25 @@ class _ChatPage extends State<ChatPage> {
                           })),
                   SafeArea(
                       child: Row(children: [
-                        IconButton(
-                            icon: Icon(Icons.expand_less),
-                            onPressed: () => myBottomSheet(context)),
-                        Flexible(
-                            child: TextField(
-                              decoration: InputDecoration(
-                                contentPadding: EdgeInsets.all(16.0),
-                                border: OutlineInputBorder(),
-                                hintText: '輸入文字',
-                              ),
-                              controller: _chatController,
-                              // onSubmitted: _submitText, // 綁定事件給_submitText這個Function
-                            )),
-                        IconButton(
-                            icon: Icon(Icons.send),
-                            onPressed: () =>
-                                _submitContent(_chatController.text, 'text'))
-                      ])),
+                    IconButton(
+                        icon: Icon(Icons.expand_less),
+                        onPressed: () => myBottomSheet(context)),
+                    Flexible(
+                        child: TextField(
+                      decoration: InputDecoration(
+                        contentPadding: EdgeInsets.all(16.0),
+                        border: OutlineInputBorder(),
+                        hintText: '輸入文字',
+                      ),
+                      controller: _chatController,
+                      // onSubmitted: _submitText, // 綁定事件給_submitText這個Function
+                    )),
+                    IconButton(
+                        icon: Icon(Icons.send),
+                        onPressed: () =>
+                            _submitContent(_chatController.text, 'text'))
+                  ])),
+
                 ],
               )),
         ));
@@ -269,13 +363,12 @@ class InviteFriend extends StatefulWidget{
   final DocumentSnapshot user;
 
   InviteFriend({Key key,
-    @required this.user,
-    @required this.roomId,
-    @required this.roomName,
-    @required this.photoURL,
-    @required this.friendEmail})
-      : super(key: key);
-
+        @required this.user,
+        @required this.roomId,
+        @required this.roomName,
+        @required this.photoURL,
+        @required this.friendEmail})
+       : super(key: key);
   @override
   _InviteFriend createState() => _InviteFriend(roomId, roomName, photoURL, user,friendEmail);
 }
@@ -300,7 +393,6 @@ class _InviteFriend extends State<InviteFriend> {
     });
     users = FirebaseFirestore.instance.collection('users');
   }
-
   void initState() {
     initFirebase();
     super.initState();
@@ -323,10 +415,11 @@ class _InviteFriend extends State<InviteFriend> {
     //print(user.data());
     //print(roomID);
     //print(roomName);
-    // print(photoURL);
+   // print(photoURL);
 
     //print(friend.length);
     if(count == 0) {
+
       friend = user.data()['friend'];
       for (int i = 0; i < friend.length; i++) {
         friend_number.addAll({
@@ -367,6 +460,7 @@ class _InviteFriend extends State<InviteFriend> {
             ElevatedButton(
               child: Text("確認"),
               onPressed: () {
+
                 addfirend();
                 //print(users);
                 Navigator.of(context).pop();
@@ -378,8 +472,9 @@ class _InviteFriend extends State<InviteFriend> {
 
     );
   }
-
   void addChatRoom(String _email, String _id, String _roomName) async {
+
+
     DocumentSnapshot document1 = await users.doc(_email).get();
     print(document1);
     List<Map<String, dynamic>> list = List.from(document1.data()['chatRoom']);
@@ -393,7 +488,7 @@ class _InviteFriend extends State<InviteFriend> {
       users.doc(_email).update({"chatRoom": list});
     }
     catch(e){
-      print('1');
+     print('1');
     }
     print('3');
   }
@@ -413,6 +508,7 @@ class _InviteFriend extends State<InviteFriend> {
       }
 
       print(document.data()['member'][i]);
+
     }
 
     if(notInTheRoom){
@@ -447,19 +543,57 @@ class MessageBox extends StatelessWidget {
   final String photoURL;
   final String username;
   final DateTime time;
+  final int seen;
+  final List<String> alreadyRead;
 
-  MessageBox({Key key, this.text, this.other, this.photoURL, this.username, this.time})
+  MessageBox(
+      {Key key, this.text, this.other, this.photoURL, this.username, this.time, this.seen, this.alreadyRead})
+
       : super(key: key);
 
   @override
   Widget build(BuildContext context) {
     final ThemeData theme = Theme.of(context);
     double clipSize = 60;
+    String outputTime;
+    String outputRead ="";
+    bool insertRead = false;
+    Widget  seenW;
+    List<Widget> TextListTile = List<Widget>(seen);
+
+    outputTime =/*time.year.toString() +'-'+*/ time.month.toString() +'/'+ time.day.toString()+ ' '+ (time.add(const Duration(hours : 8)).hour.toString())+':'+time.minute.toString();
+    if(other == false && seen!= 0){
+      outputRead = ' 已讀 $seen';
+      insertRead = true;
+      for (var i = 0 ; i<seen;i++) {
+        TextListTile[i] = ListTile(
+          title: Text(alreadyRead[i],
+            style: TextStyle(
+              fontSize: 12.0,
+            ),
+          ),
+        );
+      }
+      seenW= Container(
+        width: 150.0,
+        //color: Colors.amber[600],
+        child:ExpansionTile(
+          title: Text(outputRead,
+              style: TextStyle(
+                fontSize: 12.0,
+              ),
+          ),
+          trailing: Icon(null),
+          children :  TextListTile,
+        ),
+      );
+    }
+    print(outputRead);
     List list = <Widget>[
       Container(
         height: 35,
         alignment: Alignment.bottomCenter,
-        child: Text(timeago.format(time),
+        child: Text(outputTime ,
             // overflow: TextOverflow.ellipsis,
             maxLines: 5,
             style: TextStyle(
@@ -502,6 +636,8 @@ class MessageBox extends StatelessWidget {
                   size: 30, color: theme.backgroundColor))),
     ];
 
+    if(insertRead)
+      list.insert(0,seenW );
     // print(timeago.format(time));
     return Container(
         margin: const EdgeInsets.symmetric(vertical: 10.0),
@@ -571,10 +707,11 @@ class _ShortCutChatRoom extends State<ShortCutChatRoom> {
 
 class HandleMessage extends StatelessWidget {
   final QueryDocumentSnapshot document;
-
+  final int seen;
+  final List<String> alreadyRead;
   final FirebaseAuth auth;
 
-  HandleMessage({this.document, this.auth});
+  HandleMessage({this.document, this.auth,this.seen, this.alreadyRead});
 
   @override
   Widget build(BuildContext context) {
@@ -586,6 +723,7 @@ class HandleMessage extends StatelessWidget {
         other:
         document.data()['email'] == auth.currentUser.email ? false : true,
         imageURL: document.data()['content'],
+          seen: seen
       );
     }
     return MessageBox(
@@ -594,6 +732,8 @@ class HandleMessage extends StatelessWidget {
       photoURL: document.data()['photoURL'],
       other: document.data()['email'] == auth.currentUser.email ? false : true,
       text: document.data()['content'],
+      seen: seen,
+      alreadyRead:alreadyRead ,
     );
   }
 }
@@ -604,13 +744,17 @@ class ImageBox extends StatelessWidget {
   final String photoURL;
   final String username;
   final DateTime time;
+  final int seen;
 
-  ImageBox({Key key,
-    @required this.imageURL,
-    @required this.other,
-    @required this.photoURL,
-    @required this.username,
-    @required this.time})
+  ImageBox(
+      {Key key,
+      @required this.imageURL,
+      @required this.other,
+      @required this.photoURL,
+      @required this.username,
+      @required this.time,
+        @required this.seen})
+
       : super(key: key);
 
   @override
@@ -618,10 +762,17 @@ class ImageBox extends StatelessWidget {
     final ThemeData theme = Theme.of(context);
     Image image = Image.network(imageURL, fit: BoxFit.fill);
     double clipSize = 60;
+    String outputread ;
+    if(other == false){
+      outputread = time.year.toString() +'-'+ time.month.toString() +'-'+ time.day.toString()+ ' '+ time.hour.toString()+':'+time.minute.toString() +' 已讀' + '$seen';
+    }
+    else{
+      outputread = time.year.toString() +'-'+ time.month.toString() +'-'+ time.day.toString()+ ' '+ time.hour.toString()+':'+time.minute.toString();
+    }
     List list = <Widget>[
       Container(
         alignment: Alignment.bottomCenter,
-        child: Text(timeago.format(time),
+        child: Text( outputread,
             // overflow: TextOverflow.ellipsis,
             maxLines: 5,
             style: TextStyle(
